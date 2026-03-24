@@ -185,13 +185,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
 .ct{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;}
 .cm{font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
-/* ── MARKET CHART TABS ── */
-.market-tab{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;font-weight:500;padding:4px 10px;cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap;}
-.market-tab:hover{color:var(--text);border-color:var(--border2);}
-.market-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
-.market-tf{background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text3);font-size:10px;font-weight:500;padding:3px 7px;cursor:pointer;font-family:var(--mono);transition:all .15s;}
-.market-tf:hover{color:var(--text);border-color:var(--border2);}
-.market-tf.active{background:var(--bg4);color:var(--text);border-color:var(--border2);}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
 .tc{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
 .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
@@ -488,6 +481,7 @@ select.fi option{background:var(--bg3);}
   <div class="ni" id="nav-analytics"><span class="nic">◎</span>Analytics</div>
   <div class="ni" id="nav-calendar"><span class="nic">▦</span>Calendar</div>
   <div class="ni" id="nav-ftmo"><span class="nic">🏢</span>PropFirm</div>
+  <div class="ni" id="nav-finance" style="display:none"><span class="nic">💰</span>Finance</div>
 
   <div class="sbf" id="sbf">
     <span class="sync-dot" id="sync-dot"></span>
@@ -612,41 +606,6 @@ select.fi option{background:var(--bg3);}
         <div id="donut-empty" style="display:none;text-align:center;padding:8px 0 4px;font-size:12px;color:var(--text3)">Belum ada trade di periode ini</div>
       </div>
     </div>
-
-    <!-- ── MARKET CHART WIDGET ── -->
-    <div class="cc" style="margin-top:16px;padding:0;overflow:hidden">
-      <div class="ch" style="padding:14px 18px 12px;border-bottom:1px solid var(--border);margin-bottom:0">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <div class="ct" style="flex-shrink:0">📊 Market Chart</div>
-          <!-- Asset selector buttons -->
-          <div id="market-asset-tabs" style="display:flex;gap:5px;flex-wrap:wrap">
-            <button class="market-tab active" data-symbol="BITSTAMP:BTCUSD" data-label="BTC/USD">₿ BTC/USD</button>
-            <button class="market-tab" data-symbol="BITSTAMP:ETHUSD" data-label="ETH/USD">Ξ ETH/USD</button>
-            <button class="market-tab" data-symbol="TVC:GOLD" data-label="XAU/USD">🥇 XAU/USD</button>
-            <button class="market-tab" data-symbol="FX:EURUSD" data-label="EUR/USD">€ EUR/USD</button>
-            <button class="market-tab" data-symbol="NASDAQ:NDX" data-label="NASDAQ">📈 NASDAQ</button>
-          </div>
-          <!-- Timeframe selector -->
-          <div id="market-tf-tabs" style="display:flex;gap:4px;margin-left:auto;flex-wrap:wrap">
-            <button class="market-tf active" data-tf="1">1m</button>
-            <button class="market-tf" data-tf="5">5m</button>
-            <button class="market-tf" data-tf="15">15m</button>
-            <button class="market-tf" data-tf="60">1H</button>
-            <button class="market-tf" data-tf="D">1D</button>
-            <button class="market-tf" data-tf="W">1W</button>
-          </div>
-        </div>
-      </div>
-      <div id="market-chart-wrap" style="height:400px;position:relative;background:#0e0e10">
-        <iframe id="market-chart-iframe"
-          src=""
-          style="width:100%;height:100%;border:none;display:block"
-          allowtransparency="true"
-          scrolling="no">
-        </iframe>
-      </div>
-    </div>
-
   </div>
 
   <!-- JOURNAL -->
@@ -801,6 +760,104 @@ select.fi option{background:var(--bg3);}
       <div class="ftc"><div class="ftl">Status</div><div class="ftv" id="ftst" style="font-size:14px">🔄 In Progress</div><div class="ftli" id="ftstsb">Keep going</div></div>
     </div>
     <div class="cc"><div class="ch"><div class="ct" id="prop-chart-title">Equity vs PropFirm Limits</div></div><div style="position:relative;height:200px"><canvas id="ftC"></canvas></div></div>
+  </div>
+
+  <!-- ══ FINANCE PAGE ══ -->
+  <div class="page" id="page-finance">
+    <div class="ph">
+      <div>
+        <div class="pt">Business Finance</div>
+        <div class="ps" id="fin-ps">Keuangan bisnis — hanya kamu yang bisa lihat</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <div id="fin-sync-status" style="font-size:11px;color:var(--text3);font-family:var(--mono);display:flex;align-items:center;gap:5px">
+          <span class="sync-dot" id="fin-sync-dot"></span>
+          <span id="fin-sync-txt">–</span>
+        </div>
+        <button class="btn bsm" id="fin-sync-btn">↻ Sync Notion</button>
+      </div>
+    </div>
+
+    <!-- Period tabs -->
+    <div style="margin-bottom:16px">
+      <div class="period-tabs" id="fin-period-tabs">
+        <button class="ptab active" data-fperiod="all">Semua</button>
+        <button class="ptab" data-fperiod="7">7 Hari</button>
+        <button class="ptab" data-fperiod="30">30 Hari</button>
+        <button class="ptab" data-fperiod="180">6 Bulan</button>
+        <button class="ptab" data-fperiod="365">1 Tahun</button>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px">
+      <div class="sc">
+        <div class="sl">Total Pemasukan</div>
+        <div class="sv pos" id="fin-income">Rp 0</div>
+        <div class="sch" id="fin-income-sub">0 transaksi</div>
+      </div>
+      <div class="sc">
+        <div class="sl">Profit Bersih</div>
+        <div class="sv" id="fin-profit">Rp 0</div>
+        <div class="sch neu" id="fin-profit-sub">periode ini</div>
+      </div>
+      <div class="sc">
+        <div class="sl">Avg / Bulan</div>
+        <div class="sv neu" id="fin-avg">Rp 0</div>
+        <div class="sch neu">rata-rata pemasukan</div>
+      </div>
+      <div class="sc">
+        <div class="sl">Transaksi</div>
+        <div class="sv neu" id="fin-count">0</div>
+        <div class="sch neu" id="fin-count-sub">total entry</div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="g2" style="margin-bottom:16px">
+      <!-- Line chart: trend pemasukan -->
+      <div class="cc" style="margin-bottom:0">
+        <div class="ch">
+          <div class="ct">Trend Pemasukan</div>
+          <div class="cm" id="fin-line-meta">–</div>
+        </div>
+        <div style="position:relative;height:180px"><canvas id="finLineC"></canvas></div>
+      </div>
+      <!-- Bar chart: per kategori -->
+      <div class="cc" style="margin-bottom:0">
+        <div class="ch">
+          <div class="ct">Pemasukan per Kategori</div>
+        </div>
+        <div style="position:relative;height:180px"><canvas id="finBarC"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Transaction table -->
+    <div class="tc">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div style="font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.5px">Riwayat Transaksi</div>
+        <select class="fsel" id="fin-filter-jenis">
+          <option value="">Semua</option>
+          <option value="Pemasukan">Pemasukan</option>
+          <option value="Pengeluaran">Pengeluaran</option>
+        </select>
+      </div>
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>Tanggal</th>
+            <th>Nama</th>
+            <th>Jenis</th>
+            <th>Kategori</th>
+            <th>Nominal</th>
+            <th>Status</th>
+            <th>Keterangan</th>
+          </tr></thead>
+          <tbody id="fin-tbody"></tbody>
+        </table>
+      </div>
+      <div class="es" id="fin-empty" style="display:block">Belum ada data — klik <strong style="color:var(--accent)">Sync Notion</strong> untuk memuat transaksi.</div>
+    </div>
   </div>
 
   <!-- ANON UPGRADE BANNER — shown inside main for anonymous users -->
@@ -1087,7 +1144,7 @@ import { getAuth, signOut, onAuthStateChanged,
          sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, collection,
-         addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy }
+         addDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, getDocs }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 // ── INVITE CHECK ───────────────────────────────────────
@@ -1657,6 +1714,8 @@ onAuthStateChanged(auth, async user => {
     setAnonUI(false); // hide anon banner
     await loadUserProfile(user);
     listenTrades(user.uid);
+    updateFinanceNav();
+    if (isOwner()) listenFinance();
     if (pendingAction === 'openTrade') {
       pendingAction = null;
       setTimeout(() => openTrade(), 600);
@@ -1674,6 +1733,8 @@ onAuthStateChanged(auth, async user => {
       trades = []; bal = 0;
       updateGuestUI();
       setAnonUI(false);
+      $('nav-finance').style.display = 'none';
+      finTrades = [];
     }
     closeLoginScreen();
   }
@@ -1924,12 +1985,12 @@ function goPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
   $('page-' + name).classList.add('active');
-  $('nav-' + name).classList.add('active');
-  // Save active page so refresh restores same tab
+  if ($('nav-' + name)) $('nav-' + name).classList.add('active');
   try { sessionStorage.setItem('tl_page', name); } catch(e) {}
   if (name === 'analytics') renderAna();
   if (name === 'calendar')  renderCal();
   if (name === 'ftmo')      renderFtmo();
+  if (name === 'finance')   renderFinance();
   if (isMob()) closeSB();
 }
 ['dashboard','journal','analytics','calendar','ftmo'].forEach(name => {
@@ -1940,7 +2001,7 @@ function goPage(name) {
 function restorePage() {
   try {
     const saved = sessionStorage.getItem('tl_page');
-    if (saved && ['dashboard','journal','analytics','calendar','ftmo'].includes(saved)) {
+    if (saved && ['dashboard','journal','analytics','calendar','ftmo','finance'].includes(saved)) {
       goPage(saved);
     }
   } catch(e) {}
@@ -2543,64 +2604,6 @@ function renderAna(){
   rCh=new Chart($('rC').getContext('2d'),{type:'line',data:{labels:rL,datasets:[{data:rD,borderColor:'#7c6af7',backgroundColor:'rgba(124,106,247,.08)',borderWidth:2,fill:true,tension:.3,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:'#7c6af7',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2}]},options:rOpts});
 }
 
-// ── MARKET CHART WIDGET ──────────────────────────────
-(function(){
-  let activeSymbol = 'BITSTAMP:BTCUSD';
-  let activeTf = '1';
-
-  function buildSrc(symbol, interval){
-    return `https://s.tradingview.com/widgetembed/?frameElementId=market-chart-iframe`
-      + `&symbol=${encodeURIComponent(symbol)}`
-      + `&interval=${interval}`
-      + `&hidesidetoolbar=1`
-      + `&hidetoptoolbar=0`
-      + `&symboledit=1`
-      + `&saveimage=0`
-      + `&toolbarbg=0e0e10`
-      + `&studies=[]`
-      + `&theme=dark`
-      + `&style=1`
-      + `&timezone=Asia%2FJakarta`
-      + `&studies_overrides={}`
-      + `&overrides={}`
-      + `&enabled_features=[]`
-      + `&disabled_features=[]`
-      + `&utm_source=riskpertrade.app`
-      + `&utm_medium=widget`
-      + `&utm_campaign=chart`;
-  }
-
-  function updateChart(){
-    const iframe = document.getElementById('market-chart-iframe');
-    if(iframe) iframe.src = buildSrc(activeSymbol, activeTf);
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    // Asset tab clicks
-    document.getElementById('market-asset-tabs').addEventListener('click', function(e){
-      const btn = e.target.closest('.market-tab');
-      if(!btn) return;
-      document.querySelectorAll('.market-tab').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      activeSymbol = btn.dataset.symbol;
-      updateChart();
-    });
-
-    // Timeframe tab clicks
-    document.getElementById('market-tf-tabs').addEventListener('click', function(e){
-      const btn = e.target.closest('.market-tf');
-      if(!btn) return;
-      document.querySelectorAll('.market-tf').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      activeTf = btn.dataset.tf;
-      updateChart();
-    });
-
-    // Initial load
-    updateChart();
-  });
-})();
-
 // ── CALENDAR ──────────────────────────────────────────
 function renderCal(){
   const now=new Date(), d=new Date(now.getFullYear(), now.getMonth()+calOff, 1);
@@ -2738,6 +2741,241 @@ function renderFtmo(){
     {label:'Target',data:eFull.map(()=>bal+pt),borderColor:'rgba(0,217,126,.5)',borderWidth:1,borderDash:[4,4],fill:false,pointRadius:0,pointHoverRadius:4,pointHoverBackgroundColor:'#00d97e'},
   ]},options:ftOpts});
 }
+
+// ══════════════════════════════════════════════════════
+// ── FINANCE MODULE ─────────────────────────────────────
+// ══════════════════════════════════════════════════════
+
+// ── CONFIG ────────────────────────────────────────────
+// IMPORTANT: Replace with your actual values
+const OWNER_UID      = 'PASTE_YOUR_UID_HERE';       // ← GANTI dengan UID dari Firebase Console → Authentication → Users
+const NOTION_DB_ID   = '78871cf626784eb99004527cb4e2845d'; // Finance database ID
+const NOTION_API_KEY = 'PASTE_YOUR_NOTION_TOKEN_HERE';     // Notion integration token
+const NOTION_PROXY   = 'https://api.notion.com/v1';        // via Make.com proxy or direct
+
+// ── STATE ─────────────────────────────────────────────
+let finTrades  = [];   // all finance records
+let finPeriod  = 'all';
+let finLineC, finBarC;
+
+// ── IS OWNER ──────────────────────────────────────────
+function isOwner() {
+  if (!currentUser) return false;
+  // Primary check: UID (set OWNER_UID above)
+  if (OWNER_UID !== 'PASTE_YOUR_UID_HERE') {
+    return currentUser.uid === OWNER_UID;
+  }
+  // Fallback: email check while UID not yet set
+  return currentUser.email === 'aneregy09@gmail.com';
+}
+
+// Show Finance nav only for owner
+function updateFinanceNav() {
+  $('nav-finance').style.display = isOwner() ? 'flex' : 'none';
+}
+
+// ── PERIOD FILTER ─────────────────────────────────────
+function getFinTrades() {
+  if (finPeriod === 'all') return finTrades;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - parseInt(finPeriod));
+  const cs = cutoff.toISOString().slice(0,10);
+  return finTrades.filter(t => t.tanggal >= cs);
+}
+
+// ── FORMAT RUPIAH ─────────────────────────────────────
+function fRp(n) {
+  return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
+
+// ── SYNC FROM NOTION ──────────────────────────────────
+async function syncFromNotion() {
+  if (!isOwner()) return;
+  const dot = $('fin-sync-dot');
+  const txt = $('fin-sync-txt');
+  dot.className = 'sync-dot syncing';
+  txt.textContent = 'Syncing…';
+  $('fin-sync-btn').disabled = true;
+
+  try {
+    // Call Notion API via fetch (CORS proxy needed in production)
+    // For now we read from Firestore (written by Make.com automation)
+    const snap = await getDocs(
+      query(
+        collection(db, 'finance', OWNER_UID, 'transactions'),
+        orderBy('tanggal', 'desc')
+      )
+    );
+    finTrades = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Save last sync time
+    await setDoc(doc(db, 'finance', OWNER_UID), {
+      lastSync: new Date().toISOString()
+    }, { merge: true });
+
+    dot.className = 'sync-dot';
+    txt.textContent = 'Synced ' + new Date().toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'});
+    renderFinance();
+  } catch(e) {
+    dot.className = 'sync-dot error';
+    txt.textContent = 'Sync gagal';
+    console.error('Finance sync error:', e);
+  }
+  $('fin-sync-btn').disabled = false;
+}
+
+// ── LISTEN REALTIME ───────────────────────────────────
+function listenFinance() {
+  if (!isOwner()) return;
+  const q = query(
+    collection(db, 'finance', OWNER_UID, 'transactions'),
+    orderBy('tanggal', 'desc')
+  );
+  onSnapshot(q, snap => {
+    finTrades = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderFinance();
+    $('fin-sync-dot').className = 'sync-dot';
+    $('fin-sync-txt').textContent = 'Live';
+  }, () => {
+    $('fin-sync-dot').className = 'sync-dot error';
+    $('fin-sync-txt').textContent = 'Error';
+  });
+}
+
+// ── RENDER FINANCE ────────────────────────────────────
+function renderFinance() {
+  if (!isOwner()) return;
+  const ft = getFinTrades();
+  const jFilter = $('fin-filter-jenis').value;
+  const rows = jFilter ? ft.filter(t => t.jenis === jFilter) : ft;
+
+  // ── Stats ────────────────────────────────────────────
+  const income  = ft.filter(t => t.jenis === 'Pemasukan').reduce((s,t) => s+t.nominal, 0);
+  const expense = ft.filter(t => t.jenis === 'Pengeluaran').reduce((s,t) => s+t.nominal, 0);
+  const profit  = income - expense;
+
+  // Avg per month
+  const months = ft.length > 0
+    ? Math.max(1, new Set(ft.map(t => t.tanggal?.slice(0,7))).size)
+    : 1;
+  const avgPerMonth = income / months;
+
+  $('fin-income').textContent  = fRp(income);
+  $('fin-income-sub').textContent = ft.filter(t=>t.jenis==='Pemasukan').length + ' transaksi';
+  $('fin-profit').textContent  = fRp(profit);
+  $('fin-profit').className    = 'sv ' + (profit >= 0 ? 'pos' : 'neg');
+  $('fin-avg').textContent     = fRp(avgPerMonth);
+  $('fin-count').textContent   = ft.length;
+  $('fin-count-sub').textContent = rows.length + ' ditampilkan';
+
+  const pLabels = {all:'Semua data','7':'7 hari terakhir','30':'30 hari terakhir','180':'6 bulan terakhir','365':'1 tahun terakhir'};
+  $('fin-ps').textContent = pLabels[finPeriod] || 'Keuangan bisnis';
+
+  // ── Line chart: trend pemasukan per bulan ────────────
+  const monthMap = {};
+  ft.filter(t=>t.jenis==='Pemasukan').forEach(t => {
+    const m = t.tanggal?.slice(0,7) || '–';
+    monthMap[m] = (monthMap[m]||0) + t.nominal;
+  });
+  const sortedMonths = Object.keys(monthMap).sort();
+  const lineLabels   = sortedMonths.map(m => {
+    const [y,mo] = m.split('-');
+    return ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][parseInt(mo)-1] + ' ' + y.slice(2);
+  });
+  const lineData = sortedMonths.map(m => monthMap[m]);
+
+  $('fin-line-meta').textContent = sortedMonths.length + ' bulan';
+
+  if (finLineC) finLineC.destroy();
+  const lineOpts = lineChartBase(v => fRp(v), v => fRp(v));
+  finLineC = new Chart($('finLineC').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: lineLabels,
+      datasets: [{
+        data: lineData,
+        borderColor: '#00d97e',
+        backgroundColor: 'rgba(0,217,126,.08)',
+        borderWidth: 2, fill: true, tension: .35,
+        pointRadius: lineData.length < 15 ? 4 : 0,
+        pointHoverRadius: 6,
+        pointBackgroundColor: '#00d97e',
+        pointHoverBorderColor: '#fff', pointHoverBorderWidth: 2
+      }]
+    },
+    options: lineOpts
+  });
+
+  // ── Bar chart: per kategori ──────────────────────────
+  const katMap = {};
+  ft.filter(t=>t.jenis==='Pemasukan').forEach(t => {
+    const k = t.kategori || 'Lainnya';
+    katMap[k] = (katMap[k]||0) + t.nominal;
+  });
+  const katLabels = Object.keys(katMap).sort((a,b) => katMap[b]-katMap[a]);
+  const katColors = {'Produk':'#7c6af7','Jasa':'#00d97e','Operasional':'#f5c842','Marketing':'#ff9f43','Lainnya':'#555'};
+
+  if (finBarC) finBarC.destroy();
+  finBarC = new Chart($('finBarC').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: katLabels,
+      datasets: [{
+        data: katLabels.map(k => katMap[k]),
+        backgroundColor: katLabels.map(k => katColors[k] || '#7c6af7'),
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1a1e', borderColor: 'rgba(255,255,255,.12)', borderWidth: 1,
+          bodyColor: '#f0f0f0', bodyFont: { family: 'DM Mono', size: 11 }, padding: 10, cornerRadius: 8,
+          displayColors: false,
+          callbacks: { label: c => ' ' + fRp(c.raw) }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#444', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#444', font: { family: 'DM Mono', size: 10 }, callback: v => fRp(v) } }
+      }
+    }
+  });
+
+  // ── Table ────────────────────────────────────────────
+  $('fin-empty').style.display = rows.length === 0 ? 'block' : 'none';
+  $('fin-tbody').innerHTML = rows.map(t => {
+    const isIn = t.jenis === 'Pemasukan';
+    const rb   = t.status === 'Confirmed' ? 'bw' : t.status === 'Cancelled' ? 'bo' : 'bbe';
+    return `<tr>
+      <td>${t.tanggal||'–'}</td>
+      <td style="font-weight:500;color:var(--text)">${t.nama||'–'}</td>
+      <td><span class="b ${isIn?'bw':'bo'}">${t.jenis||'–'}</span></td>
+      <td style="color:var(--text2)">${t.kategori||'–'}</td>
+      <td class="${isIn?'pos':'neg'}" style="font-family:var(--mono)">${fRp(t.nominal||0)}</td>
+      <td><span class="b ${rb}">${t.status||'–'}</span></td>
+      <td style="color:var(--text3);font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis">${t.keterangan||'–'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── WIRE FINANCE TABS & FILTER ────────────────────────
+document.querySelectorAll('[data-fperiod]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    finPeriod = btn.dataset.fperiod;
+    document.querySelectorAll('[data-fperiod]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderFinance();
+  });
+});
+
+$('fin-filter-jenis').addEventListener('change', renderFinance);
+$('fin-sync-btn').addEventListener('click', syncFromNotion);
+
+// ── WIRE NAV ──────────────────────────────────────────
+$('nav-finance').addEventListener('click', () => goPage('finance'));
 </script>
 </body>
 </html>
