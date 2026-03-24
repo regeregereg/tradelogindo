@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>RiskPerTrade</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
@@ -20,7 +20,7 @@ const CrosshairPlugin = {
     ctx.moveTo(chart._crosshairX, top);
     ctx.lineTo(chart._crosshairX, bottom);
     ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
     ctx.setLineDash([4, 4]);
     ctx.stroke();
     ctx.restore();
@@ -56,104 +56,77 @@ function crosshairOpts() {
 }
 </script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  /* ── Light mode palette inspired by reference ── */
-  --bg:#e8ede8;        /* soft sage green background */
-  --bg2:#ffffff;       /* card background: pure white */
-  --bg3:#f4f6f4;       /* subtle surface */
-  --bg4:#eaeeea;       /* hover/muted surface */
-  --border:rgba(0,0,0,0.07);
-  --border2:rgba(0,0,0,0.12);
-  --text:#1a1d1a;      /* near-black text */
-  --text2:#6b7280;     /* muted text */
-  --text3:#9ca3af;     /* placeholder / labels */
-  --green:#5dca8a;     /* mint green accent */
-  --green2:#a8edcc;    /* light green tint */
-  --gd:rgba(93,202,138,0.15);
-  --red:#f05252;
-  --rd:rgba(240,82,82,0.10);
-  --accent:#8b7cf8;    /* soft purple */
-  --accent2:#c4b5fd;   /* light purple tint */
-  --ad:rgba(139,124,248,0.12);
-  --dark:#1a1d1a;      /* dark card (like the Sales stats card) */
-  --font:'Plus Jakarta Sans',sans-serif;
-  --mono:'DM Mono',monospace;
-  --sbw:216px;
-  --radius:18px;
-  --radius-sm:12px;
-  --shadow:0 2px 12px rgba(0,0,0,0.06),0 0 0 1px rgba(0,0,0,0.04);
-  --shadow-md:0 4px 24px rgba(0,0,0,0.08),0 0 0 1px rgba(0,0,0,0.05);
-  --shadow-lg:0 8px 40px rgba(0,0,0,0.10),0 0 0 1px rgba(0,0,0,0.05);
+  --bg:#0e0e10;--bg2:#161618;--bg3:#1c1c1f;--bg4:#242428;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f0f0f0;--text2:#888;--text3:#444;
+  --green:#00d97e;--gd:rgba(0,217,126,0.12);
+  --red:#ff4d4d;--rd:rgba(255,77,77,0.12);
+  --accent:#7c6af7;--ad:rgba(124,106,247,0.15);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --sbw:200px;
 }
-
 html,body{height:100%;overflow-x:hidden;}
-body{
-  font-family:var(--font);
-  background:var(--bg);
-  color:var(--text);
-  font-size:14px;
-  line-height:1.5;
-  -webkit-font-smoothing:antialiased;
-}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;}
 
 /* ── PERIOD TABS ── */
-.period-tabs{display:flex;gap:3px;background:var(--bg4);border-radius:10px;padding:3px;}
-.ptab{flex:1;text-align:center;padding:6px 10px;font-size:12px;font-weight:500;font-family:var(--font);color:var(--text2);cursor:pointer;border-radius:8px;border:none;background:transparent;transition:all .18s;white-space:nowrap;}
-.ptab:hover{color:var(--text);background:rgba(0,0,0,0.04);}
-.ptab.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.10);}
+.period-tabs{display:flex;gap:4px;background:var(--bg3);border-radius:10px;padding:4px;}
+.ptab{flex:1;text-align:center;padding:6px 10px;font-size:12px;font-weight:500;font-family:var(--font);color:var(--text2);cursor:pointer;border-radius:7px;border:none;background:transparent;transition:all .15s;white-space:nowrap;}
+.ptab:hover{color:var(--text);}
+.ptab.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.3);}
 
 /* ── LOGIN SCREEN ── */
 #login-screen{
-  position:fixed;inset:0;background:rgba(0,0,0,0.40);
+  position:fixed;inset:0;background:rgba(0,0,0,.82);
   display:none;align-items:center;justify-content:center;
-  z-index:1000;padding:20px;backdrop-filter:blur(8px);
+  z-index:1000;padding:20px;backdrop-filter:blur(4px);
 }
 #login-screen.open{display:flex;}
 .login-card{
   background:var(--bg2);border:1px solid var(--border2);
-  border-radius:24px;padding:48px 40px;width:100%;max-width:400px;
+  border-radius:20px;padding:48px 40px;width:100%;max-width:400px;
   text-align:center;position:relative;
-  box-shadow:var(--shadow-lg);
 }
 .login-icon{font-size:48px;margin-bottom:20px;}
-.login-title{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:8px;color:var(--text);}
+.login-title{font-size:26px;font-weight:600;letter-spacing:-.5px;margin-bottom:8px;}
 .login-sub{font-size:13px;color:var(--text2);margin-bottom:36px;line-height:1.6;}
 .login-btn{
   display:flex;align-items:center;justify-content:center;gap:12px;
-  width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;
-  background:var(--text);color:#fff;font-size:13px;font-weight:600;
-  font-family:var(--font);transition:all .18s;
+  width:100%;padding:14px;border-radius:10px;border:none;cursor:pointer;
+  background:#fff;color:#1a1a1a;font-size:14px;font-weight:600;
+  font-family:var(--font);transition:opacity .15s;
 }
-.login-btn:hover{opacity:.88;transform:translateY(-1px);}
+.login-btn:hover{opacity:.9;}
+/* .login-btn img removed — no Google button */
 .login-err{
-  margin-top:14px;font-size:12px;color:var(--red);
-  background:var(--rd);border-radius:10px;padding:8px 12px;display:none;
+  margin-top:16px;font-size:12px;color:var(--red);
+  background:var(--rd);border-radius:8px;padding:8px 12px;display:none;
 }
-.login-loading{margin-top:14px;font-size:12px;color:var(--text2);display:none;}
+.login-loading{
+  margin-top:16px;font-size:12px;color:var(--text2);display:none;
+}
 
-/* ── USER PILL ── */
+/* ── USER PILL (top of sidebar) ── */
 .user-pill{
   display:flex;align-items:center;gap:10px;
-  padding:12px 14px;margin:0 10px 16px;
-  background:var(--bg3);border-radius:12px;
+  padding:12px 16px;margin:0 8px 16px;
+  background:var(--bg3);border-radius:10px;
   border:1px solid var(--border);
 }
 .user-avatar{
   width:32px;height:32px;border-radius:50%;
-  background:var(--green);color:#fff;display:flex;align-items:center;
-  justify-content:center;font-size:13px;font-weight:700;
+  background:var(--accent);display:flex;align-items:center;
+  justify-content:center;font-size:13px;font-weight:600;
   flex-shrink:0;overflow:hidden;
 }
 .user-avatar img{width:100%;height:100%;object-fit:cover;}
 .user-info{flex:1;min-width:0;}
-.user-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .user-email{font-size:10px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .signout-btn{
   background:none;border:none;color:var(--text3);
-  cursor:pointer;font-size:11px;padding:3px 7px;border-radius:6px;
+  cursor:pointer;font-size:11px;padding:2px 6px;border-radius:4px;
   transition:all .15s;flex-shrink:0;font-family:var(--font);
 }
 .signout-btn:hover{color:var(--red);background:var(--rd);}
@@ -164,296 +137,202 @@ body{
   background:var(--green);display:inline-block;margin-right:6px;
   animation:pulse 2s infinite;
 }
-.sync-dot.syncing{background:#f5c842;animation:spin .8s linear infinite;}
+.sync-dot.syncing{background:var(--gold,#f5c842);animation:spin .8s linear infinite;}
 .sync-dot.error{background:var(--red);animation:none;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── SIDEBAR ── */
-.sidebar{
-  position:fixed;top:0;left:0;height:100vh;width:var(--sbw);
-  background:var(--bg2);border-right:1px solid var(--border);
-  display:flex;flex-direction:column;padding:20px 0 24px;
-  z-index:400;overflow-y:auto;
-  transition:transform .25s cubic-bezier(.4,0,.2,1);
-  box-shadow:2px 0 16px rgba(0,0,0,0.04);
-}
+.sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sbw);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px 0 20px;z-index:400;overflow-y:auto;transition:transform .25s cubic-bezier(.4,0,.2,1);}
 .sidebar.off{transform:translateX(-100%);}
-.sb-btn{
-  position:fixed;top:20px;left:calc(var(--sbw) - 14px);
-  width:28px;height:28px;border-radius:50%;
-  background:var(--bg2);border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:var(--text2);font-size:11px;
-  transition:left .25s cubic-bezier(.4,0,.2,1),background .15s;
-  z-index:500;box-shadow:var(--shadow);
-}
-.sb-btn:hover{background:var(--bg3);color:var(--text);}
+.sb-btn{position:fixed;top:18px;left:calc(var(--sbw) - 14px);width:28px;height:28px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:11px;transition:left .25s cubic-bezier(.4,0,.2,1),background .15s;z-index:500;}
+.sb-btn:hover{background:var(--bg4);color:var(--text);}
 .sb-btn.off{left:6px;}
-.ovl{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:350;backdrop-filter:blur(3px);}
+.ovl{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:350;backdrop-filter:blur(2px);}
 .ovl.open{display:block;}
-.topbar{
-  display:none;position:fixed;top:0;left:0;right:0;height:54px;
-  background:var(--bg2);border-bottom:1px solid var(--border);
-  z-index:300;align-items:center;padding:0 16px;gap:10px;
-  box-shadow:0 1px 8px rgba(0,0,0,0.05);
-}
-.tlogo{font-size:14px;font-weight:700;display:flex;align-items:center;gap:7px;color:var(--text);}
-.tdot{width:7px;height:7px;border-radius:50%;background:var(--green);}
-.hbg{
-  background:none;border:1px solid var(--border);border-radius:9px;
-  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:var(--text2);font-size:15px;transition:all .15s;
-}
-.hbg:hover{color:var(--text);border-color:var(--border2);background:var(--bg3);}
-.logo{
-  padding:0 18px 18px;font-size:15px;font-weight:800;letter-spacing:-.4px;
-  display:flex;align-items:center;gap:8px;
-  border-bottom:1px solid var(--border);margin-bottom:10px;color:var(--text);
-}
-.ldot{width:9px;height:9px;border-radius:50%;background:var(--green);flex-shrink:0;}
-.nlbl{
-  padding:6px 18px 4px;font-size:10px;color:var(--text3);
-  text-transform:uppercase;letter-spacing:1.2px;font-weight:600;
-}
-.ni{
-  display:flex;align-items:center;gap:10px;padding:9px 18px;
-  font-size:13px;color:var(--text2);cursor:pointer;
-  transition:all .15s;border-radius:0;
-  border-left:2px solid transparent;user-select:none;font-weight:500;
-}
-.ni:hover{color:var(--text);background:var(--bg3);}
-.ni.active{
-  color:var(--text);border-left-color:var(--green);
-  background:rgba(93,202,138,0.10);font-weight:600;
-}
-.nic{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
-.sbf{
-  margin-top:auto;padding:14px 18px 0;
-  border-top:1px solid var(--border);
-  font-size:11px;color:var(--text3);font-family:var(--mono);
-}
+.topbar{display:none;position:fixed;top:0;left:0;right:0;height:52px;background:var(--bg2);border-bottom:1px solid var(--border);z-index:300;align-items:center;padding:0 14px;gap:10px;}
+.tlogo{font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px;}
+.tdot{width:7px;height:7px;border-radius:50%;background:var(--accent);}
+.hbg{background:none;border:1px solid var(--border);border-radius:7px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:15px;transition:all .15s;}
+.hbg:hover{color:var(--text);border-color:var(--border2);}
+.logo{padding:0 16px 16px;font-size:15px;font-weight:600;letter-spacing:-.3px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);margin-bottom:8px;}
+.ldot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+.nlbl{padding:6px 20px 3px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 20px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s;border-left:2px solid transparent;user-select:none;}
+.ni:hover{color:var(--text);background:rgba(255,255,255,.025);}
+.ni.active{color:var(--text);border-left-color:var(--accent);background:var(--ad);}
+.nic{font-size:12px;width:14px;text-align:center;flex-shrink:0;}
+.sbf{margin-top:auto;padding:12px 16px 0;border-top:1px solid var(--border);font-size:11px;color:var(--text3);font-family:var(--mono);}
 
 /* ── MAIN ── */
-.main{margin-left:var(--sbw);min-height:100vh;padding:28px 32px;min-width:0;transition:margin-left .25s cubic-bezier(.4,0,.2,1);}
+.main{margin-left:var(--sbw);min-height:100vh;padding:32px;min-width:0;transition:margin-left .25s cubic-bezier(.4,0,.2,1);}
 .main.off{margin-left:0;}
-.page{display:none;animation:fi .22s ease;}
+.page{display:none;animation:fi .2s ease;}
 .page.active{display:block;}
-@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 .ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;flex-wrap:wrap;gap:10px;}
-.pt{font-size:20px;font-weight:700;letter-spacing:-.5px;color:var(--text);}
+.pt{font-size:20px;font-weight:600;letter-spacing:-.4px;}
 .ps{font-size:13px;color:var(--text2);margin-top:3px;}
-
-/* ── STAT CARDS ── */
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px;}
-.sc{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);padding:16px;
-  transition:all .18s;box-shadow:var(--shadow);
-}
-.sc:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
-.sl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;font-weight:600;}
-.sv{font-size:20px;font-weight:700;font-family:var(--mono);letter-spacing:-.5px;color:var(--text);}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;transition:border-color .15s;}
+.sc:hover{border-color:var(--border2);}
+.sl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;}
+.sv{font-size:20px;font-weight:600;font-family:var(--mono);letter-spacing:-.5px;}
 .sch{font-size:11px;margin-top:4px;font-family:var(--mono);color:var(--text3);}
-.pos{color:#22c55e;}.neg{color:var(--red);}.neu{color:var(--text2);}
-
-/* ── CHART CARDS ── */
-.cc{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius);padding:20px 22px;margin-bottom:16px;
-  box-shadow:var(--shadow);
-}
-.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:6px;}
-.ct{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;}
+.pos{color:#00d97e;}.neg{color:#ff4d4d;}.neu{color:var(--text2);}
+.cc{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:16px;}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:6px;}
+.ct{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;}
 .cm{font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap;}
-
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
-
-/* ── TABLE ── */
-.tc{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius);overflow:hidden;margin-bottom:16px;
-  box-shadow:var(--shadow);
-}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+/* ── MARKET CHART TABS ── */
+.market-tab{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;font-weight:500;padding:4px 10px;cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap;}
+.market-tab:hover{color:var(--text);border-color:var(--border2);}
+.market-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.market-tf{background:var(--bg3);border:1px solid var(--border);border-radius:5px;color:var(--text3);font-size:10px;font-weight:500;padding:3px 7px;cursor:pointer;font-family:var(--mono);transition:all .15s;}
+.market-tf:hover{color:var(--text);border-color:var(--border2);}
+.market-tf.active{background:var(--bg4);color:var(--text);border-color:var(--border2);}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+.tc{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
 .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 table{width:100%;border-collapse:collapse;min-width:700px;}
-th{
-  font-size:10px;color:var(--text3);text-transform:uppercase;
-  letter-spacing:.7px;padding:10px 14px;text-align:left;
-  border-bottom:1px solid var(--border);font-weight:700;white-space:nowrap;
-  background:var(--bg3);
-}
-td{
-  padding:10px 14px;font-size:12px;
-  border-bottom:1px solid var(--border);
-  font-family:var(--mono);white-space:nowrap;color:var(--text);
-}
+th{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:8px 13px;text-align:left;border-bottom:1px solid var(--border);font-weight:400;white-space:nowrap;}
+td{padding:9px 13px;font-size:12px;border-bottom:1px solid rgba(255,255,255,.025);font-family:var(--mono);white-space:nowrap;}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:var(--bg3);}
-.es{text-align:center;padding:48px 20px;color:var(--text3);font-size:13px;}
-
-/* ── BADGES ── */
-.b{display:inline-block;font-size:10px;padding:3px 8px;border-radius:20px;font-weight:600;font-family:var(--font);letter-spacing:.3px;}
-.bl{background:rgba(34,197,94,0.12);color:#16a34a;}
-.bs{background:var(--rd);color:var(--red);}
-.bw{background:rgba(34,197,94,0.12);color:#16a34a;}
-.bo{background:rgba(240,82,82,0.10);color:var(--red);}
-.bbe{background:var(--bg4);color:var(--text2);}
-
-/* ── BUTTONS ── */
-.btn{
-  background:var(--text);color:#fff;border:none;
-  border-radius:10px;padding:8px 16px;font-size:12px;font-weight:600;
-  cursor:pointer;font-family:var(--font);transition:all .18s;white-space:nowrap;
-}
-.btn:hover{opacity:.85;transform:translateY(-1px);}
-.btng{
-  background:var(--bg2);color:var(--text2);
-  border:1px solid var(--border2);border-radius:10px;
-  padding:8px 14px;font-size:12px;cursor:pointer;
-  font-family:var(--font);transition:all .18s;white-space:nowrap;
-}
-.btng:hover{color:var(--text);border-color:var(--text3);background:var(--bg3);}
-.bsm{padding:6px 12px;font-size:11px;}
-.bdel{
-  background:none;border:none;color:var(--text3);
-  padding:3px 7px;font-size:11px;cursor:pointer;
-  border-radius:6px;font-family:var(--font);transition:all .15s;
-}
-.bdel:hover{color:var(--red);background:var(--rd);}
-
-/* ── SELECT ── */
-.fsel{
-  background:var(--bg3);border:1px solid var(--border);
-  border-radius:9px;color:var(--text);padding:7px 11px;
-  font-size:12px;font-family:var(--font);outline:none;cursor:pointer;
-}
-.fsel option{background:var(--bg2);}
-
-/* ── MODAL ── */
-.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:600;align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:16px;}
+tr:hover td{background:rgba(255,255,255,.02);}
+.es{text-align:center;padding:44px 20px;color:var(--text3);font-size:13px;}
+.b{display:inline-block;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:500;font-family:var(--font);letter-spacing:.3px;}
+.bl{background:var(--gd);color:#00d97e;}.bs{background:var(--rd);color:#ff4d4d;}
+.bw{background:rgba(0,217,126,.1);color:#00d97e;}.bo{background:rgba(255,77,77,.1);color:#ff4d4d;}
+.bbe{background:rgba(255,255,255,.06);color:var(--text2);}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:opacity .15s;white-space:nowrap;}
+.btn:hover{opacity:.85;}
+.btng{background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:7px;padding:7px 12px;font-size:12px;cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap;}
+.btng:hover{color:var(--text);border-color:var(--border2);}
+.bsm{padding:5px 10px;font-size:11px;}
+.bdel{background:none;border:none;color:var(--text3);padding:3px 6px;font-size:11px;cursor:pointer;border-radius:4px;font-family:var(--font);transition:all .15s;}
+.bdel:hover{color:#ff4d4d;background:var(--rd);}
+.fsel{background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:6px 10px;font-size:12px;font-family:var(--font);outline:none;cursor:pointer;}
+.fsel option{background:var(--bg3);}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:600;align-items:center;justify-content:center;backdrop-filter:blur(3px);padding:16px;}
 .mo.open{display:flex;}
-.md{
-  background:var(--bg2);border:1px solid var(--border2);
-  border-radius:20px;padding:26px;width:500px;max-width:100%;
-  max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);
-}
-.mdt{font-size:16px;font-weight:700;margin-bottom:18px;letter-spacing:-.3px;color:var(--text);}
-.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.md{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:24px;width:500px;max-width:100%;max-height:90vh;overflow-y:auto;}
+.mdt{font-size:16px;font-weight:600;margin-bottom:18px;letter-spacing:-.3px;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
 .fgg{display:flex;flex-direction:column;gap:5px;}
 .fgg.full{grid-column:1/-1;}
-.fl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;font-weight:600;}
-.fi{
-  background:var(--bg3);border:1px solid var(--border);
-  border-radius:9px;color:var(--text);padding:9px 13px;
-  font-size:13px;font-family:var(--mono);outline:none;width:100%;
-  transition:border-color .15s;
-}
-.fi:focus{border-color:var(--green);}
+.fl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;}
+.fi{background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:8px 12px;font-size:13px;font-family:var(--mono);outline:none;width:100%;transition:border-color .15s;}
+.fi:focus{border-color:var(--accent);}
 .fi::placeholder{color:var(--text3);}
-select.fi option{background:var(--bg2);}
-.ta{
-  background:var(--bg3);border:1px solid var(--border);
-  border-radius:9px;color:var(--text);padding:9px 13px;
-  font-size:12px;font-family:var(--mono);resize:vertical;
-  min-height:60px;outline:none;width:100%;transition:border-color .15s;
-}
-.ta:focus{border-color:var(--green);}
+select.fi option{background:var(--bg3);}
+.ta{background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text);padding:8px 12px;font-size:12px;font-family:var(--mono);resize:vertical;min-height:60px;outline:none;width:100%;transition:border-color .15s;}
+.ta:focus{border-color:var(--accent);}
 .fa{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;}
-
-/* ── BAR CHART MINI ── */
-.smc{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;}
-.smt{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px;font-weight:600;}
-.brow{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.smc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.smt{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;}
+.brow{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
 .blbl{font-size:11px;color:var(--text2);width:66px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;}
-.btr{flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;}
-.bfl{height:100%;border-radius:3px;transition:width .6s ease;}
-.bvl{font-size:11px;font-family:var(--mono);width:44px;text-align:right;flex-shrink:0;color:var(--text2);}
-
-/* ── CALENDAR ── */
-.cal-labels{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;}
-.caldl{font-size:10px;color:var(--text3);text-align:center;padding:3px 0;font-weight:600;}
-.calg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.calc-wrap{position:relative;width:100%;padding-bottom:100%;}
-.calc{
-  position:absolute;inset:0;border-radius:8px;
-  background:var(--bg3);border:1px solid var(--border);
-  overflow:hidden;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:2px;
+.btr{flex:1;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+.bfl{height:100%;border-radius:2px;transition:width .6s ease;}
+.bvl{font-size:11px;font-family:var(--mono);width:44px;text-align:right;flex-shrink:0;}
+/* ── DAY LABELS ROW (separate from date grid) ── */
+.cal-labels{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:3px;
+  margin-bottom:3px;
 }
-.calc.win{background:rgba(93,202,138,0.18);border-color:rgba(93,202,138,0.35);color:#16a34a;}
-.calc.loss{background:rgba(240,82,82,0.10);border-color:rgba(240,82,82,0.22);color:var(--red);}
+.caldl{
+  font-size:10px;color:var(--text3);
+  text-align:center;padding:3px 0;font-weight:500;
+}
+/* ── DATE GRID ── */
+.calg{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  /* Each row height = column width = 1/7 of container
+     We use vw units as a proxy. The calendar sits inside a
+     card that's roughly full width minus sidebar minus padding.
+     Using padding-bottom trick on a per-cell wrapper is the
+     only CSS-only way to guarantee square cells regardless of content. */
+  gap:3px;
+}
+/* Wrapper inside each cell — this is what makes it square */
+.calc-wrap{
+  position:relative;
+  width:100%;
+  padding-bottom:100%; /* = width → always square */
+}
+.calc{
+  position:absolute;
+  inset:0;
+  border-radius:5px;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+}
+.calc.win{background:rgba(0,217,126,.15);border-color:rgba(0,217,126,.3);color:#00d97e;}
+.calc.loss{background:rgba(255,77,77,.13);border-color:rgba(255,77,77,.25);color:#ff4d4d;}
 .calc.empty{background:transparent;border-color:transparent;pointer-events:none;}
 .calc-pnl{
-  font-size:clamp(8px,2.2vw,13px);font-family:var(--mono);
-  font-weight:700;line-height:1.15;text-align:center;
-  white-space:nowrap;max-width:92%;
+  /* Use vw so font scales with screen width automatically */
+  font-size:clamp(8px,2.2vw,13px);
+  font-family:var(--mono);
+  font-weight:700;
+  line-height:1.15;
+  text-align:center;
+  white-space:nowrap;
+  max-width:92%;
+  /* Do NOT clip — let parent's overflow:hidden handle it */
 }
-.dn{font-size:clamp(7px,1.8vw,11px);color:var(--text3);line-height:1.15;font-family:var(--mono);}
-.calc.win .dn,.calc.loss .dn{color:inherit;opacity:.7;}
-
-/* ── PROPFIRM ── */
-.ftg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;}
-.ftc{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius-sm);padding:16px;
-  box-shadow:var(--shadow);
+.dn{
+  font-size:clamp(7px,1.8vw,11px);
+  color:var(--text3);
+  line-height:1.15;
+  font-family:var(--mono);
 }
-.ftl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;font-weight:600;}
-.ftv{font-size:20px;font-weight:700;font-family:var(--mono);color:var(--text);}
+.calc.win .dn,.calc.loss .dn{color:inherit;opacity:.75;}
+.ftg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.ftc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.ftl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
+.ftv{font-size:20px;font-weight:600;font-family:var(--mono);}
 .ftli{font-size:11px;color:var(--text3);margin-top:3px;font-family:var(--mono);}
-.ftbw{margin-top:8px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;}
+.ftbw{margin-top:7px;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden;}
 .ftb{height:100%;border-radius:2px;transition:width .5s ease;}
-
-/* ── BALANCE BANNER ── */
-.bbal{
-  background:rgba(93,202,138,0.10);border:1px solid rgba(93,202,138,0.25);
-  border-radius:var(--radius-sm);padding:16px 20px;margin-bottom:16px;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-}
-.bbal h3{font-size:13px;font-weight:700;margin-bottom:2px;color:var(--text);}
+.bbal{background:rgba(124,106,247,.08);border:1px solid rgba(124,106,247,.2);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.bbal h3{font-size:13px;font-weight:600;margin-bottom:2px;}
 .bbal p{font-size:12px;color:var(--text2);}
-.bval{
-  font-family:var(--mono);font-size:22px;font-weight:700;
-  color:var(--accent);background:var(--ad);
-  border:1px solid rgba(139,124,248,0.25);border-radius:10px;
-  padding:6px 16px;cursor:pointer;transition:all .18s;
-  display:flex;align-items:center;gap:8px;
-}
-.bval:hover{background:rgba(139,124,248,0.18);}
+.bval{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--accent);background:var(--ad);border:1px solid rgba(124,106,247,.3);border-radius:8px;padding:5px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;}
+.bval:hover{background:rgba(124,106,247,.2);}
 .bedit{font-size:11px;color:var(--text2);font-weight:400;}
 
-/* ── WELCOME MODAL ── */
+/* WELCOME */
 .wbody{text-align:center;padding:8px 0 4px;}
 .wicon{font-size:44px;margin-bottom:16px;}
-.wtitle{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:8px;color:var(--text);}
+.wtitle{font-size:22px;font-weight:600;letter-spacing:-.5px;margin-bottom:8px;}
 .wsub{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.6;}
 .winwrap{position:relative;margin-bottom:8px;}
-.wpfx{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:20px;font-weight:700;color:var(--green);font-family:var(--mono);}
-.win{
-  background:var(--bg3);border:1px solid rgba(93,202,138,0.35);
-  border-radius:12px;color:var(--text);
-  padding:14px 16px 14px 34px;font-size:20px;
-  font-family:var(--mono);font-weight:500;
-  outline:none;width:100%;transition:border-color .15s;
-}
-.win:focus{border-color:var(--green);}
+.wpfx{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:20px;font-weight:600;color:var(--accent);font-family:var(--mono);}
+.win{background:var(--bg3);border:1px solid rgba(124,106,247,.4);border-radius:10px;color:var(--text);padding:14px 16px 14px 34px;font-size:20px;font-family:var(--mono);font-weight:500;outline:none;width:100%;transition:border-color .15s;}
+.win:focus{border-color:var(--accent);}
 .win::placeholder{color:var(--text3);}
 .whint{font-size:11px;color:var(--text3);text-align:left;margin-bottom:20px;}
 
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
 
-/* ── RESPONSIVE ── */
 @media(max-width:768px){
   .topbar{display:flex;}
   .sb-btn{display:none;}
-  .sidebar{top:54px;height:calc(100vh - 54px);}
-  .main{margin-left:0!important;padding:14px;padding-top:70px;}
+  .sidebar{top:52px;height:calc(100vh - 52px);}
+  .main{margin-left:0!important;padding:14px;padding-top:66px;}
   .stats{grid-template-columns:repeat(2,1fr);}
   .g2,.g3{grid-template-columns:1fr;}
   .ftg{grid-template-columns:1fr 1fr;}
@@ -489,7 +368,7 @@ select.fi option{background:var(--bg2);}
       </div>
 
       <!-- 1. Google (paling atas, paling simple) -->
-      <button id="google-login-btn" class="login-btn" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);margin-bottom:10px;gap:10px;font-size:14px">
+      <button id="google-login-btn" class="login-btn" style="background:#fff;color:#1a1a1a;border:none;margin-bottom:10px;gap:10px;font-size:14px">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px" alt="G">
         Masuk dengan Google
       </button>
@@ -505,9 +384,9 @@ select.fi option{background:var(--bg2);}
       <div style="margin-bottom:8px">
         <input id="magic-email-input" type="email" placeholder="emailkamu@gmail.com"
           style="width:100%;padding:12px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;box-sizing:border-box"
-          onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border2)'">
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
       </div>
-      <button class="login-btn" id="send-magic-btn" style="background:var(--green);border:none;color:#fff;margin-bottom:4px">
+      <button class="login-btn" id="send-magic-btn" style="background:var(--accent);border:none;color:#fff;margin-bottom:4px">
         ✉️ Kirim Link Masuk
       </button>
       <div class="login-err" id="login-err" style="margin-top:8px">Gagal mengirim. Coba lagi.</div>
@@ -563,7 +442,7 @@ select.fi option{background:var(--bg2);}
     <p style="font-size:12px;color:var(--text3);margin-bottom:20px;line-height:1.6">
       Hubungi admin untuk mendapatkan akses, atau coba dengan email lain.
     </p>
-    <button class="login-btn" id="try-other-btn" style="background:var(--green);border:none;color:#fff;margin-bottom:10px">
+    <button class="login-btn" id="try-other-btn" style="background:var(--accent);border:none;color:#fff;margin-bottom:10px">
       Coba Email Lain
     </button>
     <a href="https://instagram.com/anelkazone" target="_blank"
@@ -615,7 +494,7 @@ select.fi option{background:var(--bg2);}
     <span id="sbf-bal">Balance: —</span>
   </div>
   <div style="padding:10px 12px 0;display:flex;flex-direction:column;gap:6px">
-    <button id="sb-login-btn" style="display:none;width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+    <button id="sb-login-btn" style="display:none;width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
       Masuk / Login
     </button>
     <a href="https://instagram.com/anelkazone" target="_blank"
@@ -639,32 +518,32 @@ select.fi option{background:var(--bg2);}
     </div>
 
     <!-- Trader Identity Card (shown when logged in) -->
-    <div id="trader-card" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px 20px;margin-bottom:16px;box-shadow:var(--shadow)">
+    <div id="trader-card" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
         <!-- Avatar -->
-        <div id="tc-avatar" style="width:48px;height:48px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid rgba(93,202,138,.35)"></div>
+        <div id="tc-avatar" style="width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid rgba(124,106,247,.4)"></div>
         <!-- Info -->
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <div id="tc-greeting" style="font-size:13px;color:var(--text2)">Selamat datang,</div>
-            <div id="tc-name" style="font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+            <div id="tc-name" style="font-size:15px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
           </div>
           <div id="tc-tagline" style="font-size:12px;color:var(--text3);margin-top:2px;font-family:var(--mono)">📈 Konsisten adalah kunci</div>
         </div>
         <!-- Share button -->
-        <button id="share-btn" style="background:rgba(93,202,138,.12);color:#16a34a;border:1px solid rgba(93,202,138,.3);border-radius:10px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap;flex-shrink:0" title="Bagikan statistik trading kamu">
+        <button id="share-btn" style="background:var(--accent-d);color:var(--accent);border:1px solid rgba(124,106,247,.3);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s;white-space:nowrap;flex-shrink:0" title="Bagikan statistik trading kamu">
           📤 Share Stats
         </button>
       </div>
     </div>
 
     <!-- Guest banner -->
-    <div id="guest-banner" style="background:rgba(93,202,138,.10);border:1px solid rgba(93,202,138,.30);border-radius:14px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div id="guest-banner" style="background:rgba(124,106,247,.08);border:1px solid rgba(124,106,247,.25);border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
       <div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:3px;color:var(--text)">👋 Selamat datang di RiskPerTrade</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:3px">👋 Selamat datang di RiskPerTrade</div>
         <div style="font-size:12px;color:var(--text2)">Kamu sedang melihat sebagai guest. Login untuk mulai mencatat trade dan menyimpan journal kamu.</div>
       </div>
-      <button id="guest-banner-login" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">Masuk Sekarang</button>
+      <button id="guest-banner-login" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0">Masuk Sekarang</button>
     </div>
 
     <!-- Balance banner -->
@@ -733,6 +612,41 @@ select.fi option{background:var(--bg2);}
         <div id="donut-empty" style="display:none;text-align:center;padding:8px 0 4px;font-size:12px;color:var(--text3)">Belum ada trade di periode ini</div>
       </div>
     </div>
+
+    <!-- ── MARKET CHART WIDGET ── -->
+    <div class="cc" style="margin-top:16px;padding:0;overflow:hidden">
+      <div class="ch" style="padding:14px 18px 12px;border-bottom:1px solid var(--border);margin-bottom:0">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div class="ct" style="flex-shrink:0">📊 Market Chart</div>
+          <!-- Asset selector buttons -->
+          <div id="market-asset-tabs" style="display:flex;gap:5px;flex-wrap:wrap">
+            <button class="market-tab active" data-symbol="BITSTAMP:BTCUSD" data-label="BTC/USD">₿ BTC/USD</button>
+            <button class="market-tab" data-symbol="BITSTAMP:ETHUSD" data-label="ETH/USD">Ξ ETH/USD</button>
+            <button class="market-tab" data-symbol="TVC:GOLD" data-label="XAU/USD">🥇 XAU/USD</button>
+            <button class="market-tab" data-symbol="FX:EURUSD" data-label="EUR/USD">€ EUR/USD</button>
+            <button class="market-tab" data-symbol="NASDAQ:NDX" data-label="NASDAQ">📈 NASDAQ</button>
+          </div>
+          <!-- Timeframe selector -->
+          <div id="market-tf-tabs" style="display:flex;gap:4px;margin-left:auto;flex-wrap:wrap">
+            <button class="market-tf active" data-tf="1">1m</button>
+            <button class="market-tf" data-tf="5">5m</button>
+            <button class="market-tf" data-tf="15">15m</button>
+            <button class="market-tf" data-tf="60">1H</button>
+            <button class="market-tf" data-tf="D">1D</button>
+            <button class="market-tf" data-tf="W">1W</button>
+          </div>
+        </div>
+      </div>
+      <div id="market-chart-wrap" style="height:400px;position:relative;background:#0e0e10">
+        <iframe id="market-chart-iframe"
+          src=""
+          style="width:100%;height:100%;border:none;display:block"
+          allowtransparency="true"
+          scrolling="no">
+        </iframe>
+      </div>
+    </div>
+
   </div>
 
   <!-- JOURNAL -->
@@ -891,12 +805,12 @@ select.fi option{background:var(--bg2);}
 
   <!-- ANON UPGRADE BANNER — shown inside main for anonymous users -->
   <div id="anon-banner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;width:calc(100% - 40px);max-width:500px">
-    <div style="background:var(--bg2);border:1px solid rgba(139,124,248,.30);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-lg);flex-wrap:wrap">
+    <div style="background:linear-gradient(135deg,#1a1040,#0f0f1a);border:1px solid rgba(124,106,247,.4);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);flex-wrap:wrap">
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
           <div style="font-size:13px;font-weight:600;color:var(--text)">👻 Mode Anonim</div>
           <!-- Trade counter pill -->
-          <div id="anon-trade-counter" style="font-size:10px;font-family:var(--mono);font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(139,124,248,.12);color:var(--accent);border:1px solid rgba(139,124,248,.25)">
+          <div id="anon-trade-counter" style="font-size:10px;font-family:var(--mono);font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(124,106,247,.2);color:var(--accent);border:1px solid rgba(124,106,247,.3)">
             0 / 10 trade
           </div>
         </div>
@@ -904,7 +818,7 @@ select.fi option{background:var(--bg2);}
           Data tersimpan sementara. Simpan akun supaya tidak hilang.
         </div>
       </div>
-      <button id="upgrade-btn" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+      <button id="upgrade-btn" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
         💾 Simpan Akun
       </button>
     </div>
@@ -965,7 +879,7 @@ select.fi option{background:var(--bg2);}
       <div style="margin-bottom:10px">
         <input id="upgrade-email-input" type="email" placeholder="emailkamu@gmail.com"
           style="width:100%;padding:13px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;box-sizing:border-box"
-          onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border2)'">
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
       </div>
       <div id="upgrade-err" style="display:none;font-size:12px;color:var(--red);background:var(--rd);border-radius:8px;padding:8px 12px;margin-bottom:10px"></div>
       <div id="upgrade-loading" style="display:none;font-size:12px;color:var(--text2);margin-bottom:10px;text-align:center">⏳ Mengirim link…</div>
@@ -1078,60 +992,60 @@ select.fi option{background:var(--bg2);}
       </div>
 
       <!-- ─── Share Card (this div gets captured as image) ─── -->
-      <div id="share-preview" style="background:linear-gradient(145deg,#f0f9f4 0%,#e8f5ee 50%,#f0f4ff 100%);border-radius:16px;padding:24px;margin-bottom:16px;font-family:'Plus Jakarta Sans',sans-serif;position:relative;overflow:hidden;border:1px solid rgba(93,202,138,.2)">
+      <div id="share-preview" style="background:linear-gradient(145deg,#0f0f1a 0%,#1a1040 50%,#0a1628 100%);border-radius:16px;padding:24px;margin-bottom:16px;font-family:'DM Sans',sans-serif;position:relative;overflow:hidden">
         <!-- Background decoration -->
-        <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(93,202,138,.10);pointer-events:none"></div>
-        <div style="position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(139,124,248,.07);pointer-events:none"></div>
+        <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(124,106,247,.08);pointer-events:none"></div>
+        <div style="position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(0,217,126,.05);pointer-events:none"></div>
 
         <!-- Header: avatar + name + brand -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
           <div style="display:flex;align-items:center;gap:12px">
-            <div id="sp-avatar" style="width:44px;height:44px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid rgba(93,202,138,.4)"></div>
+            <div id="sp-avatar" style="width:44px;height:44px;border-radius:50%;background:#7c6af7;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid rgba(124,106,247,.5)"></div>
             <div>
-              <div id="sp-name" style="font-size:15px;font-weight:700;color:#1a1d1a;line-height:1.2"></div>
-              <div style="font-size:10px;color:#5dca8a;font-family:'DM Mono',monospace;margin-top:2px">Trading Journal</div>
+              <div id="sp-name" style="font-size:15px;font-weight:700;color:#f0f0f0;line-height:1.2"></div>
+              <div style="font-size:10px;color:#7c6af7;font-family:'DM Mono',monospace;margin-top:2px">Trading Journal</div>
             </div>
           </div>
           <div style="text-align:right">
-            <div style="font-size:11px;font-weight:700;color:#5dca8a;letter-spacing:.5px">RISKPERTRADE</div>
-            <div style="font-size:9px;color:#9ca3af;font-family:'DM Mono',monospace;margin-top:1px">riskpertrade.me</div>
+            <div style="font-size:11px;font-weight:700;color:#7c6af7;letter-spacing:.5px">RISKPERTRADE</div>
+            <div style="font-size:9px;color:#444;font-family:'DM Mono',monospace;margin-top:1px">riskpertrade.me</div>
           </div>
         </div>
 
         <!-- Divider -->
-        <div style="height:1px;background:rgba(0,0,0,.07);margin-bottom:16px"></div>
+        <div style="height:1px;background:rgba(255,255,255,.07);margin-bottom:16px"></div>
 
         <!-- Stats grid -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-          <div style="background:rgba(93,202,138,.12);border:1px solid rgba(93,202,138,.25);border-radius:10px;padding:12px">
-            <div style="font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Total P&amp;L</div>
-            <div id="sp-pnl" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#16a34a;line-height:1">$0</div>
+          <div style="background:rgba(0,217,126,.08);border:1px solid rgba(0,217,126,.15);border-radius:10px;padding:12px">
+            <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Total P&amp;L</div>
+            <div id="sp-pnl" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#00d97e;line-height:1">$0</div>
           </div>
-          <div style="background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.07);border-radius:10px;padding:12px">
-            <div style="font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Win Rate</div>
-            <div id="sp-wr" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#1a1d1a;line-height:1">—</div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
+            <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Win Rate</div>
+            <div id="sp-wr" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#f0f0f0;line-height:1">—</div>
           </div>
-          <div style="background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.07);border-radius:10px;padding:12px">
-            <div style="font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Trades</div>
-            <div id="sp-trades" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#1a1d1a;line-height:1">0</div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
+            <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Trades</div>
+            <div id="sp-trades" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#f0f0f0;line-height:1">0</div>
           </div>
-          <div style="background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.07);border-radius:10px;padding:12px">
-            <div style="font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Profit Factor</div>
-            <div id="sp-pf" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#1a1d1a;line-height:1">—</div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px">
+            <div style="font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Profit Factor</div>
+            <div id="sp-pf" style="font-size:22px;font-weight:800;font-family:'DM Mono',monospace;color:#f0f0f0;line-height:1">—</div>
           </div>
         </div>
 
         <!-- Streak bar -->
-        <div style="background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.06);border-radius:10px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:11px;color:#6b7280">Avg R:R</div>
-          <div id="sp-rr" style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:#8b7cf8">—</div>
-          <div style="width:1px;height:16px;background:rgba(0,0,0,.10)"></div>
-          <div style="font-size:11px;color:#6b7280">Best Streak</div>
-          <div id="sp-streak" style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:#16a34a">—</div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:11px;color:#888">Avg R:R</div>
+          <div id="sp-rr" style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:#7c6af7">—</div>
+          <div style="width:1px;height:16px;background:rgba(255,255,255,.1)"></div>
+          <div style="font-size:11px;color:#888">Best Streak</div>
+          <div id="sp-streak" style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:#00d97e">—</div>
         </div>
 
         <!-- Tagline -->
-        <div id="sp-tagline" style="font-size:11px;color:#5dca8a;font-family:'DM Mono',monospace;text-align:center;letter-spacing:.3px">📈 Konsisten adalah kunci</div>
+        <div id="sp-tagline" style="font-size:11px;color:rgba(124,106,247,.8);font-family:'DM Mono',monospace;text-align:center;letter-spacing:.3px">📈 Konsisten adalah kunci</div>
       </div>
 
       <!-- Action buttons -->
@@ -1775,10 +1689,12 @@ function openLoginScreen(reason) {
   showLoginPanel();
   showEmailStep();
   const sub = $('login-sub-text');
-  if (reason === 'log') {
-    sub.textContent = 'Masukkan email kamu untuk mulai mencatat trade.';
-  } else {
-    sub.textContent = 'Masukkan email kamu. Kami kirimkan link masuk — tidak perlu password.';
+  if (sub) {
+    if (reason === 'log') {
+      sub.textContent = 'Masukkan email kamu untuk mulai mencatat trade.';
+    } else {
+      sub.textContent = 'Masukkan email kamu. Kami kirimkan link masuk — tidak perlu password.';
+    }
   }
   $('login-screen').classList.add('open');
   setTimeout(() => $('magic-email-input').focus(), 100);
@@ -2376,22 +2292,22 @@ function lineChartBase(yFmt, labelFmt) {
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
-      mode: 'index',
-      intersect: false,
+      mode: 'index',       // snap tooltip to nearest x-axis point
+      intersect: false,    // show tooltip even when not directly on dot
     },
     onHover: crosshairOpts().onHover,
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: '#1a1d1a',
-        borderColor: 'rgba(0,0,0,0.10)',
+        backgroundColor: '#1a1a1e',
+        borderColor: 'rgba(255,255,255,0.12)',
         borderWidth: 1,
-        titleColor: '#9ca3af',
+        titleColor: '#666',
         titleFont: { family: 'DM Mono', size: 10 },
-        bodyColor: '#ffffff',
+        bodyColor: '#f0f0f0',
         bodyFont: { family: 'DM Mono', size: 12 },
         padding: 10,
-        cornerRadius: 10,
+        cornerRadius: 8,
         displayColors: false,
         callbacks: {
           label: c => ' ' + labelFmt(c.raw)
@@ -2400,12 +2316,12 @@ function lineChartBase(yFmt, labelFmt) {
     },
     scales: {
       x: {
-        grid: { color: 'rgba(0,0,0,.05)' },
-        ticks: { color: '#9ca3af', font: { family: 'DM Mono', size: 10 }, maxTicksLimit: 8, maxRotation: 0 }
+        grid: { color: 'rgba(255,255,255,.04)' },
+        ticks: { color: '#444', font: { family: 'DM Mono', size: 10 }, maxTicksLimit: 8, maxRotation: 0 }
       },
       y: {
-        grid: { color: 'rgba(0,0,0,.05)' },
-        ticks: { color: '#9ca3af', font: { family: 'DM Mono', size: 10 }, callback: yFmt }
+        grid: { color: 'rgba(255,255,255,.04)' },
+        ticks: { color: '#444', font: { family: 'DM Mono', size: 10 }, callback: yFmt }
       }
     }
   };
@@ -2458,7 +2374,7 @@ function renderPnl(){
   const ft=getFilteredTrades();
   const L=ft.map((_,i)=>'#'+(i+1)),D=ft.map(t=>t.pnl);
   if(pnlCh)pnlCh.destroy();
-  pnlCh=new Chart($('pnlC').getContext('2d'),{type:'bar',data:{labels:L,datasets:[{data:D,backgroundColor:D.map(v=>v>=0?'rgba(93,202,138,0.75)':'rgba(240,82,82,0.65)'),borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d1a',borderColor:'rgba(0,0,0,.10)',borderWidth:1,bodyColor:'#ffffff',bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>' $'+c.raw.toFixed(2)}}},scales:{x:{grid:{display:false},ticks:{color:'#9ca3af',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.05)'},ticks:{color:'#9ca3af',font:{family:'DM Mono',size:10},callback:v=>'$'+v}}}}});
+  pnlCh=new Chart($('pnlC').getContext('2d'),{type:'bar',data:{labels:L,datasets:[{data:D,backgroundColor:D.map(v=>v>=0?'#00d97e':'#ff4d4d'),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1c1c1f',borderColor:'rgba(255,255,255,.1)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},callbacks:{label:c=>' $'+c.raw.toFixed(2)}}},scales:{x:{grid:{display:false},ticks:{color:'#444',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#444',font:{family:'DM Mono',size:10},callback:v=>'$'+v}}}}});
 }
 function renderDonut(){
   const ft=getFilteredTrades();
@@ -2497,8 +2413,8 @@ function renderDonut(){
       plugins:{
         legend:{display:false},
         tooltip:{
-          backgroundColor:'#1a1d1a',borderColor:'rgba(0,0,0,.10)',borderWidth:1,
-          bodyColor:'#ffffff',bodyFont:{family:'DM Mono',size:11},
+          backgroundColor:'#1c1c1f',borderColor:'rgba(255,255,255,.1)',borderWidth:1,
+          bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},
           callbacks:{
             label: c => {
               const pct = total>0 ? Math.round(c.raw/total*100) : 0;
@@ -2626,6 +2542,64 @@ function renderAna(){
   const rOpts=lineChartBase(v=>v+'R',v=>(v>=0?'+':'')+v+'R');
   rCh=new Chart($('rC').getContext('2d'),{type:'line',data:{labels:rL,datasets:[{data:rD,borderColor:'#7c6af7',backgroundColor:'rgba(124,106,247,.08)',borderWidth:2,fill:true,tension:.3,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:'#7c6af7',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2}]},options:rOpts});
 }
+
+// ── MARKET CHART WIDGET ──────────────────────────────
+(function(){
+  let activeSymbol = 'BITSTAMP:BTCUSD';
+  let activeTf = '1';
+
+  function buildSrc(symbol, interval){
+    return `https://s.tradingview.com/widgetembed/?frameElementId=market-chart-iframe`
+      + `&symbol=${encodeURIComponent(symbol)}`
+      + `&interval=${interval}`
+      + `&hidesidetoolbar=1`
+      + `&hidetoptoolbar=0`
+      + `&symboledit=1`
+      + `&saveimage=0`
+      + `&toolbarbg=0e0e10`
+      + `&studies=[]`
+      + `&theme=dark`
+      + `&style=1`
+      + `&timezone=Asia%2FJakarta`
+      + `&studies_overrides={}`
+      + `&overrides={}`
+      + `&enabled_features=[]`
+      + `&disabled_features=[]`
+      + `&utm_source=riskpertrade.app`
+      + `&utm_medium=widget`
+      + `&utm_campaign=chart`;
+  }
+
+  function updateChart(){
+    const iframe = document.getElementById('market-chart-iframe');
+    if(iframe) iframe.src = buildSrc(activeSymbol, activeTf);
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    // Asset tab clicks
+    document.getElementById('market-asset-tabs').addEventListener('click', function(e){
+      const btn = e.target.closest('.market-tab');
+      if(!btn) return;
+      document.querySelectorAll('.market-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      activeSymbol = btn.dataset.symbol;
+      updateChart();
+    });
+
+    // Timeframe tab clicks
+    document.getElementById('market-tf-tabs').addEventListener('click', function(e){
+      const btn = e.target.closest('.market-tf');
+      if(!btn) return;
+      document.querySelectorAll('.market-tf').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      activeTf = btn.dataset.tf;
+      updateChart();
+    });
+
+    // Initial load
+    updateChart();
+  });
+})();
 
 // ── CALENDAR ──────────────────────────────────────────
 function renderCal(){
