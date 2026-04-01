@@ -108,6 +108,15 @@ function crosshairOpts() {
     }
   };
 }
+
+// ── BOTTOM NAV GLOBAL STUBS ──
+// Must live in a non-module script so inline onclick= attributes resolve immediately.
+window._bnQueue = [];
+window._bnReady = null;
+function bnGo(p){if(window._bnReady)window._bnReady.bnGo(p);else window._bnQueue.push(['bnGo',p]);}
+function bnToggleSB(){if(window._bnReady)window._bnReady.bnToggleSB();else window._bnQueue.push(['bnToggleSB']);}
+function openTrade(){if(window._bnReady)window._bnReady.openTrade();else window._bnQueue.push(['openTrade']);}
+function clearScreenshot(){if(window._bnReady)window._bnReady.clearScreenshot();}
 </script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -4483,34 +4492,62 @@ scheduleReminder();
 // ══════════════════════════════════════════════════════
 // ── BOTTOM NAV (mobile) ───────────────────────────────
 // ══════════════════════════════════════════════════════
-function bnGo(page) {
-  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
-  const btn = document.getElementById('bn-' + page);
-  if (btn) btn.classList.add('active');
-  goPage(page);
-}
+// ── BOTTOM NAV SYNC (inside module) ──
+const BN_PAGES = ['dashboard', 'journal', 'analytics'];
 
-function bnToggleSB() {
-  if (sbOpen) {
-    closeSB();
-    document.getElementById('bn-more').classList.remove('active');
+function bnSyncActive(page) {
+  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+  const moreBtn = document.getElementById('bn-more');
+  if (moreBtn) moreBtn.classList.remove('active');
+  if (BN_PAGES.includes(page)) {
+    const btn = document.getElementById('bn-' + page);
+    if (btn) btn.classList.add('active');
   } else {
-    toggleSB();
-    document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
-    document.getElementById('bn-more').classList.add('active');
+    // Page opened via sidebar / More — highlight More button
+    if (moreBtn) moreBtn.classList.add('active');
   }
 }
 
-// Sync bottom nav active indicator when navigating via sidebar
+// Register actual implementations into window._bnReady so global stubs can call them
+window._bnReady = {
+  bnGo(page) {
+    bnSyncActive(page);
+    goPage(page);
+  },
+  bnToggleSB() {
+    if (sbOpen) {
+      closeSB();
+      const moreBtn = document.getElementById('bn-more');
+      if (moreBtn) moreBtn.classList.remove('active');
+    } else {
+      toggleSB();
+      document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+      const moreBtn = document.getElementById('bn-more');
+      if (moreBtn) moreBtn.classList.add('active');
+    }
+  },
+  openTrade,
+  clearScreenshot,
+};
+
+// Flush any queued calls made before the module finished loading
+(window._bnQueue || []).forEach(([fn, ...args]) => {
+  if (window._bnReady[fn]) window._bnReady[fn](...args);
+});
+window._bnQueue = [];
+
+// Patch goPage so navigating via sidebar also syncs bottom nav
 const _origGoPage = goPage;
-window._bnWrapped = true;
-// patch: after goPage runs, sync bottom nav
+window.goPage = function(name) {
+  _origGoPage(name);
+  bnSyncActive(name);
+};
+
+// Sync bottom nav when sidebar nav items are clicked
 document.querySelectorAll('.ni[id^="nav-"]').forEach(el => {
   el.addEventListener('click', () => {
-    const page = el.id.replace('nav-','');
-    document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
-    const btn = document.getElementById('bn-' + page);
-    if (btn) btn.classList.add('active');
+    const page = el.id.replace('nav-', '');
+    bnSyncActive(page);
   });
 });
 </script>
