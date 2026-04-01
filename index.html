@@ -674,8 +674,8 @@ select.fi option{background:var(--bg3);}
   <div class="nlbl" style="margin-top:6px">Tools</div>
   <div class="ni" id="nav-daily"><span class="nic">📔</span>Daily Journal</div>
   <div class="ni" id="nav-riskcalc"><span class="nic">🧮</span>Risk Calculator</div>
-  <div class="ni" id="nav-ai-review" onclick="openAIReview()"><span class="nic">🤖</span>AI Trade Review</div>
-  <div class="ni" id="nav-daily-reminder" onclick="openDailyReminder()"><span class="nic">🔔</span>Daily Reminder</div>
+  <div class="ni" id="nav-ai-review"><span class="nic">🤖</span>AI Trade Review</div>
+  <div class="ni" id="nav-reminder"><span class="nic">🔔</span>Daily Reminder</div>
 
   <div class="sbf" id="sbf">
     <span class="sync-dot" id="sync-dot"></span>
@@ -1566,19 +1566,14 @@ select.fi option{background:var(--bg3);}
       <div class="fgg"><label class="fl">Setup Tag</label><input class="fi" type="text" id="f-su" placeholder="BOS, OB, FVG…"></div>
       <div class="fgg"><label class="fl">Emotion</label><select class="fi" id="f-em"><option>Calm</option><option>Confident</option><option>Anxious</option><option>FOMO</option><option>Impatient</option><option>Revenge</option></select></div>
       <div class="fgg full"><label class="fl">Notes</label><textarea class="ta" id="f-nt" placeholder="Setup, execution, lessons…"></textarea></div>
-      <!-- 📸 Screenshot Attach -->
       <div class="fgg full">
-        <label class="fl">📸 Chart Screenshot</label>
-        <div id="screenshot-drop-zone" style="border:2px dashed var(--border2);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3);position:relative;overflow:hidden" onclick="document.getElementById('f-screenshot').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="handleScreenshotDrop(event)">
+        <label class="fl">📸 Chart Screenshot <span style="font-weight:400;color:var(--text3)">(opsional)</span></label>
+        <div id="screenshot-drop-zone" style="border:2px dashed var(--border2);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--bg3)" onclick="document.getElementById('f-screenshot').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="handleScreenshotDrop(event)">
           <input type="file" id="f-screenshot" accept="image/*" style="display:none" onchange="handleScreenshotFile(this.files[0])">
-          <div id="screenshot-placeholder" style="color:var(--text3);font-size:12px;pointer-events:none">
-            <div style="font-size:24px;margin-bottom:6px">📷</div>
-            <div>Drop screenshot chart di sini, atau klik untuk upload</div>
-            <div style="font-size:10px;margin-top:4px;color:var(--text3)">PNG, JPG, WEBP — maks 5MB</div>
-          </div>
-          <div id="screenshot-preview" style="display:none;position:relative">
-            <img id="screenshot-img" style="max-width:100%;max-height:200px;border-radius:8px;object-fit:contain" alt="chart">
-            <button onclick="event.stopPropagation();clearScreenshot()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+          <div id="screenshot-placeholder" style="color:var(--text3);font-size:12px;pointer-events:none"><span style="font-size:20px">📷</span><br>Drop screenshot di sini atau klik upload<br><span style="font-size:10px">PNG/JPG maks 3MB</span></div>
+          <div id="screenshot-preview" style="display:none;position:relative;display:none">
+            <img id="screenshot-img" style="max-width:100%;max-height:180px;border-radius:8px;object-fit:contain" alt="chart">
+            <button onclick="event.stopPropagation();clearScreenshot()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.75);border:none;color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;line-height:1">✕</button>
           </div>
         </div>
       </div>
@@ -1618,135 +1613,6 @@ select.fi option{background:var(--bg3);}
         <button class="btng" id="logout-cancel" style="flex:1">Batal</button>
         <button class="btn" id="logout-confirm" style="flex:1;background:#ff4d4d">Ya, Keluar</button>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ AI TRADE REVIEW MODAL ══ -->
-<div class="mo" id="md-ai-review">
-  <div class="md" style="max-width:540px;max-height:85vh;overflow-y:auto">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div>
-        <div style="font-size:16px;font-weight:600;letter-spacing:-.3px">🤖 AI Trade Review</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:2px">Analisis mendalam dari trade kamu</div>
-      </div>
-      <button id="ai-review-close" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px;line-height:1;transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕</button>
-    </div>
-
-    <!-- Trade selector -->
-    <div style="margin-bottom:14px">
-      <label class="fl">Pilih Trade untuk Dianalisis</label>
-      <select class="fi" id="ai-trade-select" style="width:100%">
-        <option value="">— Pilih trade —</option>
-      </select>
-    </div>
-
-    <!-- Or analyze all recent -->
-    <div style="margin-bottom:14px;display:flex;gap:8px">
-      <button class="btn" id="ai-analyze-btn" style="flex:1;padding:10px;font-size:13px">
-        🔍 Analisis Trade Ini
-      </button>
-      <button class="btng" id="ai-analyze-all-btn" style="flex:1;padding:10px;font-size:13px">
-        📊 Review Performa Keseluruhan
-      </button>
-    </div>
-
-    <!-- AI Result area -->
-    <div id="ai-result-area" style="display:none">
-      <div style="height:1px;background:var(--border);margin-bottom:14px"></div>
-      <div id="ai-loading" style="display:none;text-align:center;padding:24px;color:var(--text2);font-size:13px">
-        <div style="font-size:28px;margin-bottom:10px;animation:pulse 1.5s infinite">🤖</div>
-        <div id="ai-loading-text">Menganalisis trade…</div>
-      </div>
-      <div id="ai-output" style="display:none">
-        <!-- Header badge -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-          <div style="background:rgba(124,106,247,.15);border:1px solid rgba(124,106,247,.25);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;color:var(--accent)">🤖 Claude AI</div>
-          <div id="ai-trade-label" style="font-size:12px;color:var(--text3);font-family:var(--mono)"></div>
-        </div>
-        <!-- Main output -->
-        <div id="ai-content" style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;font-size:13px;line-height:1.75;color:var(--text2);white-space:pre-wrap"></div>
-        <!-- Save / copy -->
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btng bsm" id="ai-copy-btn" style="flex:1;padding:9px;font-size:12px">📋 Copy</button>
-          <button class="btng bsm" id="ai-save-notes-btn" style="flex:1;padding:9px;font-size:12px">💾 Simpan ke Notes Trade</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ DAILY REMINDER MODAL ══ -->
-<div class="mo" id="md-daily-reminder">
-  <div class="md" style="max-width:420px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div>
-        <div style="font-size:16px;font-weight:600;letter-spacing:-.3px">🔔 Daily Reminder</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:2px">Atur notifikasi & laporan harian</div>
-      </div>
-      <button id="reminder-close" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px;line-height:1;transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕</button>
-    </div>
-
-    <!-- Notif permission -->
-    <div id="notif-permission-banner" style="display:none;background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#f5c842;line-height:1.5">
-      ⚠️ Notifikasi browser belum diizinkan. Klik tombol di bawah untuk mengaktifkan.
-    </div>
-
-    <!-- Enable toggle -->
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div style="font-size:13px;font-weight:500;color:var(--text)">Aktifkan Reminder Harian</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px">Notifikasi browser + laporan performa</div>
-        </div>
-        <label style="position:relative;display:inline-block;width:42px;height:24px;cursor:pointer">
-          <input type="checkbox" id="reminder-toggle" style="opacity:0;width:0;height:0">
-          <span id="reminder-slider" style="position:absolute;inset:0;background:var(--bg4);border-radius:12px;transition:.3s;border:1px solid var(--border2)">
-            <span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#aaa;border-radius:50%;transition:.3s" id="reminder-knob"></span>
-          </span>
-        </label>
-      </div>
-    </div>
-
-    <!-- Time picker -->
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px">
-      <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:10px">⏰ Waktu Reminder</div>
-      <div style="display:flex;gap:10px;align-items:center">
-        <input type="time" id="reminder-time" value="09:00" style="flex:1;padding:9px 12px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:14px;font-family:var(--mono);outline:none;border-box:box-sizing">
-        <div style="font-size:12px;color:var(--text3);line-height:1.5;text-align:right">Waktu lokal<br>browser kamu</div>
-      </div>
-    </div>
-
-    <!-- Reminder type -->
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px">
-      <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:10px">📋 Isi Laporan Harian</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
-          <input type="checkbox" id="rpt-pnl" checked style="accent-color:var(--accent)"> P&amp;L hari ini
-        </label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
-          <input type="checkbox" id="rpt-wr" checked style="accent-color:var(--accent)"> Win rate 7 hari terakhir
-        </label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
-          <input type="checkbox" id="rpt-streak" checked style="accent-color:var(--accent)"> Streak win/loss
-        </label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
-          <input type="checkbox" id="rpt-reminder-text" style="accent-color:var(--accent)"> Teks motivasi trading
-        </label>
-      </div>
-    </div>
-
-    <!-- Preview laporan harian -->
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px">
-      <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:8px">👁 Preview Laporan</div>
-      <div id="reminder-preview" style="font-size:12px;color:var(--text2);font-family:var(--mono);line-height:1.8;white-space:pre-wrap"></div>
-    </div>
-
-    <!-- Buttons -->
-    <div style="display:flex;gap:8px">
-      <button class="btng" id="reminder-cancel-btn" style="flex:1;padding:10px">Tutup</button>
-      <button class="btn" id="reminder-send-now-btn" style="flex:1;padding:10px;font-size:13px">📤 Kirim Sekarang</button>
-      <button class="btn" id="reminder-save-btn" style="flex:1;padding:10px;font-size:13px">💾 Simpan</button>
     </div>
   </div>
 </div>
@@ -2845,6 +2711,7 @@ function openTrade() {
     openAnonLimitModal();
     return;
   }
+  clearScreenshot();
   $('f-dt').value = new Date().toISOString().slice(0,10);
   $('md-trade').classList.add('open');
   setTimeout(() => $('f-pair').focus(), 80);
@@ -2873,7 +2740,9 @@ $('trade-save').addEventListener('click', async () => {
     emotion: $('f-em').value,
     notes:   $('f-nt').value.trim(),
   };
+  if (window._pendingScreenshot) { trade.screenshot = window._pendingScreenshot; window._pendingScreenshot = null; }
   ['f-pair','f-en','f-ex','f-sl','f-rk','f-pnl','f-su','f-nt'].forEach(id => $(id).value='');
+  clearScreenshot();
   closeTradeModal();
   await saveTradeToCloud(trade);
 });
@@ -4231,21 +4100,20 @@ document.addEventListener('keydown', e => {
 });
 
 // ══════════════════════════════════════════════════════
-// ── 📸 SCREENSHOT ATTACH ──────────────────────────────
+// ── 📸 SCREENSHOT ATTACH ─────────────────────────────
 // ══════════════════════════════════════════════════════
-let currentScreenshotBase64 = null;
+window._pendingScreenshot = null;
 
 function handleScreenshotFile(file) {
   if (!file) return;
-  if (file.size > 5 * 1024 * 1024) { alert('File terlalu besar. Maks 5MB.'); return; }
+  if (file.size > 3 * 1024 * 1024) { alert('File terlalu besar. Maks 3MB.'); return; }
   const reader = new FileReader();
   reader.onload = e => {
-    currentScreenshotBase64 = e.target.result;
+    window._pendingScreenshot = e.target.result;
     $('screenshot-img').src = e.target.result;
     $('screenshot-placeholder').style.display = 'none';
     $('screenshot-preview').style.display = 'block';
     $('screenshot-drop-zone').style.borderColor = 'var(--accent)';
-    $('screenshot-drop-zone').style.background = 'rgba(124,106,247,.05)';
   };
   reader.readAsDataURL(file);
 }
@@ -4253,132 +4121,47 @@ function handleScreenshotFile(file) {
 function handleScreenshotDrop(e) {
   e.preventDefault();
   $('screenshot-drop-zone').style.borderColor = 'var(--border2)';
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) handleScreenshotFile(file);
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) handleScreenshotFile(f);
 }
 
 function clearScreenshot() {
-  currentScreenshotBase64 = null;
-  $('f-screenshot').value = '';
-  $('screenshot-placeholder').style.display = 'block';
-  $('screenshot-preview').style.display = 'none';
-  $('screenshot-drop-zone').style.borderColor = 'var(--border2)';
-  $('screenshot-drop-zone').style.background = 'var(--bg3)';
-}
-
-// Patch trade save to include screenshot
-const _origTradeSave = $('trade-save').onclick;
-$('trade-save').addEventListener('click', async () => {
-  // inject screenshot into trade object — patch openTrade to reset it
-}, { capture: false });
-
-// Override the existing trade-save click to include screenshot
-// (we need to re-wire, since the original is wired with addEventListener)
-// We'll patch via the saveTradeToCloud call by overriding the trade object construction
-// Actually, let's patch openTrade to reset screenshot
-const _origOpenTrade = window.openTrade;
-function openTrade() {
-  clearScreenshot();
-  if (!currentUser) {
-    pendingAction = 'openTrade';
-    openLoginScreen('log');
-    return;
-  }
-  if (currentUser.isAnonymous && trades.length >= ANON_LIMIT) {
-    openAnonLimitModal();
-    return;
-  }
-  $('f-dt').value = new Date().toISOString().slice(0,10);
-  $('md-trade').classList.add('open');
-  setTimeout(() => $('f-pair').focus(), 80);
-}
-
-// Re-wire buttons that call openTrade
-$('dash-log-btn').onclick = openTrade;
-$('journal-log-btn').onclick = openTrade;
-$('mob-log-btn').onclick = openTrade;
-
-// Intercept trade-save to append screenshot
-$('trade-save').addEventListener('click', async () => {
-  // The existing listener already fires — we need to patch the trade object.
-  // Instead, we add screenshot to Firestore separately after main save.
-  // Since the main listener fires first, we'll attach screenshot in a micro callback.
-  // Better approach: use a flag and override saveTradeToCloud patch.
-}, { once: false });
-
-// Patch saveTradeToCloud to inject screenshot
-const _origSaveTradeToCloud = window.saveTradeToCloud;
-window.saveTradeToCloud = async function(trade) {
-  if (currentScreenshotBase64) {
-    trade.screenshot = currentScreenshotBase64;
-    clearScreenshot();
-  }
-  return _origSaveTradeToCloud ? _origSaveTradeToCloud(trade) : null;
-};
-
-// Show screenshot in journal table — patch renderTrades
-// We hook into the existing renderTrades function
-const _origRenderTrades = window.renderTrades;
-window.renderTrades = function() {
-  if (_origRenderTrades) _origRenderTrades();
-  // After render, add screenshot thumbnails
-  document.querySelectorAll('[data-trade-id]').forEach(row => {
-    const id = row.dataset.tradeId;
-    const trade = trades.find(t => t.firestoreId === id);
-    if (trade && trade.screenshot) {
-      // find the notes cell and append thumbnail
-      const notesTd = row.querySelector('.notes-cell');
-      if (notesTd && !notesTd.querySelector('.shot-thumb')) {
-        const thumb = document.createElement('img');
-        thumb.src = trade.screenshot;
-        thumb.className = 'shot-thumb';
-        thumb.style.cssText = 'width:32px;height:24px;object-fit:cover;border-radius:4px;vertical-align:middle;margin-left:6px;cursor:pointer;border:1px solid var(--border2)';
-        thumb.title = 'Lihat screenshot chart';
-        thumb.onclick = e => { e.stopPropagation(); showScreenshotFullscreen(trade.screenshot); };
-        notesTd.appendChild(thumb);
-      }
-    }
-  });
-};
-
-function showScreenshotFullscreen(src) {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;cursor:pointer';
-  overlay.innerHTML = `<img src="${src}" style="max-width:100%;max-height:90vh;border-radius:10px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.5)"><button style="position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1">✕</button>`;
-  overlay.onclick = () => document.body.removeChild(overlay);
-  document.body.appendChild(overlay);
+  window._pendingScreenshot = null;
+  const fi = $('f-screenshot');
+  if (fi) fi.value = '';
+  const ph = $('screenshot-placeholder');
+  const pv = $('screenshot-preview');
+  const dz = $('screenshot-drop-zone');
+  if (ph) ph.style.display = 'block';
+  if (pv) pv.style.display = 'none';
+  if (dz) dz.style.borderColor = 'var(--border2)';
 }
 
 // ══════════════════════════════════════════════════════
-// ── 🤖 AI TRADE REVIEW ────────────────────────────────
+// ── 🤖 AI TRADE REVIEW ───────────────────────────────
 // ══════════════════════════════════════════════════════
-let aiCurrentTradeId = null;
-let aiCurrentContent = '';
+let _aiContent = '';
+let _aiTradeId = null;
 
-function openAIReview() {
+$('nav-ai-review').addEventListener('click', () => {
   if (!currentUser) { openLoginScreen('general'); return; }
-  // Populate trade selector
   const sel = $('ai-trade-select');
   sel.innerHTML = '<option value="">— Pilih trade —</option>';
-  const sorted = [...trades].sort((a,b) => b.date.localeCompare(a.date));
-  sorted.forEach(t => {
+  [...trades].sort((a,b) => b.date.localeCompare(a.date)).forEach((t, i) => {
     const opt = document.createElement('option');
-    opt.value = t.firestoreId || t.id || t.date + t.pair;
-    opt.textContent = `${t.date} · ${t.pair} · ${t.dir} · ${t.result} · P&L ${t.pnl >= 0 ? '+' : ''}$${t.pnl}`;
-    opt.dataset.tid = t.firestoreId || '';
+    opt.value = i;
+    opt.textContent = `${t.date} · ${t.pair} · ${t.dir} · ${t.result} · $${t.pnl >= 0 ? '+' : ''}${t.pnl}`;
     sel.appendChild(opt);
   });
   $('ai-result-area').style.display = 'none';
-  $('ai-output').style.display = 'none';
-  $('ai-loading').style.display = 'none';
   $('md-ai-review').classList.add('open');
   if (isMob()) closeSB();
-}
+});
 
 $('ai-review-close').addEventListener('click', () => $('md-ai-review').classList.remove('open'));
 $('md-ai-review').addEventListener('click', e => { if (e.target === $('md-ai-review')) $('md-ai-review').classList.remove('open'); });
 
-async function callClaudeAPI(prompt) {
+async function callAI(prompt) {
   const resp = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -4388,326 +4171,294 @@ async function callClaudeAPI(prompt) {
       messages: [{ role: 'user', content: prompt }]
     })
   });
-  const data = await resp.json();
-  return data.content?.map(b => b.text || '').join('') || 'Tidak ada respons.';
+  const d = await resp.json();
+  if (d.error) throw new Error(d.error.message);
+  return d.content?.map(b => b.text || '').join('') || '';
 }
 
-$('ai-analyze-btn').addEventListener('click', async () => {
-  const sel = $('ai-trade-select');
-  const optEl = sel.options[sel.selectedIndex];
-  if (!sel.value) { alert('Pilih trade dulu.'); return; }
-  const tid = optEl?.dataset?.tid;
-  const trade = tid ? trades.find(t => t.firestoreId === tid) : trades.find((t, i) => String(i) === sel.value);
-  if (!trade) { alert('Trade tidak ditemukan.'); return; }
-  
+function showAILoading(text) {
   $('ai-result-area').style.display = 'block';
   $('ai-loading').style.display = 'block';
   $('ai-output').style.display = 'none';
-  $('ai-loading-text').textContent = 'Menganalisis trade…';
+  $('ai-loading-text').textContent = text;
+}
 
-  const prompt = `Kamu adalah coach trading profesional. Analisis trade berikut dan berikan feedback yang jujur, spesifik, dan actionable dalam Bahasa Indonesia.
+function showAIResult(label, content) {
+  _aiContent = content;
+  $('ai-loading').style.display = 'none';
+  $('ai-output').style.display = 'block';
+  $('ai-trade-label').textContent = label;
+  $('ai-content').textContent = content;
+}
 
-DATA TRADE:
-- Tanggal: ${trade.date}
-- Pair: ${trade.pair}
-- Arah: ${trade.dir}
-- Session: ${trade.session || '-'}
-- Entry: ${trade.entry}
-- Exit: ${trade.exit}
-- Stop Loss: ${trade.sl}
-- Risk: $${trade.risk}
-- P&L: $${trade.pnl}
-- R-Multiple: ${trade.r}R
-- Hasil: ${trade.result}
-- Setup: ${trade.setup || '-'}
-- Emosi: ${trade.emotion || '-'}
-- Notes trader: ${trade.notes || '-'}
-
-Berikan analisis mencakup:
-1. 📊 **Evaluasi Eksekusi** — apakah entry/exit/SL terlihat logis?
-2. ✅ **Yang Sudah Bagus** — hal positif dari trade ini
-3. ⚠️ **Area Perbaikan** — apa yang bisa dioptimalkan?
-4. 💡 **Saran Konkret** — 2-3 action item spesifik
-5. ⭐ **Rating Trade** — skala 1-10 dengan alasan singkat
-
-Gunakan bahasa yang direktif dan motivatif seperti coach trading profesional.`;
-
+$('ai-analyze-one-btn').addEventListener('click', async () => {
+  const idx = parseInt($('ai-trade-select').value);
+  const sorted = [...trades].sort((a,b) => b.date.localeCompare(a.date));
+  const t = sorted[idx];
+  if (!t) { alert('Pilih trade dulu.'); return; }
+  _aiTradeId = t.firestoreId || null;
+  showAILoading('Menganalisis trade…');
   try {
-    const result = await callClaudeAPI(prompt);
-    aiCurrentContent = result;
-    $('ai-loading').style.display = 'none';
-    $('ai-output').style.display = 'block';
-    $('ai-trade-label').textContent = `${trade.date} · ${trade.pair} · ${trade.result}`;
-    $('ai-content').textContent = result;
-    aiCurrentTradeId = tid;
-  } catch(err) {
-    $('ai-loading').style.display = 'none';
-    $('ai-output').style.display = 'block';
-    $('ai-content').textContent = '❌ Gagal menganalisis. Cek koneksi internet kamu dan coba lagi.';
+    const result = await callAI(`Kamu adalah coach trading profesional. Analisis trade berikut dan beri feedback jujur dan actionable dalam Bahasa Indonesia.
+
+Trade: ${t.date} | ${t.pair} | ${t.dir} | Session: ${t.session||'-'}
+Entry: ${t.entry} | Exit: ${t.exit} | SL: ${t.sl}
+Risk: $${t.risk} | P&L: $${t.pnl} | R: ${t.r}R | Hasil: ${t.result}
+Setup: ${t.setup||'-'} | Emosi: ${t.emotion||'-'}
+Notes: ${t.notes||'-'}
+
+Berikan:
+1. 📊 Evaluasi eksekusi (entry/exit/SL)
+2. ✅ Yang sudah bagus
+3. ⚠️ Area perbaikan
+4. 💡 2-3 saran konkret
+5. ⭐ Rating 1-10 dengan alasan`);
+    showAIResult(`${t.date} · ${t.pair} · ${t.result}`, result);
+  } catch(e) {
+    showAIResult('Error', '❌ Gagal analisis. Pastikan koneksi internet aktif.');
   }
 });
 
 $('ai-analyze-all-btn').addEventListener('click', async () => {
-  if (!trades.length) { alert('Belum ada trade untuk dianalisis.'); return; }
-  
-  $('ai-result-area').style.display = 'block';
-  $('ai-loading').style.display = 'block';
-  $('ai-output').style.display = 'none';
-  $('ai-loading-text').textContent = 'Menganalisis performa keseluruhan…';
-
+  if (!trades.length) { alert('Belum ada trade.'); return; }
+  _aiTradeId = null;
+  showAILoading('Menganalisis performa keseluruhan…');
   const recent = [...trades].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 20);
   const wins = recent.filter(t => t.result === 'Win').length;
-  const losses = recent.filter(t => t.result === 'Loss').length;
-  const wr = recent.length ? Math.round(wins / recent.length * 100) : 0;
-  const totalPnl = recent.reduce((s,t) => s + (t.pnl || 0), 0);
-  const avgR = recent.length ? (recent.reduce((s,t) => s + (t.r || 0), 0) / recent.length).toFixed(2) : 0;
-  const pairs = [...new Set(recent.map(t => t.pair))].join(', ');
-  const setups = [...new Set(recent.map(t => t.setup).filter(Boolean))].join(', ');
-  const emotions = recent.map(t => t.emotion).filter(Boolean);
-  const badEmotion = emotions.filter(e => ['FOMO','Revenge','Anxious','Impatient'].includes(e)).length;
-
-  const prompt = `Kamu adalah coach trading profesional. Berikan review performa trading mendalam dalam Bahasa Indonesia.
-
-DATA PERFORMA (${recent.length} trade terakhir):
-- Win Rate: ${wr}% (${wins}W / ${losses}L)
-- Total P&L: $${totalPnl.toFixed(2)}
-- Rata-rata R: ${avgR}R
-- Pair yang diperdagangkan: ${pairs}
-- Setup yang digunakan: ${setups || 'tidak dicatat'}
-- Trade dengan emosi negatif (FOMO/Revenge/Cemas): ${badEmotion} dari ${recent.length}
-
-Berikan review mencakup:
-1. 🎯 **Evaluasi Performa Umum** — seberapa baik performa ini?
-2. 💪 **Kekuatan Terbesar** — apa yang trader ini lakukan dengan baik?
-3. 🔍 **Pola Masalah** — pola negatif yang terlihat dari data
-4. 📈 **Rekomendasi Prioritas** — 3 hal yang harus diperbaiki SEGERA
-5. 🧠 **Aspek Psikologi** — insight dari data emosi trading
-6. 🏆 **Goal Setting** — target realistis untuk 30 hari ke depan
-
-Jadilah jujur tapi konstruktif. Gunakan data secara spesifik.`;
-
+  const totalPnl = recent.reduce((s,t) => s+(t.pnl||0), 0);
+  const avgR = recent.length ? (recent.reduce((s,t) => s+(t.r||0), 0)/recent.length).toFixed(2) : 0;
+  const badEmo = recent.filter(t => ['FOMO','Revenge','Anxious','Impatient'].includes(t.emotion)).length;
   try {
-    const result = await callClaudeAPI(prompt);
-    aiCurrentContent = result;
-    $('ai-loading').style.display = 'none';
-    $('ai-output').style.display = 'block';
-    $('ai-trade-label').textContent = `${recent.length} trade terakhir`;
-    $('ai-content').textContent = result;
-    aiCurrentTradeId = null;
-  } catch(err) {
-    $('ai-loading').style.display = 'none';
-    $('ai-output').style.display = 'block';
-    $('ai-content').textContent = '❌ Gagal menganalisis. Cek koneksi internet kamu dan coba lagi.';
+    const result = await callAI(`Kamu adalah coach trading profesional. Review performa trading berikut dalam Bahasa Indonesia.
+
+Data ${recent.length} trade terakhir:
+- Win Rate: ${Math.round(wins/recent.length*100)}% (${wins}W/${recent.length-wins}L)
+- Total P&L: $${totalPnl.toFixed(2)}
+- Avg R: ${avgR}R
+- Trade dengan emosi negatif: ${badEmo}/${recent.length}
+- Pair: ${[...new Set(recent.map(t=>t.pair))].join(', ')}
+- Setup: ${[...new Set(recent.map(t=>t.setup).filter(Boolean))].join(', ')||'-'}
+
+Berikan:
+1. 🎯 Evaluasi performa umum
+2. 💪 Kekuatan terbesar
+3. 🔍 Pola masalah dari data
+4. 📈 3 rekomendasi prioritas
+5. 🧠 Insight psikologi trading
+6. 🏆 Target realistis 30 hari`);
+    showAIResult(`${recent.length} trade terakhir`, result);
+  } catch(e) {
+    showAIResult('Error', '❌ Gagal analisis. Pastikan koneksi internet aktif.');
   }
 });
 
 $('ai-copy-btn').addEventListener('click', () => {
-  if (!aiCurrentContent) return;
-  navigator.clipboard.writeText(aiCurrentContent).then(() => {
+  if (!_aiContent) return;
+  navigator.clipboard.writeText(_aiContent).then(() => {
     $('ai-copy-btn').textContent = '✓ Tersalin!';
     setTimeout(() => { $('ai-copy-btn').textContent = '📋 Copy'; }, 2000);
   });
 });
 
 $('ai-save-notes-btn').addEventListener('click', async () => {
-  if (!aiCurrentContent || !aiCurrentTradeId) { alert('Pilih dan analisis trade tertentu dulu sebelum menyimpan.'); return; }
-  const trade = trades.find(t => t.firestoreId === aiCurrentTradeId);
-  if (!trade) return;
-  const existingNotes = trade.notes || '';
-  trade.notes = (existingNotes ? existingNotes + '\n\n' : '') + '--- AI Review ---\n' + aiCurrentContent;
-  await saveTradeToCloud(trade);
+  if (!_aiContent || !_aiTradeId) { alert('Analisis trade spesifik dulu untuk menyimpan ke notes.'); return; }
+  const t = trades.find(t => t.firestoreId === _aiTradeId);
+  if (!t) return;
+  t.notes = (t.notes ? t.notes + '\n\n' : '') + '--- AI Review ---\n' + _aiContent;
+  await saveTradeToCloud(t);
   $('ai-save-notes-btn').textContent = '✓ Tersimpan!';
-  setTimeout(() => { $('ai-save-notes-btn').textContent = '💾 Simpan ke Notes Trade'; }, 2500);
+  setTimeout(() => { $('ai-save-notes-btn').textContent = '💾 Simpan ke Notes'; }, 2500);
 });
 
 // ══════════════════════════════════════════════════════
-// ── 🔔 DAILY REMINDER ─────────────────────────────────
+// ── 🔔 DAILY REMINDER ────────────────────────────────
 // ══════════════════════════════════════════════════════
-const REMINDER_KEY = 'rpt_reminder_settings';
-let reminderSettings = { enabled: false, time: '09:00', pnl: true, wr: true, streak: true, motivasi: false };
-let reminderTimerId = null;
+const RPT_REM_KEY = 'rpt_reminder';
+let _remSettings = { enabled: false, time: '09:00', pnl: true, wr: true, streak: true, motivasi: false };
+let _remTimer = null;
 
-function loadReminderSettings() {
-  try {
-    const s = JSON.parse(localStorage.getItem(REMINDER_KEY) || '{}');
-    reminderSettings = { ...reminderSettings, ...s };
-  } catch(e) {}
+function loadRemSettings() {
+  try { const s = JSON.parse(localStorage.getItem(RPT_REM_KEY)||'{}'); _remSettings = {..._remSettings,...s}; } catch(e){}
 }
 
-function saveReminderSettings() {
-  try { localStorage.setItem(REMINDER_KEY, JSON.stringify(reminderSettings)); } catch(e) {}
+function saveRemSettings() {
+  try { localStorage.setItem(RPT_REM_KEY, JSON.stringify(_remSettings)); } catch(e){}
 }
 
-function buildDailyReport() {
+function buildReport() {
   const today = new Date().toISOString().slice(0,10);
-  const todayTrades = trades.filter(t => t.date === today);
-  const last7 = trades.filter(t => {
-    const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-7);
-    return t.date >= cutoff.toISOString().slice(0,10);
-  });
-  const wins7 = last7.filter(t => t.result === 'Win').length;
-  const wr7 = last7.length ? Math.round(wins7/last7.length*100) : 0;
-  const todayPnl = todayTrades.reduce((s,t) => s+(t.pnl||0), 0);
-  
-  // streak
-  let streak = 0, streakType = '';
-  const sorted = [...trades].sort((a,b) => b.date.localeCompare(a.date));
-  if (sorted.length) {
-    streakType = sorted[0].result === 'Win' ? 'Win' : sorted[0].result === 'Loss' ? 'Loss' : '';
-    for (const t of sorted) {
-      if (t.result === streakType) streak++;
-      else break;
-    }
-  }
-
-  const motivasi = [
-    '💪 Disiplin hari ini = profit bulan depan.',
-    '📈 Setiap trade adalah data. Belajarlah dari semuanya.',
-    '🎯 Fokus pada proses, bukan hasil.',
-    '🧘 Trader terbaik adalah yang paling konsisten, bukan yang paling berani.',
-    '🔑 Risk management yang baik = karir trading yang panjang.',
-  ][Math.floor(Math.random() * 5)];
-
-  let lines = [`🔔 RiskPerTrade Daily — ${new Date().toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long'})}`];
-  lines.push('');
-  if (reminderSettings.pnl) lines.push(`📊 P&L Hari Ini: ${todayPnl >= 0 ? '+' : ''}$${todayPnl.toFixed(2)} (${todayTrades.length} trade)`);
-  if (reminderSettings.wr) lines.push(`🎯 Win Rate 7 Hari: ${wr7}% (dari ${last7.length} trade)`);
-  if (reminderSettings.streak && streak > 1) lines.push(`🔥 Streak: ${streak}x ${streakType} beruntun`);
-  if (reminderSettings.motivasi) { lines.push(''); lines.push(motivasi); }
-  lines.push('');
-  lines.push('📱 Buka RiskPerTrade untuk update lengkap →');
+  const todayT = trades.filter(t => t.date === today);
+  const cut7 = new Date(); cut7.setDate(cut7.getDate()-7);
+  const last7 = trades.filter(t => t.date >= cut7.toISOString().slice(0,10));
+  const wins7 = last7.filter(t => t.result==='Win').length;
+  const todayPnl = todayT.reduce((s,t)=>s+(t.pnl||0),0);
+  const sorted = [...trades].sort((a,b)=>b.date.localeCompare(a.date));
+  let streak=0, stype='';
+  if (sorted.length) { stype=sorted[0].result==='Win'?'Win':'Loss'; for(const t of sorted){if(t.result===stype)streak++;else break;} }
+  const motivasi=['💪 Disiplin hari ini = profit bulan depan.','📈 Setiap trade adalah data, pelajari semuanya.','🎯 Fokus proses, bukan hasil.','🧘 Konsisten > berani.'][Math.floor(Math.random()*4)];
+  const lines = [`🔔 RiskPerTrade — ${new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'})}`,``];
+  if (_remSettings.pnl) lines.push(`📊 P&L Hari Ini: ${todayPnl>=0?'+':''}$${todayPnl.toFixed(2)} (${todayT.length} trade)`);
+  if (_remSettings.wr) lines.push(`🎯 Win Rate 7 Hari: ${last7.length?Math.round(wins7/last7.length*100):0}% (${last7.length} trade)`);
+  if (_remSettings.streak && streak>1) lines.push(`🔥 Streak: ${streak}x ${stype}`);
+  if (_remSettings.motivasi) { lines.push(''); lines.push(motivasi); }
   return lines.join('\n');
 }
 
-function openDailyReminder() {
-  loadReminderSettings();
-  // Sync UI
-  $('reminder-toggle').checked = reminderSettings.enabled;
-  $('reminder-time').value = reminderSettings.time || '09:00';
-  $('rpt-pnl').checked = reminderSettings.pnl !== false;
-  $('rpt-wr').checked = reminderSettings.wr !== false;
-  $('rpt-streak').checked = reminderSettings.streak !== false;
-  $('rpt-reminder-text').checked = reminderSettings.motivasi === true;
-  updateReminderSlider();
-  updateReminderPreview();
-  checkNotifPermission();
-  $('md-daily-reminder').classList.add('open');
-  if (isMob()) closeSB();
-}
-
-function updateReminderSlider() {
+function updateRemUI() {
   const on = $('reminder-toggle').checked;
   $('reminder-knob').style.left = on ? '22px' : '3px';
-  $('reminder-knob').style.background = on ? 'var(--accent)' : '#aaa';
-  $('reminder-slider').style.background = on ? 'rgba(124,106,247,.3)' : 'var(--bg4)';
+  $('reminder-knob').style.background = on ? 'var(--accent)' : '#888';
+  $('reminder-track').style.background = on ? 'rgba(124,106,247,.3)' : 'var(--bg4)';
+  $('reminder-preview').textContent = buildReport();
 }
 
-function updateReminderPreview() {
-  // Temporarily sync settings from UI for preview
-  const tmpSettings = {
-    pnl: $('rpt-pnl').checked,
-    wr: $('rpt-wr').checked,
-    streak: $('rpt-streak').checked,
-    motivasi: $('rpt-reminder-text').checked
-  };
-  const saved = { ...reminderSettings };
-  reminderSettings = { ...reminderSettings, ...tmpSettings };
-  $('reminder-preview').textContent = buildDailyReport();
-  reminderSettings = saved;
-}
-
-function checkNotifPermission() {
-  if (!('Notification' in window)) return;
-  if (Notification.permission === 'denied' || Notification.permission === 'default') {
-    $('notif-permission-banner').style.display = 'block';
-  } else {
-    $('notif-permission-banner').style.display = 'none';
-  }
-}
-
-function scheduleReminder() {
-  if (reminderTimerId) clearInterval(reminderTimerId);
-  if (!reminderSettings.enabled) return;
-  reminderTimerId = setInterval(() => {
-    const now = new Date();
-    const [h, m] = (reminderSettings.time || '09:00').split(':').map(Number);
-    if (now.getHours() === h && now.getMinutes() === m) {
-      sendReminderNotification();
-    }
-  }, 60000); // check every minute
-}
-
-async function sendReminderNotification() {
-  const report = buildDailyReport();
-  if ('Notification' in window) {
-    if (Notification.permission !== 'granted') {
-      await Notification.requestPermission();
-    }
-    if (Notification.permission === 'granted') {
-      const todayTrades = trades.filter(t => t.date === new Date().toISOString().slice(0,10));
-      const todayPnl = todayTrades.reduce((s,t) => s+(t.pnl||0), 0);
-      new Notification('📊 RiskPerTrade Daily Report', {
-        body: `P&L Hari Ini: ${todayPnl >= 0 ? '+' : ''}$${todayPnl.toFixed(2)} · ${todayTrades.length} trade\nKlik untuk lihat detail.`,
-        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAASElEQVQ4jWNgYGD4z8BQDwABBgABgf8AgYGBgQEABgYGBgIABgYGBg8ABgYGBgYGBgYGBgYGBkQABgYGBgYGBgYGBgYGBgAAAP8ABQQDnQAAAABJRU5ErkJggg=='
-      });
-    }
-  }
-}
-
-$('reminder-toggle').addEventListener('change', () => {
-  updateReminderSlider();
-  updateReminderPreview();
+$('nav-reminder').addEventListener('click', () => {
+  loadRemSettings();
+  $('reminder-toggle').checked = _remSettings.enabled;
+  $('reminder-time').value = _remSettings.time;
+  $('rpt-pnl').checked = _remSettings.pnl !== false;
+  $('rpt-wr').checked = _remSettings.wr !== false;
+  $('rpt-streak').checked = _remSettings.streak !== false;
+  $('rpt-motivasi').checked = _remSettings.motivasi === true;
+  $('notif-banner').style.display = ('Notification' in window && Notification.permission !== 'granted') ? 'block' : 'none';
+  updateRemUI();
+  $('md-reminder').classList.add('open');
+  if (isMob()) closeSB();
 });
-['rpt-pnl','rpt-wr','rpt-streak','rpt-reminder-text'].forEach(id => {
-  $(id)?.addEventListener('change', updateReminderPreview);
+
+$('reminder-toggle').addEventListener('change', updateRemUI);
+['rpt-pnl','rpt-wr','rpt-streak','rpt-motivasi'].forEach(id => {
+  const el = $(id); if(el) el.addEventListener('change', () => {
+    _remSettings[id.replace('rpt-','')] = el.checked;
+    $('reminder-preview').textContent = buildReport();
+  });
 });
-$('reminder-time').addEventListener('change', updateReminderPreview);
 
 $('reminder-save-btn').addEventListener('click', async () => {
-  reminderSettings.enabled = $('reminder-toggle').checked;
-  reminderSettings.time = $('reminder-time').value;
-  reminderSettings.pnl = $('rpt-pnl').checked;
-  reminderSettings.wr = $('rpt-wr').checked;
-  reminderSettings.streak = $('rpt-streak').checked;
-  reminderSettings.motivasi = $('rpt-reminder-text').checked;
-  saveReminderSettings();
-  
-  if (reminderSettings.enabled) {
-    if ('Notification' in window && Notification.permission !== 'granted') {
-      const perm = await Notification.requestPermission();
-      if (perm !== 'granted') {
-        $('notif-permission-banner').style.display = 'block';
-        alert('Notifikasi browser tidak diizinkan. Aktifkan notifikasi di pengaturan browser kamu.');
-        return;
-      }
-    }
-    $('notif-permission-banner').style.display = 'none';
-    scheduleReminder();
-  } else {
-    if (reminderTimerId) clearInterval(reminderTimerId);
+  _remSettings.enabled = $('reminder-toggle').checked;
+  _remSettings.time = $('reminder-time').value;
+  _remSettings.pnl = $('rpt-pnl').checked;
+  _remSettings.wr = $('rpt-wr').checked;
+  _remSettings.streak = $('rpt-streak').checked;
+  _remSettings.motivasi = $('rpt-motivasi').checked;
+  if (_remSettings.enabled && 'Notification' in window && Notification.permission !== 'granted') {
+    const p = await Notification.requestPermission();
+    $('notif-banner').style.display = p !== 'granted' ? 'block' : 'none';
   }
-  
+  saveRemSettings();
+  scheduleReminder();
   $('reminder-save-btn').textContent = '✓ Tersimpan!';
   setTimeout(() => { $('reminder-save-btn').textContent = '💾 Simpan'; }, 2000);
 });
 
-$('reminder-send-now-btn').addEventListener('click', async () => {
-  reminderSettings.pnl = $('rpt-pnl').checked;
-  reminderSettings.wr = $('rpt-wr').checked;
-  reminderSettings.streak = $('rpt-streak').checked;
-  reminderSettings.motivasi = $('rpt-reminder-text').checked;
-  await sendReminderNotification();
-  $('reminder-send-now-btn').textContent = '✓ Terkirim!';
-  setTimeout(() => { $('reminder-send-now-btn').textContent = '📤 Kirim Sekarang'; }, 2000);
+$('reminder-test-btn').addEventListener('click', async () => {
+  _remSettings.pnl = $('rpt-pnl').checked;
+  _remSettings.wr = $('rpt-wr').checked;
+  _remSettings.streak = $('rpt-streak').checked;
+  _remSettings.motivasi = $('rpt-motivasi').checked;
+  if ('Notification' in window) {
+    if (Notification.permission !== 'granted') await Notification.requestPermission();
+    if (Notification.permission === 'granted') {
+      new Notification('📊 RiskPerTrade Test Reminder', { body: buildReport().split('\n').slice(2).join('\n').trim() });
+    } else { alert('Notifikasi tidak diizinkan browser.'); }
+  }
+  $('reminder-test-btn').textContent = '✓ Terkirim!';
+  setTimeout(() => { $('reminder-test-btn').textContent = '📤 Test'; }, 2000);
 });
 
-$('reminder-close').addEventListener('click', () => $('md-daily-reminder').classList.remove('open'));
-$('reminder-cancel-btn').addEventListener('click', () => $('md-daily-reminder').classList.remove('open'));
-$('md-daily-reminder').addEventListener('click', e => { if (e.target === $('md-daily-reminder')) $('md-daily-reminder').classList.remove('open'); });
+function scheduleReminder() {
+  if (_remTimer) clearInterval(_remTimer);
+  if (!_remSettings.enabled) return;
+  _remTimer = setInterval(() => {
+    const now = new Date();
+    const [h, m] = (_remSettings.time||'09:00').split(':').map(Number);
+    if (now.getHours()===h && now.getMinutes()===m && 'Notification' in window && Notification.permission==='granted') {
+      new Notification('📊 RiskPerTrade Daily', { body: buildReport().split('\n').slice(2).join('\n').trim() });
+    }
+  }, 60000);
+}
 
-// Auto-schedule on load if previously enabled
-loadReminderSettings();
-if (reminderSettings.enabled) scheduleReminder();
+$('reminder-close').addEventListener('click', () => $('md-reminder').classList.remove('open'));
+$('reminder-cancel-btn').addEventListener('click', () => $('md-reminder').classList.remove('open'));
+$('md-reminder').addEventListener('click', e => { if(e.target===$('md-reminder')) $('md-reminder').classList.remove('open'); });
+
+loadRemSettings();
+scheduleReminder();
 </script>
+<!-- ══ AI TRADE REVIEW MODAL ══ -->
+<div class="mo" id="md-ai-review">
+  <div class="md" style="max-width:540px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div><div style="font-size:16px;font-weight:600">🤖 AI Trade Review</div><div style="font-size:12px;color:var(--text2);margin-top:2px">Analisis trade pakai Claude AI</div></div>
+      <button id="ai-review-close" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px;line-height:1">✕</button>
+    </div>
+    <div style="margin-bottom:12px">
+      <label class="fl">Pilih Trade</label>
+      <select class="fi" id="ai-trade-select" style="width:100%"><option value="">— Pilih trade —</option></select>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn" id="ai-analyze-one-btn" style="flex:1;padding:10px;font-size:13px">🔍 Analisis Trade Ini</button>
+      <button class="btng" id="ai-analyze-all-btn" style="flex:1;padding:10px;font-size:13px">📊 Review Performa</button>
+    </div>
+    <div id="ai-result-area" style="display:none">
+      <div style="height:1px;background:var(--border);margin-bottom:14px"></div>
+      <div id="ai-loading" style="display:none;text-align:center;padding:24px;color:var(--text2);font-size:13px">
+        <div style="font-size:28px;margin-bottom:8px">🤖</div><div id="ai-loading-text">Menganalisis…</div>
+      </div>
+      <div id="ai-output" style="display:none">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <div style="background:rgba(124,106,247,.15);border:1px solid rgba(124,106,247,.25);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--accent)">🤖 Claude AI</div>
+          <div id="ai-trade-label" style="font-size:12px;color:var(--text3);font-family:var(--mono)"></div>
+        </div>
+        <div id="ai-content" style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:13px;line-height:1.75;color:var(--text2);white-space:pre-wrap"></div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btng bsm" id="ai-copy-btn" style="flex:1;padding:9px;font-size:12px">📋 Copy</button>
+          <button class="btng bsm" id="ai-save-notes-btn" style="flex:1;padding:9px;font-size:12px">💾 Simpan ke Notes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DAILY REMINDER MODAL ══ -->
+<div class="mo" id="md-reminder">
+  <div class="md" style="max-width:420px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div><div style="font-size:16px;font-weight:600">🔔 Daily Reminder</div><div style="font-size:12px;color:var(--text2);margin-top:2px">Notifikasi & laporan harian</div></div>
+      <button id="reminder-close" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px;line-height:1">✕</button>
+    </div>
+    <div id="notif-banner" style="display:none;background:rgba(245,200,66,.08);border:1px solid rgba(245,200,66,.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#f5c842">⚠️ Aktifkan notifikasi browser untuk menerima reminder.</div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+      <div><div style="font-size:13px;font-weight:500">Aktifkan Reminder</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Notifikasi harian otomatis</div></div>
+      <label style="position:relative;display:inline-block;width:42px;height:24px;cursor:pointer;flex-shrink:0">
+        <input type="checkbox" id="reminder-toggle" style="opacity:0;width:0;height:0">
+        <span id="reminder-track" style="position:absolute;inset:0;background:var(--bg4);border-radius:12px;border:1px solid var(--border2);transition:.2s"><span id="reminder-knob" style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:#888;border-radius:50%;transition:.2s"></span></span>
+      </label>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:500;margin-bottom:8px">⏰ Waktu</div>
+      <input type="time" id="reminder-time" value="09:00" style="width:100%;padding:8px 12px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:14px;font-family:var(--mono);outline:none">
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:500;margin-bottom:8px">📋 Konten Laporan</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer"><input type="checkbox" id="rpt-pnl" checked style="accent-color:var(--accent)"> P&amp;L hari ini</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer"><input type="checkbox" id="rpt-wr" checked style="accent-color:var(--accent)"> Win rate 7 hari</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer"><input type="checkbox" id="rpt-streak" checked style="accent-color:var(--accent)"> Streak saat ini</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer"><input type="checkbox" id="rpt-motivasi" style="accent-color:var(--accent)"> Motivasi trading</label>
+      </div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:500;margin-bottom:8px">👁 Preview</div>
+      <div id="reminder-preview" style="font-size:11px;color:var(--text2);font-family:var(--mono);line-height:1.8;white-space:pre-wrap"></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btng" id="reminder-cancel-btn" style="flex:1;padding:10px">Tutup</button>
+      <button class="btng" id="reminder-test-btn" style="flex:1;padding:10px;font-size:13px">📤 Test</button>
+      <button class="btn" id="reminder-save-btn" style="flex:1;padding:10px;font-size:13px">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
