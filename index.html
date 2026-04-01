@@ -674,7 +674,7 @@ select.fi option{background:var(--bg3);}
   <div class="nlbl" style="margin-top:6px">Tools</div>
   <div class="ni" id="nav-daily"><span class="nic">📔</span>Daily Journal</div>
   <div class="ni" id="nav-riskcalc"><span class="nic">🧮</span>Risk Calculator</div>
-  <div class="ni" id="nav-ai-review"><span class="nic">🤖</span>AI Trade Review</div>
+  <div class="ni" id="nav-ai-review" style="display:none"><span class="nic">🤖</span>AI Trade Review</div>
   <div class="ni" id="nav-reminder"><span class="nic">🔔</span>Daily Reminder</div>
 
   <div class="sbf" id="sbf">
@@ -3449,6 +3449,7 @@ function isOwner() {
 
 function updateFinanceNav() {
   $('nav-finance').style.display = isOwner() ? 'flex' : 'none';
+  $('nav-ai-review').style.display = isOwner() ? 'flex' : 'none';
 }
 
 // ── FORMAT RUPIAH ─────────────────────────────────────
@@ -4144,7 +4145,7 @@ let _aiContent = '';
 let _aiTradeId = null;
 
 $('nav-ai-review').addEventListener('click', () => {
-  if (!currentUser) { openLoginScreen('general'); return; }
+  if (!currentUser || !isOwner()) return;
   const sel = $('ai-trade-select');
   sel.innerHTML = '<option value="">— Pilih trade —</option>';
   [...trades].sort((a,b) => b.date.localeCompare(a.date)).forEach((t, i) => {
