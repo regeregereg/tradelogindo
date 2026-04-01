@@ -426,7 +426,7 @@ select.fi option{background:var(--bg3);}
   .topbar{display:flex;}
   .sb-btn{display:none;}
   .sidebar{top:52px;height:calc(100vh - 52px);}
-  .main{margin-left:0!important;padding:14px;padding-top:66px;}
+  .main{margin-left:0!important;padding:14px;padding-top:66px;padding-bottom:80px;}
   .stats{grid-template-columns:repeat(2,1fr);}
   .g2,.g3{grid-template-columns:1fr;}
   .ftg{grid-template-columns:1fr 1fr;}
@@ -434,6 +434,74 @@ select.fi option{background:var(--bg3);}
   .ph{flex-direction:column;align-items:flex-start;}
   .bbal{flex-direction:column;align-items:flex-start;}
   .login-card{padding:36px 24px;}
+}
+
+/* ── BOTTOM NAV (mobile only) ── */
+#bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  height:62px;
+  background:rgba(18,18,20,0.92);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-top:1px solid rgba(255,255,255,0.07);
+  z-index:500;
+  padding:0 4px;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+#bottom-nav .bnav-inner{
+  display:flex;align-items:stretch;height:100%;
+}
+.bn-item{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:3px;cursor:pointer;
+  border:none;background:none;
+  padding:6px 2px 4px;
+  position:relative;
+  transition:opacity .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.bn-item:active{opacity:.6;}
+.bn-icon{
+  font-size:20px;line-height:1;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+}
+.bn-label{
+  font-size:9.5px;font-weight:500;
+  color:var(--text3);font-family:var(--font);
+  letter-spacing:.2px;white-space:nowrap;
+  transition:color .15s;
+}
+.bn-item.active .bn-label{ color:var(--accent); }
+.bn-item.active .bn-icon{ transform:scale(1.15); }
+.bn-item.active::after{
+  content:'';position:absolute;top:0;left:20%;right:20%;
+  height:2px;border-radius:0 0 2px 2px;
+  background:var(--accent);
+}
+/* Center FAB button */
+.bn-fab{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:3px;cursor:pointer;border:none;background:none;
+  padding:0 2px;position:relative;
+  -webkit-tap-highlight-color:transparent;
+}
+.bn-fab-circle{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),#5b50d6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;line-height:1;
+  box-shadow:0 4px 16px rgba(124,106,247,.5);
+  margin-top:-12px;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;
+}
+.bn-fab:active .bn-fab-circle{transform:scale(.92);box-shadow:0 2px 8px rgba(124,106,247,.4);}
+.bn-fab-label{font-size:9.5px;font-weight:500;color:var(--text3);font-family:var(--font);letter-spacing:.2px;}
+@media(max-width:768px){
+  #bottom-nav{display:block;}
+  .topbar{display:none !important;}
+  .sidebar{top:0;height:100vh;}
 }
 </style>
 </head>
@@ -649,6 +717,32 @@ select.fi option{background:var(--bg3);}
 
 <div class="ovl" id="ovl"></div>
 <div class="sb-btn" id="sb-btn">◀</div>
+
+<!-- ══ BOTTOM NAV (mobile) ══ -->
+<div id="bottom-nav">
+  <div class="bnav-inner">
+    <button class="bn-item active" id="bn-dashboard" onclick="bnGo('dashboard')">
+      <span class="bn-icon">◈</span>
+      <span class="bn-label">Dashboard</span>
+    </button>
+    <button class="bn-item" id="bn-journal" onclick="bnGo('journal')">
+      <span class="bn-icon">≡</span>
+      <span class="bn-label">Journal</span>
+    </button>
+    <button class="bn-fab" id="bn-log" onclick="openTrade()">
+      <div class="bn-fab-circle">＋</div>
+      <span class="bn-fab-label">Log Trade</span>
+    </button>
+    <button class="bn-item" id="bn-analytics" onclick="bnGo('analytics')">
+      <span class="bn-icon">◎</span>
+      <span class="bn-label">Analytics</span>
+    </button>
+    <button class="bn-item" id="bn-more" onclick="bnToggleSB()">
+      <span class="bn-icon">☰</span>
+      <span class="bn-label">More</span>
+    </button>
+  </div>
+</div>
 
 <!-- ══ SIDEBAR ══ -->
 <nav class="sidebar off" id="sb">
@@ -4385,6 +4479,40 @@ $('md-reminder').addEventListener('click', e => { if(e.target===$('md-reminder')
 
 loadRemSettings();
 scheduleReminder();
+
+// ══════════════════════════════════════════════════════
+// ── BOTTOM NAV (mobile) ───────────────────────────────
+// ══════════════════════════════════════════════════════
+function bnGo(page) {
+  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('bn-' + page);
+  if (btn) btn.classList.add('active');
+  goPage(page);
+}
+
+function bnToggleSB() {
+  if (sbOpen) {
+    closeSB();
+    document.getElementById('bn-more').classList.remove('active');
+  } else {
+    toggleSB();
+    document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('bn-more').classList.add('active');
+  }
+}
+
+// Sync bottom nav active indicator when navigating via sidebar
+const _origGoPage = goPage;
+window._bnWrapped = true;
+// patch: after goPage runs, sync bottom nav
+document.querySelectorAll('.ni[id^="nav-"]').forEach(el => {
+  el.addEventListener('click', () => {
+    const page = el.id.replace('nav-','');
+    document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('bn-' + page);
+    if (btn) btn.classList.add('active');
+  });
+});
 </script>
 <!-- ══ AI TRADE REVIEW MODAL ══ -->
 <div class="mo" id="md-ai-review">
