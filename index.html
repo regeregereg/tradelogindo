@@ -4303,7 +4303,7 @@ const OWNER_UID = 'PASTE_YOUR_UID_HERE'; // ← Ganti dengan UID di Firebase Con
 
 // ── STATE ─────────────────────────────────────────────
 let finTrades = [];
-let finTxMap  = {};   // firestoreId → tx object (untuk onclick lookup)
+let finTxMap  = {};
 let finPeriod = 'all';
 let finLineC, finBarC, finDonutC;
 let finEditId  = null; // null = tambah baru, string = edit existing
@@ -4368,7 +4368,7 @@ window.delFinTx = async (firestoreId) => {
 
 // ── OPEN MODAL ────────────────────────────────────────
 window.openFinModal = function openFinModal(txOrId = null) {
-  const tx = (txOrId && typeof txOrId === 'string') ? (finTxMap[txOrId] || null) : txOrId;
+  const tx = (typeof txOrId === 'string') ? (finTxMap[txOrId] || null) : txOrId;
   finEditId = tx ? tx.firestoreId : null;
   $('fin-modal-title').textContent = tx ? 'Edit Transaksi' : 'Tambah Transaksi';
   $('fin-f-tgl').value     = tx?.tanggal  || new Date().toISOString().slice(0,10);
@@ -4439,12 +4439,12 @@ function renderFinance() {
   const katMap={};
   ft.filter(t=>t.jenis==='Pemasukan').forEach(t=>{const k=t.kategori||'Lainnya';katMap[k]=(katMap[k]||0)+(t.nominal||0);});
   const katKeys=Object.keys(katMap).sort((a,b)=>katMap[b]-katMap[a]);
-  const katColors={'Produk':'#a78bfa','Jasa':'#7c6af7','Operasional':'#c4b5fd','Marketing':'#f472b6','Lainnya':'rgba(139,92,246,.4)'};
+  const katColors={'Produk':'#a78bfa','Jasa':'#7c6af7','Operasional':'#c4b5fd','Marketing':'#f472b6','Lainnya':'rgba(139,92,246,.35)'};
   if(finBarC)finBarC.destroy();
   finBarC=new Chart($('finBarC').getContext('2d'),{
     type:'bar',
-    data:{labels:katKeys.length?katKeys:['–'],datasets:[{data:katKeys.length?katKeys.map(k=>katMap[k]):[0],backgroundColor:katKeys.map(k=>katColors[k]||'#7c6af7'),borderRadius:5}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(139,92,246,.3)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,cornerRadius:8,displayColors:false,callbacks:{label:c=>' '+fRp(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'rgba(255,255,255,.35)',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.3)',font:{family:'DM Mono',size:10},callback:v=>fRp(v)}}}}}
+    data:{labels:katKeys.length?katKeys:['–'],datasets:[{data:katKeys.length?katKeys.map(k=>katMap[k]):[0],backgroundColor:katKeys.map(k=>katColors[k]||'#7c6af7'),borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(139,92,246,.3)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'DM Mono',size:11},padding:10,cornerRadius:8,displayColors:false,callbacks:{label:c=>' '+fRp(c.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'rgba(255,255,255,.4)',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.3)',font:{family:'DM Mono',size:10},callback:v=>fRp(v)}}}}
   });
 
   // ── Donut: income vs expense ───────────────────────
