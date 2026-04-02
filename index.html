@@ -230,9 +230,9 @@ body::before{
 /* ── DEEP ANALYTICS CARDS ── */
 .ana-deep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px;}
 .ana-stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
-.ana-stat-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;font-weight:600;margin-bottom:6px;}
+.ana-stat-label{font-size:10px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:.9px;font-weight:600;margin-bottom:7px;}
 .ana-stat-val{font-size:18px;font-weight:700;font-family:var(--mono);color:var(--text);line-height:1;}
-.ana-stat-sub{font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono);}
+.ana-stat-sub{font-size:11px;color:rgba(255,255,255,0.38);margin-top:6px;font-family:var(--font);letter-spacing:.1px;}
 
 /* ── TAG FILTER CHIPS ── */
 .tag-filter-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
@@ -1330,7 +1330,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
     <div class="tc"><div class="tw">
       <table>
-        <thead><tr><th>#</th><th>Date</th><th>Pair</th><th>Dir</th><th>Session</th><th>Entry</th><th>Exit</th><th>Risk</th><th>P&amp;L</th><th>R</th><th>Result</th><th>Setup</th><th>Notes</th><th style="text-align:center">Chart</th><th></th></tr></thead>
+        <thead><tr><th>#</th><th>Date</th><th>Pair</th><th>Dir</th><th>Session</th><th>Entry</th><th>Exit</th><th>Risk</th><th>P&amp;L</th><th>R</th><th>Result</th><th>Setup</th><th>Notes</th><th></th></tr></thead>
         <tbody id="ttb"></tbody>
       </table>
     </div>
@@ -1368,18 +1368,18 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <div class="cc" style="margin-bottom:16px">
       <div class="ch"><div class="ct">📐 Deep Statistics</div></div>
       <div class="ana-deep-grid" id="ana-deep-grid">
-        <div class="ana-stat-card"><div class="ana-stat-label">Avg Win</div><div class="ana-stat-val pos" id="ana-avg-win">—</div><div class="ana-stat-sub">per winning trade</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Avg Loss</div><div class="ana-stat-val neg" id="ana-avg-loss">—</div><div class="ana-stat-sub">per losing trade</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Best Trade</div><div class="ana-stat-val pos" id="ana-best-trade">—</div><div class="ana-stat-sub" id="ana-best-trade-pair">—</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Worst Trade</div><div class="ana-stat-val neg" id="ana-worst-trade">—</div><div class="ana-stat-sub" id="ana-worst-trade-pair">—</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Best Day</div><div class="ana-stat-val" id="ana-best-day">—</div><div class="ana-stat-sub" id="ana-best-day-pnl">—</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Worst Day</div><div class="ana-stat-val" id="ana-worst-day">—</div><div class="ana-stat-sub" id="ana-worst-day-pnl">—</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Win Streak</div><div class="ana-stat-val pos" id="ana-win-streak">—</div><div class="ana-stat-sub">best run</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Loss Streak</div><div class="ana-stat-val neg" id="ana-loss-streak">—</div><div class="ana-stat-sub">worst run</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Rata-rata Profit</div><div class="ana-stat-val pos" id="ana-avg-win">—</div><div class="ana-stat-sub">per trade menang</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Rata-rata Loss</div><div class="ana-stat-val neg" id="ana-avg-loss">—</div><div class="ana-stat-sub">per trade kalah</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Trade Terbaik</div><div class="ana-stat-val pos" id="ana-best-trade">—</div><div class="ana-stat-sub" id="ana-best-trade-pair">—</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Trade Terburuk</div><div class="ana-stat-val neg" id="ana-worst-trade">—</div><div class="ana-stat-sub" id="ana-worst-trade-pair">—</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Hari Terbaik</div><div class="ana-stat-val" id="ana-best-day">—</div><div class="ana-stat-sub" id="ana-best-day-pnl">—</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Hari Terburuk</div><div class="ana-stat-val" id="ana-worst-day">—</div><div class="ana-stat-sub" id="ana-worst-day-pnl">—</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Win Streak</div><div class="ana-stat-val pos" id="ana-win-streak">—</div><div class="ana-stat-sub">streak terpanjang</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Loss Streak</div><div class="ana-stat-val neg" id="ana-loss-streak">—</div><div class="ana-stat-sub">streak terburuk</div></div>
         <div class="ana-stat-card"><div class="ana-stat-label">Avg R:R Aktual</div><div class="ana-stat-val" id="ana-avg-rr">—</div><div class="ana-stat-sub">risk/reward realisasi</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Expectancy</div><div class="ana-stat-val" id="ana-expectancy">—</div><div class="ana-stat-sub">per trade average</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Best Session</div><div class="ana-stat-val" id="ana-best-session">—</div><div class="ana-stat-sub" id="ana-best-session-pnl">—</div></div>
-        <div class="ana-stat-card"><div class="ana-stat-label">Best Setup</div><div class="ana-stat-val" id="ana-best-setup" style="font-size:13px">—</div><div class="ana-stat-sub" id="ana-best-setup-wr">—</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Ekspektansi</div><div class="ana-stat-val" id="ana-expectancy">—</div><div class="ana-stat-sub">rata-rata per trade</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Sesi Terbaik</div><div class="ana-stat-val" id="ana-best-session">—</div><div class="ana-stat-sub" id="ana-best-session-pnl">—</div></div>
+        <div class="ana-stat-card"><div class="ana-stat-label">Setup Terbaik</div><div class="ana-stat-val" id="ana-best-setup" style="font-size:13px">—</div><div class="ana-stat-sub" id="ana-best-setup-wr">—</div></div>
       </div>
     </div>
 
@@ -2107,59 +2107,13 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div class="fgg full"><label class="fl">Notes</label><textarea class="ta" id="f-nt" placeholder="Setup, execution, lessons…"></textarea></div>
       <div class="fgg full">
         <label class="fl">📸 Chart Screenshot <span style="font-weight:400;color:var(--text3)">(opsional)</span></label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-
-          <!-- BEFORE ENTRY -->
-          <div>
-            <div style="font-size:10px;color:var(--text3);margin-bottom:6px;font-family:var(--mono);letter-spacing:.6px;text-transform:uppercase">Before Entry</div>
-            <div id="drop-before"
-              style="border:2px dashed var(--border2);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3);min-height:90px;display:flex;align-items:center;justify-content:center;position:relative"
-              onclick="document.getElementById('f-img-before').click()"
-              ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-              ondragleave="this.style.borderColor='var(--border2)'"
-              ondrop="handleChartDrop(event,'before')">
-              <input type="file" id="f-img-before" accept="image/*" style="display:none" onchange="handleChartFile(this.files[0],'before')">
-              <div id="ph-before" style="color:var(--text3);font-size:11px;pointer-events:none;line-height:1.6">
-                <div style="font-size:22px;margin-bottom:4px">📊</div>
-                Drop atau klik upload<br>
-                <span style="font-size:10px;opacity:.6">sebelum entry</span>
-              </div>
-              <div id="pv-before" style="display:none;width:100%;position:relative">
-                <img id="img-before" style="max-width:100%;max-height:130px;border-radius:6px;object-fit:contain;display:block;margin:0 auto" alt="before">
-                <div id="sz-before" style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:4px;text-align:center"></div>
-                <button onclick="event.stopPropagation();clearChart('before')"
-                  style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.8);border:none;color:#fff;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;display:flex;align-items:center;justify-content:center">✕</button>
-              </div>
-            </div>
+        <div id="screenshot-drop-zone" style="border:2px dashed var(--border2);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--bg3)" onclick="document.getElementById('f-screenshot').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="handleScreenshotDrop(event)">
+          <input type="file" id="f-screenshot" accept="image/*" style="display:none" onchange="handleScreenshotFile(this.files[0])">
+          <div id="screenshot-placeholder" style="color:var(--text3);font-size:12px;pointer-events:none"><span style="font-size:20px">📷</span><br>Drop screenshot di sini atau klik upload<br><span style="font-size:10px">PNG/JPG maks 3MB</span></div>
+          <div id="screenshot-preview" style="display:none;position:relative;display:none">
+            <img id="screenshot-img" style="max-width:100%;max-height:180px;border-radius:8px;object-fit:contain" alt="chart">
+            <button onclick="event.stopPropagation();clearScreenshot()" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.75);border:none;color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;line-height:1">✕</button>
           </div>
-
-          <!-- AFTER EXIT -->
-          <div>
-            <div style="font-size:10px;color:var(--text3);margin-bottom:6px;font-family:var(--mono);letter-spacing:.6px;text-transform:uppercase">After Exit</div>
-            <div id="drop-after"
-              style="border:2px dashed var(--border2);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3);min-height:90px;display:flex;align-items:center;justify-content:center;position:relative"
-              onclick="document.getElementById('f-img-after').click()"
-              ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-              ondragleave="this.style.borderColor='var(--border2)'"
-              ondrop="handleChartDrop(event,'after')">
-              <input type="file" id="f-img-after" accept="image/*" style="display:none" onchange="handleChartFile(this.files[0],'after')">
-              <div id="ph-after" style="color:var(--text3);font-size:11px;pointer-events:none;line-height:1.6">
-                <div style="font-size:22px;margin-bottom:4px">📈</div>
-                Drop atau klik upload<br>
-                <span style="font-size:10px;opacity:.6">setelah exit</span>
-              </div>
-              <div id="pv-after" style="display:none;width:100%;position:relative">
-                <img id="img-after" style="max-width:100%;max-height:130px;border-radius:6px;object-fit:contain;display:block;margin:0 auto" alt="after">
-                <div id="sz-after" style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:4px;text-align:center"></div>
-                <button onclick="event.stopPropagation();clearChart('after')"
-                  style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.8);border:none;color:#fff;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:10px;line-height:1;display:flex;align-items:center;justify-content:center">✕</button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-        <div style="font-size:10px;color:var(--text3);margin-top:6px;font-family:var(--mono)">
-          ✦ Gambar dikompres otomatis · maks 10MB per file · PNG/JPG
         </div>
       </div>
     </div>
@@ -3315,7 +3269,7 @@ function openTrade() {
     openAnonLimitModal();
     return;
   }
-  clearAllCharts();
+  clearScreenshot();
   $('f-dt').value = new Date().toISOString().slice(0,10);
   $('md-trade').classList.add('open');
   setTimeout(() => $('f-pair').focus(), 80);
@@ -3348,11 +3302,9 @@ $('trade-save').addEventListener('click', async () => {
     emotion: $('f-em').value,
     notes:   $('f-nt').value.trim(),
   };
-  if (window._pendingCharts.before) { trade.chartBefore = window._pendingCharts.before; }
-  if (window._pendingCharts.after)  { trade.chartAfter  = window._pendingCharts.after;  }
-  window._pendingCharts = { before: null, after: null };
+  if (window._pendingScreenshot) { trade.screenshot = window._pendingScreenshot; window._pendingScreenshot = null; }
   ['f-pair','f-en','f-ex','f-sl','f-rk','f-pnl','f-su','f-nt'].forEach(id => $(id).value='');
-  clearAllCharts();
+  clearScreenshot();
   closeTradeModal();
   await saveTradeToCloud(trade);
 });
@@ -3991,24 +3943,6 @@ function renderTable(){
     const rc=t.r>0?'pos':t.r<0?'neg':'neu';
     const rb=t.result==='Win'?'bw':t.result==='Loss'?'bo':'bbe';
     const fid=t.firestoreId||'';
-
-    // Chart column — mini thumbnail jika ada before/after
-    const hasBefore = !!t.chartBefore;
-    const hasAfter  = !!t.chartAfter;
-    const hasOldSS  = !!t.screenshot; // backward-compat trades lama
-    let chartCell = '<td style="text-align:center">—</td>';
-    if (hasBefore || hasAfter || hasOldSS) {
-      const fidSafe = fid.replace(/'/g, "\\'");
-      chartCell = `<td style="text-align:center">
-        <button onclick="openChartLightbox('${fidSafe}')"
-          style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);border-radius:7px;padding:3px 8px;cursor:pointer;color:var(--accent2);font-size:11px;font-family:var(--font);display:inline-flex;align-items:center;gap:4px;transition:all .15s"
-          onmouseover="this.style.background='rgba(139,92,246,.22)'"
-          onmouseout="this.style.background='rgba(139,92,246,.12)'">
-          📊 <span style="font-weight:600">${hasBefore && hasAfter ? '2' : hasOldSS ? '1' : '1'}</span>
-        </button>
-      </td>`;
-    }
-
     return`<tr>
       <td style="color:var(--text3)">${idx}</td><td>${t.date||'—'}</td>
       <td style="font-weight:500;color:var(--text)">${t.pair||'—'}</td>
@@ -4021,7 +3955,6 @@ function renderTable(){
       <td><span class="b ${rb}">${t.result||'—'}</span></td>
       <td style="color:var(--text2)">${t.setup||'—'}</td>
       <td style="color:var(--text3);max-width:100px;overflow:hidden;text-overflow:ellipsis;font-family:var(--font)" title="${t.notes||''}">${t.notes||'—'}</td>
-      ${chartCell}
       <td><button class="bdel" onclick="window.delTrade('${fid}')">✕</button></td>
     </tr>`;
   }).join('');
@@ -5035,148 +4968,42 @@ document.addEventListener('keydown', e => {
 });
 
 // ══════════════════════════════════════════════════════
-// ── 📸 CHART UPLOAD — BEFORE / AFTER ─────────────────
+// ── 📸 SCREENSHOT ATTACH ─────────────────────────────
 // ══════════════════════════════════════════════════════
+window._pendingScreenshot = null;
 
-// Global state untuk pending charts
-window._pendingCharts = { before: null, after: null };
-
-/**
- * compressImage — resize + kompres gambar ke JPEG sebelum disimpan.
- * Target akhir: base64 string ≤ ~220KB (aman untuk Firestore 1MB doc limit)
- * @param {File} file
- * @param {number} maxWidth  — lebar maksimum (px), default 1024
- * @param {number} quality   — kualitas JPEG 0–1, default 0.72
- * @returns {Promise<string>} base64 data URL
- */
-function compressImage(file, maxWidth = 1024, quality = 0.72) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error('Gagal membaca file'));
-    reader.onload = e => {
-      const img = new Image();
-      img.onerror = () => reject(new Error('Gagal memuat gambar'));
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let w = img.width, h = img.height;
-
-        // Resize jika lebih lebar dari maxWidth
-        if (w > maxWidth) {
-          h = Math.round(h * maxWidth / w);
-          w = maxWidth;
-        }
-        canvas.width  = w;
-        canvas.height = h;
-
-        const ctx = canvas.getContext('2d');
-        // Isi background putih dulu (chart PNG transparan → JPEG solid)
-        ctx.fillStyle = '#0e0e10';
-        ctx.fillRect(0, 0, w, h);
-        ctx.drawImage(img, 0, 0, w, h);
-
-        // First pass
-        let out = canvas.toDataURL('image/jpeg', quality);
-
-        // Safety: kalau masih > 230KB base64, compress lagi lebih agresif
-        if (out.length > 310000) {
-          out = canvas.toDataURL('image/jpeg', 0.52);
-        }
-        // Extreme fallback: scale down lagi 60%
-        if (out.length > 310000) {
-          const c2 = document.createElement('canvas');
-          c2.width  = Math.round(w * 0.6);
-          c2.height = Math.round(h * 0.6);
-          const ctx2 = c2.getContext('2d');
-          ctx2.fillStyle = '#0e0e10';
-          ctx2.fillRect(0, 0, c2.width, c2.height);
-          ctx2.drawImage(canvas, 0, 0, c2.width, c2.height);
-          out = c2.toDataURL('image/jpeg', 0.52);
-        }
-
-        resolve(out);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-/** Format ukuran bytes → string cantik */
-function fmtSize(base64Str) {
-  const bytes = Math.round(base64Str.length * 0.75);
-  if (bytes < 1024)      return bytes + ' B';
-  if (bytes < 1048576)   return (bytes / 1024).toFixed(0) + ' KB';
-  return (bytes / 1048576).toFixed(1) + ' MB';
-}
-
-/**
- * handleChartFile — proses + compress file gambar untuk slot 'before' | 'after'
- */
-async function handleChartFile(file, slot) {
+function handleScreenshotFile(file) {
   if (!file) return;
-  if (file.size > 10 * 1024 * 1024) {
-    alert('File terlalu besar. Maks 10MB.');
-    return;
-  }
-
-  // Set loading state
-  const ph = $('ph-' + slot);
-  const pv = $('pv-' + slot);
-  const dz = $('drop-' + slot);
-  if (ph) ph.innerHTML = '<div style="font-size:18px;margin-bottom:4px">⏳</div><span style="font-size:11px;color:var(--text3)">Mengompresi...</span>';
-
-  try {
-    const compressed = await compressImage(file, 1024, 0.72);
-    window._pendingCharts[slot] = compressed;
-
-    const imgEl = $('img-' + slot);
-    const szEl  = $('sz-' + slot);
-    if (imgEl) imgEl.src = compressed;
-    if (szEl)  szEl.textContent = '✓ ' + fmtSize(compressed) + ' (compressed)';
-    if (ph) ph.style.display = 'none';
-    if (pv) pv.style.display = 'block';
-    if (dz) dz.style.borderColor = 'var(--accent)';
-
-  } catch (err) {
-    console.error('compressImage error:', err);
-    if (ph) ph.innerHTML = `<div style="font-size:18px;margin-bottom:4px">${slot === 'before' ? '📊' : '📈'}</div>Drop atau klik upload<br><span style="font-size:10px;opacity:.6">Error, coba lagi</span>`;
-    alert('Gagal memproses gambar. Coba file lain.');
-  }
+  if (file.size > 3 * 1024 * 1024) { alert('File terlalu besar. Maks 3MB.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    window._pendingScreenshot = e.target.result;
+    $('screenshot-img').src = e.target.result;
+    $('screenshot-placeholder').style.display = 'none';
+    $('screenshot-preview').style.display = 'block';
+    $('screenshot-drop-zone').style.borderColor = 'var(--accent)';
+  };
+  reader.readAsDataURL(file);
 }
 
-function handleChartDrop(e, slot) {
+function handleScreenshotDrop(e) {
   e.preventDefault();
-  const dz = $('drop-' + slot);
-  if (dz) dz.style.borderColor = 'var(--border2)';
+  $('screenshot-drop-zone').style.borderColor = 'var(--border2)';
   const f = e.dataTransfer.files[0];
-  if (f && f.type.startsWith('image/')) handleChartFile(f, slot);
+  if (f && f.type.startsWith('image/')) handleScreenshotFile(f);
 }
 
-/**
- * clearChart — reset satu slot
- */
-window.clearChart = function(slot) {
-  window._pendingCharts[slot] = null;
-  const ph = $('ph-' + slot);
-  const pv = $('pv-' + slot);
-  const dz = $('drop-' + slot);
-  const fi = $('f-img-' + slot);
+function clearScreenshot() {
+  window._pendingScreenshot = null;
+  const fi = $('f-screenshot');
   if (fi) fi.value = '';
-  if (ph) { ph.innerHTML = `<div style="font-size:22px;margin-bottom:4px">${slot === 'before' ? '📊' : '📈'}</div>Drop atau klik upload<br><span style="font-size:10px;opacity:.6">${slot === 'before' ? 'sebelum entry' : 'setelah exit'}</span>`; ph.style.display = 'flex'; }
+  const ph = $('screenshot-placeholder');
+  const pv = $('screenshot-preview');
+  const dz = $('screenshot-drop-zone');
+  if (ph) ph.style.display = 'block';
   if (pv) pv.style.display = 'none';
   if (dz) dz.style.borderColor = 'var(--border2)';
-};
-
-/**
- * clearAllCharts — reset kedua slot sekaligus (dipanggil saat modal dibuka/ditutup)
- */
-function clearAllCharts() {
-  clearChart('before');
-  clearChart('after');
 }
-
-// Backward-compat stub (dipanggil dari global stub di head)
-function clearScreenshot() { clearAllCharts(); }
 
 // ══════════════════════════════════════════════════════
 // ── 🤖 AI TRADE REVIEW ───────────────────────────────
@@ -5456,8 +5283,7 @@ window._bnReady = {
     bnMoreToggle();
   },
   openTrade,
-  clearScreenshot,   // backward-compat stub
-  clearAllCharts,
+  clearScreenshot,
 };
 
 // Flush any queued calls made before the module finished loading
@@ -5720,120 +5546,7 @@ window.goPage = function(name) {
 </div>
 
 
-<!-- ── CHART LIGHTBOX MODAL ── -->
-<div id="md-chart-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:900;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(10px)" onclick="if(event.target===this)closeChartLightbox()">
-  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:20px;width:100%;max-width:820px;max-height:92vh;overflow-y:auto;position:relative">
-
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div>
-        <div id="lb-title" style="font-size:15px;font-weight:700;letter-spacing:-.3px"></div>
-        <div id="lb-meta" style="font-size:11px;color:var(--text3);margin-top:2px;font-family:var(--mono)"></div>
-      </div>
-      <button onclick="closeChartLightbox()" style="background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;color:var(--text2);cursor:pointer;font-size:16px;padding:4px 10px;line-height:1;transition:all .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text2)'">✕</button>
-    </div>
-
-    <!-- Chart panels -->
-    <div id="lb-panels" style="display:grid;gap:14px">
-      <!-- filled dynamically -->
-    </div>
-
-    <!-- Notes strip -->
-    <div id="lb-notes" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text2);font-family:var(--mono);line-height:1.6;white-space:pre-wrap"></div>
-
-  </div>
-</div>
-
-<script>
-// ── CHART LIGHTBOX ────────────────────────────────────
-window.openChartLightbox = function(firestoreId) {
-  const trade = trades.find(t => t.firestoreId === firestoreId);
-  if (!trade) return;
-
-  const hasBefore = !!trade.chartBefore;
-  const hasAfter  = !!trade.chartAfter;
-  const hasOldSS  = !!trade.screenshot;
-
-  // Title
-  const resultColor = trade.result === 'Win' ? '#00d97e' : trade.result === 'Loss' ? '#ef4444' : 'var(--text2)';
-  document.getElementById('lb-title').innerHTML =
-    `${trade.pair||'—'} &nbsp;<span style="color:var(--text3);font-weight:400">${trade.date||''}</span> &nbsp;<span style="font-size:11px;background:${trade.result==='Win'?'rgba(0,217,126,.12)':trade.result==='Loss'?'rgba(239,68,68,.1)':'rgba(255,255,255,.06)'};color:${resultColor};border-radius:5px;padding:2px 8px;font-weight:700">${trade.result||''}</span>`;
-
-  const pnlSign = trade.pnl >= 0 ? '+' : '';
-  document.getElementById('lb-meta').textContent =
-    `${trade.dir||''} · ${trade.session||''} · P&L: ${pnlSign}$${(trade.pnl||0).toFixed(2)} · ${trade.r>=0?'+':''}${trade.r||0}R${trade.setup ? ' · ' + trade.setup : ''}`;
-
-  // Build panels
-  let panelsHTML = '';
-
-  if (hasBefore && hasAfter) {
-    // 2 kolom side by side
-    panelsHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      ${chartPanel('Before Entry', trade.chartBefore, 'rgba(139,92,246,.1)', 'rgba(139,92,246,.3)', '📊')}
-      ${chartPanel('After Exit',   trade.chartAfter,  'rgba(0,217,126,.08)', 'rgba(0,217,126,.25)', '📈')}
-    </div>`;
-  } else if (hasBefore) {
-    panelsHTML = chartPanel('Before Entry', trade.chartBefore, 'rgba(139,92,246,.1)', 'rgba(139,92,246,.3)', '📊');
-  } else if (hasAfter) {
-    panelsHTML = chartPanel('After Exit', trade.chartAfter, 'rgba(0,217,126,.08)', 'rgba(0,217,126,.25)', '📈');
-  } else if (hasOldSS) {
-    panelsHTML = chartPanel('Chart Screenshot', trade.screenshot, 'rgba(255,255,255,.04)', 'rgba(255,255,255,.12)', '📷');
-  }
-
-  document.getElementById('lb-panels').innerHTML = panelsHTML;
-
-  // Notes
-  const notesEl = document.getElementById('lb-notes');
-  if (trade.notes && trade.notes.trim()) {
-    notesEl.style.display = 'block';
-    notesEl.textContent = '📝 ' + trade.notes.trim();
-  } else {
-    notesEl.style.display = 'none';
-  }
-
-  // Open
-  const lb = document.getElementById('md-chart-lightbox');
-  lb.style.display = 'flex';
-  requestAnimationFrame(() => { lb.style.opacity = '1'; });
-};
-
-function chartPanel(label, src, bgColor, borderColor, icon) {
-  return `<div style="background:${bgColor};border:1px solid ${borderColor};border-radius:12px;padding:12px">
-    <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:5px">
-      <span>${icon}</span> ${label}
-    </div>
-    <img src="${src}" style="width:100%;border-radius:8px;object-fit:contain;display:block;cursor:zoom-in;max-height:400px"
-      onclick="openImgFull(this.src)" alt="${label}">
-  </div>`;
-}
-
-window.openImgFull = function(src) {
-  const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:16px';
-  ov.onclick = () => document.body.removeChild(ov);
-  const img = document.createElement('img');
-  img.src = src;
-  img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;border-radius:8px';
-  ov.appendChild(img);
-  document.body.appendChild(ov);
-};
-
-window.closeChartLightbox = function() {
-  document.getElementById('md-chart-lightbox').style.display = 'none';
-};
-
-// Close on Escape key
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    closeChartLightbox();
-    // also close fullscreen img if open
-    const ov = document.querySelector('[style*="z-index:9999"]');
-    if (ov) document.body.removeChild(ov);
-  }
-});
-</script>
-
-
+<!-- ── Service Worker: cache CDN assets & enable offline ── -->
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
