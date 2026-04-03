@@ -1832,6 +1832,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       .enews-item:hover{background:rgba(255,255,255,.04);border-color:var(--border2);}
       .enews-item.impact-high{border-left:3px solid #ef4444;}
       .enews-item.impact-medium{border-left:3px solid #f59e0b;}
+      .enews-item.enews-passed{opacity:0.45;}
       .enews-item-top{display:flex;align-items:center;gap:7px;margin-bottom:4px;}
       .enews-flag{font-size:14px;line-height:1;flex-shrink:0;}
       .enews-name{
@@ -1902,6 +1903,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         </div>
         <div class="enews-filter" style="margin-bottom:10px;">
           <button class="enews-ftab active" data-enews-filter="today" id="enews-f-today">Hari Ini</button>
+          <button class="enews-ftab" data-enews-filter="upcoming" id="enews-f-upcoming">Upcoming</button>
           <button class="enews-ftab" data-enews-filter="week" id="enews-f-week">Minggu Ini</button>
         </div>
         <div class="enews-list" id="enews-list">
@@ -1916,299 +1918,315 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <!-- Economic News Script -->
       <script>
       (function(){
-        // High-impact forex events by keyword
-        var HIGH_KEYWORDS = [
-          'Non-Farm','NFP','Unemployment','CPI','Interest Rate','Fed','FOMC',
-          'Rate Decision','GDP','Retail Sales','PMI','ECB','BOE','BOJ','RBA',
-          'Payroll','Inflation','PCE','ISM','Trade Balance','Consumer Price',
-          'Producer Price','Employment','Jobs','ADP','Monetary Policy','Press Conference'
-        ];
-        var MEDIUM_KEYWORDS = [
-          'Manufacturing','Services','Housing','Building Permits','Consumer Confidence',
-          'Durable Goods','Industrial','Business','Treasury','Current Account','ZEW','IFO'
-        ];
 
-        // Country flag map
+        // ── TIMEZONE ──────────────────────────────────────────
+        // FF data = US Eastern Time (ET). WIB = UTC+7.
+        var WIB_MS = 7 * 60 * 60 * 1000;
+
+        function nthSundayUTC(yr, mo, n, utcH){
+          var d = new Date(Date.UTC(yr,mo,1));
+          var firstSun = d.getUTCDay()===0 ? 1 : 8-d.getUTCDay();
+          return Date.UTC(yr, mo, firstSun+(n-1)*7, utcH);
+        }
+        function isEDT(utcMs){
+          var yr = new Date(utcMs).getUTCFullYear();
+          return utcMs >= nthSundayUTC(yr,2,2,7) && utcMs < nthSundayUTC(yr,10,1,6);
+        }
+        function etToUTC(yr,mo,dy,hr,mn){
+          var approx = Date.UTC(yr,mo,dy,hr+5,mn);
+          return Date.UTC(yr,mo,dy,hr+(isEDT(approx)?4:5),mn);
+        }
+
+        function pad2(n){ return String(n).padStart(2,'0'); }
+
+        function formatTimeWIB(date){
+          var t = new Date(date.getTime()+WIB_MS);
+          var h=t.getUTCHours(), m=t.getUTCMinutes();
+          var ap=h>=12?'PM':'AM'; h=h%12||12;
+          return h+':'+pad2(m)+' '+ap+' WIB';
+        }
+
+        function wibDate(date){
+          return new Date(date.getTime()+WIB_MS);
+        }
+        function nowWIB(){ return new Date(Date.now()+WIB_MS); }
+
+        function sameUTCDate(a,b){
+          return a.getUTCFullYear()===b.getUTCFullYear()
+              && a.getUTCMonth()===b.getUTCMonth()
+              && a.getUTCDate()===b.getUTCDate();
+        }
+
+        function isTodayWIB(date){ return sameUTCDate(wibDate(date), nowWIB()); }
+
+        function isThisWeekWIB(date){
+          var nw = nowWIB();
+          var dow = nw.getUTCDay(); var daysFromMon = (dow+6)%7;
+          var monStart = new Date(Date.UTC(nw.getUTCFullYear(),nw.getUTCMonth(),nw.getUTCDate()-daysFromMon));
+          var sunEnd   = new Date(monStart.getTime()+7*864e5-1);
+          var ev = wibDate(date);
+          return ev>=monStart && ev<=sunEnd;
+        }
+
+        // "Upcoming" = events that haven't started yet, within next 7 days
+        function isUpcomingWIB(date){
+          var nowMs = Date.now();
+          return date.getTime() > nowMs && date.getTime() <= nowMs + 7*864e5;
+        }
+
+        // ── HELPERS ───────────────────────────────────────────
         var FLAGS = {
           'USD':'🇺🇸','EUR':'🇪🇺','GBP':'🇬🇧','JPY':'🇯🇵','AUD':'🇦🇺',
-          'CAD':'🇨🇦','CHF':'🇨🇭','NZD':'🇳🇿','CNY':'🇨🇳','CNH':'🇨🇳',
-          'ALL':'🌍'
+          'CAD':'🇨🇦','CHF':'🇨🇭','NZD':'🇳🇿','CNY':'🇨🇳','ALL':'🌍'
         };
+        function getFlag(c){ return FLAGS[c]||'🏳️'; }
 
-        var currentFilter = 'today';
-        var cachedEvents = [];
-        var lastFetch = 0;
-        var CACHE_MS = 5 * 60 * 1000; // 5 min cache
-
-        function getImpact(title){
-          var t = title||'';
-          for(var i=0;i<HIGH_KEYWORDS.length;i++) if(t.toLowerCase().indexOf(HIGH_KEYWORDS[i].toLowerCase())>=0) return 'high';
-          for(var j=0;j<MEDIUM_KEYWORDS.length;j++) if(t.toLowerCase().indexOf(MEDIUM_KEYWORDS[j].toLowerCase())>=0) return 'medium';
-          return null;
-        }
-
-        function getFlag(currency){
-          return FLAGS[currency] || '🏳️';
-        }
-
-        function pad2(n){return String(n).padStart(2,'0');}
-
-        function formatTime(date){
-          var h = date.getHours(), m = date.getMinutes();
-          var ampm = h>=12?'PM':'AM';
-          h = h%12||12;
-          return h+':'+pad2(m)+' '+ampm;
-        }
+        var DAYS_ID = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+        var MONTHS_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 
         function formatCountdown(ms){
-          if(ms<0) return null;
-          var mins = Math.floor(ms/60000);
-          if(mins<60) return mins+'m lagi';
-          var hrs = Math.floor(mins/60);
-          var rm = mins%60;
-          return hrs+'h '+(rm>0?rm+'m ':'')+' lagi';
+          if(ms<=0) return null;
+          var mins=Math.floor(ms/6e4);
+          if(mins===0) return '< 1m lagi';
+          if(mins<60)  return mins+'m lagi';
+          var h=Math.floor(mins/60), m=mins%60;
+          if(h<24)     return h+'j'+(m?' '+m+'m':'')+' lagi';
+          var days=Math.floor(h/24), rh=h%24;
+          return days+'h'+(rh?' '+rh+'j':'')+' lagi';
         }
 
-        function isToday(date){
-          var now = new Date();
-          return date.getFullYear()===now.getFullYear()&&
-                 date.getMonth()===now.getMonth()&&
-                 date.getDate()===now.getDate();
+        function wibDateLabel(date){
+          var d = wibDate(date);
+          var nw = nowWIB();
+          if(sameUTCDate(d,nw)) return 'Hari Ini';
+          var tom = new Date(nw.getTime()+864e5);
+          if(sameUTCDate(d,tom)) return 'Besok';
+          return DAYS_ID[d.getUTCDay()]+', '+d.getUTCDate()+' '+MONTHS_ID[d.getUTCMonth()];
         }
 
-        function isThisWeek(date){
-          var now = new Date();
-          var startOfWeek = new Date(now);
-          startOfWeek.setHours(0,0,0,0);
-          startOfWeek.setDate(now.getDate()-now.getDay());
-          var endOfWeek = new Date(startOfWeek);
-          endOfWeek.setDate(startOfWeek.getDate()+6);
-          endOfWeek.setHours(23,59,59,999);
-          return date>=startOfWeek && date<=endOfWeek;
+        // ── STATE ─────────────────────────────────────────────
+        var currentFilter = 'today';
+        var cachedThis = [];   // this week
+        var cachedNext = [];   // next week
+        var lastFetchThis = 0;
+        var lastFetchNext = 0;
+        var CACHE_MS = 5*60*1000;
+
+        function allEvents(){
+          // merge + dedupe by title+time
+          var seen={}, out=[];
+          cachedThis.concat(cachedNext).forEach(function(ev){
+            var k=ev.title+'|'+ev.date.getTime();
+            if(!seen[k]){seen[k]=1;out.push(ev);}
+          });
+          return out;
         }
 
-        function renderNews(events){
+        // ── RENDER ────────────────────────────────────────────
+        function renderNews(dummy){
           var list = document.getElementById('enews-list');
           if(!list) return;
-          var now = new Date();
-          var nowMs = now.getTime();
+          var nowMs = Date.now();
+          var events = allEvents();
 
-          var filtered = events.filter(function(ev){
-            if(currentFilter==='today') return isToday(ev.date);
-            return isThisWeek(ev.date);
-          });
+          var filtered;
+          if(currentFilter==='today'){
+            filtered = events.filter(function(ev){ return isTodayWIB(ev.date); });
+          } else if(currentFilter==='upcoming'){
+            filtered = events.filter(function(ev){ return isUpcomingWIB(ev.date); });
+          } else {
+            filtered = events.filter(function(ev){ return isThisWeekWIB(ev.date); });
+          }
+          filtered.sort(function(a,b){ return a.date-b.date; });
 
-          // Sort by time
-          filtered.sort(function(a,b){return a.date-b.date;});
-
-          if(filtered.length===0){
-            list.innerHTML = '<div class="enews-empty">📭 Tidak ada berita high-impact<br><span style="font-size:10px;color:var(--text3)">'+
-              (currentFilter==='today'?'Hari ini':'Minggu ini')+'</span></div>';
+          if(!filtered.length){
+            var msgs = {today:'hari ini', upcoming:'7 hari ke depan', week:'minggu ini'};
+            list.innerHTML='<div class="enews-empty">📭 Tidak ada berita high-impact '+msgs[currentFilter]+'</div>';
             return;
           }
 
-          var html = '';
+          var html='', lastDateKey='';
           filtered.forEach(function(ev){
-            var diff = ev.date.getTime() - nowMs;
-            var passed = diff < 0;
-            var soon = diff>=0 && diff < 30*60*1000; // within 30min
-            var timeStr = formatTime(ev.date);
-            var countdownStr = passed ? null : formatCountdown(diff);
+            var diff   = ev.date.getTime()-nowMs;
+            var passed = diff<0;
+            var soon   = diff>=0 && diff<30*60*1000;
+            var cdStr  = passed ? null : formatCountdown(diff);
 
-            var impactCls = ev.impact==='high'?'high':'medium';
-            var impactLabel = ev.impact==='high'?'HIGH':'MEDIUM';
-            var itemCls = 'enews-item impact-'+ev.impact;
-            var timeCls = 'enews-time'+(passed?' passed':soon?' soon':'');
-            var countCls = 'enews-countdown'+(soon?' soon':'');
+            var impCls   = ev.impact==='high'?'high':'medium';
+            var impLabel = ev.impact==='high'?'HIGH':'MEDIUM';
+            var itemCls  = 'enews-item impact-'+ev.impact+(passed?' enews-passed':'');
+            var timeCls  = 'enews-time'+(passed?' passed':soon?' soon':'');
+            var cdCls    = 'enews-countdown'+(soon?' soon':'');
 
-            html += '<div class="'+itemCls+'">'
+            // Date group header (only for upcoming/week)
+            if(currentFilter!=='today'){
+              var evWIB = wibDate(ev.date);
+              var dk = evWIB.getUTCFullYear()+'-'+evWIB.getUTCMonth()+'-'+evWIB.getUTCDate();
+              if(dk!==lastDateKey){
+                lastDateKey=dk;
+                var isToday2 = sameUTCDate(evWIB,nowWIB());
+                html+='<div style="font-size:9px;font-weight:700;text-transform:uppercase;'
+                  +'letter-spacing:.8px;color:'+(isToday2?'var(--accent2)':'var(--text3)')
+                  +';padding:6px 2px 3px;margin-top:'+(lastDateKey===dk?'0':'4px')+';">'
+                  +wibDateLabel(ev.date)+'</div>';
+              }
+            }
+
+            html+='<div class="'+itemCls+'">'
               +'<div class="enews-item-top">'
               +'<span class="enews-flag">'+getFlag(ev.currency)+'</span>'
               +'<span class="enews-name" title="'+ev.title+'">'+ev.title+'</span>'
-              +'<span class="enews-impact '+impactCls+'">'+impactLabel+'</span>'
+              +'<span class="enews-impact '+impCls+'">'+impLabel+'</span>'
               +'</div>'
               +'<div class="enews-item-bottom">'
-              +'<span class="'+timeCls+'">'+timeStr+'</span>'
+              +'<span class="'+timeCls+'">'+formatTimeWIB(ev.date)+'</span>'
               +'<span class="enews-currency">'+ev.currency+'</span>'
-              +(countdownStr?'<span class="'+countCls+'">'+countdownStr+'</span>':'<span style="font-size:9px;color:var(--text3);margin-left:auto;">✔ Selesai</span>')
+              +(cdStr
+                ? '<span class="'+cdCls+'">'+cdStr+'</span>'
+                : '<span style="font-size:9px;color:var(--text3);margin-left:auto;">✔ Selesai</span>')
               +'</div>'
               +'</div>';
           });
 
-          list.innerHTML = html;
-
-          // Update timestamp
-          var updEl = document.getElementById('enews-updated');
-          if(updEl) updEl.textContent = 'Update '+formatTime(now);
+          list.innerHTML=html;
+          var upd=document.getElementById('enews-updated');
+          if(upd) upd.textContent='Update '+formatTimeWIB(new Date());
         }
 
-        function buildFallbackEvents(){
-          // Hardcoded weekly events as reliable fallback
-          // These are recurring high-impact events that happen every week/month
-          var now = new Date();
-          var year = now.getFullYear();
-          var month = now.getMonth();
-          var day = now.getDate();
-
-          // Get Mon-Fri of current week
-          var monday = new Date(now);
-          monday.setDate(day - now.getDay() + 1);
-          monday.setHours(0,0,0,0);
-
-          var schedule = [
-            // Every Tuesday
-            {dayOffset:1, hour:8,  min:30, currency:'USD', title:'JOLTS Job Openings',    impact:'high'},
-            {dayOffset:1, hour:10, min:0,  currency:'EUR', title:'ZEW Economic Sentiment',impact:'medium'},
-            // Every Wednesday
-            {dayOffset:2, hour:8,  min:15, currency:'USD', title:'ADP Nonfarm Employment',impact:'high'},
-            {dayOffset:2, hour:10, min:0,  currency:'USD', title:'ISM Services PMI',      impact:'medium'},
-            {dayOffset:2, hour:14, min:0,  currency:'USD', title:'FOMC Meeting Minutes',   impact:'high'},
-            {dayOffset:2, hour:10, min:30, currency:'USD', title:'Crude Oil Inventories',  impact:'medium'},
-            // Every Thursday
-            {dayOffset:3, hour:8,  min:30, currency:'USD', title:'Initial Jobless Claims', impact:'high'},
-            {dayOffset:3, hour:10, min:0,  currency:'USD', title:'Factory Orders',          impact:'medium'},
-            // Every Friday — NFP first Friday of month
-            {dayOffset:4, hour:8,  min:30, currency:'USD', title:'Nonfarm Payrolls (NFP)', impact:'high'},
-            {dayOffset:4, hour:8,  min:30, currency:'USD', title:'Unemployment Rate',      impact:'high'},
-            {dayOffset:4, hour:8,  min:30, currency:'USD', title:'Average Hourly Earnings',impact:'high'},
-            {dayOffset:4, hour:10, min:0,  currency:'USD', title:'Michigan Consumer Sentiment',impact:'medium'},
-          ];
-
-          // Add monthly events based on approximate timing
-          var monthlyEvents = [
-            {dayOfMonth:null, weekday:2, weekNum:1, hour:14,min:0,  currency:'USD', title:'Fed Interest Rate Decision',impact:'high'},
-            {dayOfMonth:null, weekday:4, weekNum:1, hour:8, min:30, currency:'USD', title:'Nonfarm Payrolls (NFP)',    impact:'high'},
-            {dayOfMonth:null, weekday:4, weekNum:1, hour:8, min:30, currency:'USD', title:'Unemployment Rate',        impact:'high'},
-            {dayOfMonth:12,   weekday:null,          hour:8, min:30, currency:'USD', title:'Consumer Price Index (CPI)',impact:'high'},
-            {dayOfMonth:15,   weekday:null,          hour:8, min:30, currency:'USD', title:'Retail Sales',            impact:'high'},
-            {dayOfMonth:28,   weekday:null,          hour:8, min:30, currency:'USD', title:'GDP Growth Rate',         impact:'high'},
-            {dayOfMonth:1,    weekday:null,          hour:10,min:0,  currency:'USD', title:'ISM Manufacturing PMI',   impact:'high'},
-            {dayOfMonth:null, weekday:4, weekNum:3, hour:12,min:0,  currency:'GBP', title:'BOE Interest Rate Decision',impact:'high'},
-            {dayOfMonth:null, weekday:4, weekNum:2, hour:13,min:15, currency:'EUR', title:'ECB Rate Decision',        impact:'high'},
-          ];
-
-          var events = [];
-          var added = {};
-
-          schedule.forEach(function(s){
-            var d = new Date(monday);
-            d.setDate(monday.getDate()+s.dayOffset);
-            d.setHours(s.hour,s.min,0,0);
-            var key = s.title+d.getDate();
-            if(!added[key]){ events.push({date:d,currency:s.currency,title:s.title,impact:s.impact}); added[key]=1; }
-          });
-
-          return events.sort(function(a,b){return a.date-b.date;});
-        }
-
-        function fetchNews(){
-          var list = document.getElementById('enews-list');
-          if(!list) return;
-
-          // Use cache if fresh
-          var nowMs = Date.now();
-          if(cachedEvents.length>0 && nowMs-lastFetch < CACHE_MS){
-            renderNews(cachedEvents); return;
-          }
-
-          list.innerHTML = '<div class="enews-loading"><div class="enews-spinner"></div>Memuat berita...</div>';
-
-          // Try to fetch from Forex Factory via RSS (multiple CORS proxies)
-          var proxies = [
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?'
-          ];
-          var ffUrl = 'https://nfs.faireconomy.media/ff_calendar_thisweek.json';
-
-          var tryProxy = function(idx){
-            if(idx>=proxies.length){
-              // All proxies failed - use smart fallback
-              cachedEvents = buildFallbackEvents();
-              lastFetch = Date.now();
-              renderNews(cachedEvents);
-              return;
-            }
-            var url = proxies[idx] + encodeURIComponent(ffUrl);
-            fetch(url, {method:'GET'})
-              .then(function(r){
-                if(!r.ok) throw new Error('HTTP '+r.status);
-                return r.json();
-              })
-              .then(function(data){
-                var events = [];
-                var arr = Array.isArray(data)?data:(data.data||data.results||[]);
-                arr.forEach(function(item){
-                  var impact = (item.impact||'').toLowerCase();
-                  if(impact!=='high' && impact!=='medium') return;
-                  var dateStr = item.date; // format: "04-03-2026 8:30am"
-                  var d = parseFFDate(dateStr);
-                  if(!d || isNaN(d.getTime())) return;
-                  events.push({
-                    date:d,
-                    currency:item.currency||'USD',
-                    title:item.title||item.name||'—',
-                    impact:impact
-                  });
-                });
-                if(events.length===0) throw new Error('no events');
-                cachedEvents = events;
-                lastFetch = Date.now();
-                renderNews(cachedEvents);
-              })
-              .catch(function(){
-                tryProxy(idx+1);
-              });
-          };
-
-          tryProxy(0);
-        }
-
+        // ── PARSE FOREX FACTORY DATE ──────────────────────────
+        // FF JSON: "date":"2026-04-04T12:30:00+00:00" (UTC)  OR  "04-04-2026 8:30am" (ET)
         function parseFFDate(str){
           if(!str) return null;
-          // Format: "04-03-2026 8:30am" or "04-03-2026 All Day"
           try{
-            var parts = str.trim().split(' ');
-            var dateParts = parts[0].split('-');
-            var month = parseInt(dateParts[0])-1;
-            var day = parseInt(dateParts[1]);
-            var year = parseInt(dateParts[2]);
-            var hour=0,min=0;
-            if(parts[1] && parts[1]!=='All'){
-              var timeStr = parts[1].toLowerCase();
-              var isPm = timeStr.indexOf('pm')>=0;
-              var timeParts = timeStr.replace(/[ap]m/,'').split(':');
-              hour = parseInt(timeParts[0]);
-              min = parseInt(timeParts[1]||0);
-              if(isPm && hour!==12) hour+=12;
-              if(!isPm && hour===12) hour=0;
+            if(str.indexOf('T')>=0){ var d=new Date(str); return isNaN(d)?null:d; }
+            var p=str.trim().split(' ');
+            var dp=p[0].split('-');
+            var mo=parseInt(dp[0])-1, dy=parseInt(dp[1]), yr=parseInt(dp[2]);
+            var hr=0,mn=0;
+            if(p[1]&&p[1].toLowerCase()!=='all'){
+              var ts=p[1].toLowerCase(), pm=ts.indexOf('pm')>=0;
+              var tp=ts.replace(/[ap]m/,'').split(':');
+              hr=parseInt(tp[0]); mn=parseInt(tp[1]||0);
+              if(pm&&hr!==12) hr+=12; if(!pm&&hr===12) hr=0;
             }
-            return new Date(year,month,day,hour,min,0,0);
+            return new Date(etToUTC(yr,mo,dy,hr,mn));
           }catch(e){return null;}
         }
 
+        // ── FALLBACK SCHEDULE ─────────────────────────────────
+        function buildFallbackForWeek(weekOffsetDays){
+          var nw = nowWIB();
+          var dow=(nw.getUTCDay()+6)%7; // days since Monday
+          var monUTC=new Date(Date.UTC(nw.getUTCFullYear(),nw.getUTCMonth(),nw.getUTCDate()-dow)+weekOffsetDays*864e5);
+
+          var sched=[
+            {d:0,h:10,m:0,  cur:'USD',title:'ISM Manufacturing PMI',      imp:'high'},
+            {d:1,h:8, m:30, cur:'USD',title:'JOLTS Job Openings',         imp:'high'},
+            {d:1,h:10,m:0,  cur:'EUR',title:'ZEW Economic Sentiment',     imp:'medium'},
+            {d:2,h:8, m:15, cur:'USD',title:'ADP Nonfarm Employment',     imp:'high'},
+            {d:2,h:9, m:45, cur:'USD',title:'ISM Services PMI',           imp:'medium'},
+            {d:2,h:10,m:30, cur:'USD',title:'Crude Oil Inventories',      imp:'medium'},
+            {d:2,h:14,m:0,  cur:'USD',title:'FOMC Meeting Minutes',       imp:'high'},
+            {d:3,h:8, m:30, cur:'USD',title:'Initial Jobless Claims',     imp:'high'},
+            {d:3,h:10,m:0,  cur:'USD',title:'Factory Orders',             imp:'medium'},
+            {d:4,h:8, m:30, cur:'USD',title:'Nonfarm Payrolls (NFP)',     imp:'high'},
+            {d:4,h:8, m:30, cur:'USD',title:'Unemployment Rate',          imp:'high'},
+            {d:4,h:8, m:30, cur:'USD',title:'Average Hourly Earnings m/m',imp:'high'},
+            {d:4,h:10,m:0,  cur:'USD',title:'Michigan Consumer Sentiment',imp:'medium'},
+          ];
+
+          var events=[],seen={};
+          sched.forEach(function(s){
+            var dayUTC=new Date(monUTC.getTime()+s.d*864e5);
+            var utcMs=etToUTC(dayUTC.getUTCFullYear(),dayUTC.getUTCMonth(),dayUTC.getUTCDate(),s.h,s.m);
+            var key=s.title+'|'+utcMs;
+            if(!seen[key]){seen[key]=1;events.push({date:new Date(utcMs),currency:s.cur,title:s.title,impact:s.imp});}
+          });
+          return events;
+        }
+
+        // ── FETCH ─────────────────────────────────────────────
+        function fetchWeek(isNext, cb){
+          var urls=[
+            'https://nfs.faireconomy.media/ff_calendar_'+(isNext?'nextweek':'thisweek')+'.json?v='+Date.now(),
+            'https://api.allorigins.win/raw?url='+encodeURIComponent('https://nfs.faireconomy.media/ff_calendar_'+(isNext?'nextweek':'thisweek')+'.json'),
+            'https://corsproxy.io/?'+encodeURIComponent('https://nfs.faireconomy.media/ff_calendar_'+(isNext?'nextweek':'thisweek')+'.json')
+          ];
+          var tryIdx=function(i){
+            if(i>=urls.length){ cb(buildFallbackForWeek(isNext?7:0), true); return; }
+            fetch(urls[i],{cache:'no-store'})
+              .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+              .then(function(data){
+                var arr=Array.isArray(data)?data:(data.data||data.results||[]);
+                var evs=[];
+                arr.forEach(function(item){
+                  var imp=(item.impact||'').toLowerCase();
+                  if(imp!=='high'&&imp!=='medium') return;
+                  var d=parseFFDate(item.date||item.datetime||'');
+                  if(!d||isNaN(d)) return;
+                  evs.push({date:d,currency:(item.currency||'USD').toUpperCase(),title:item.title||item.name||'—',impact:imp});
+                });
+                if(!evs.length) throw 0;
+                cb(evs, false);
+              })
+              .catch(function(){ tryIdx(i+1); });
+          };
+          tryIdx(0);
+        }
+
+        function fetchAll(){
+          var list=document.getElementById('enews-list');
+          if(!list) return;
+          var nowMs=Date.now();
+          var needThis=cachedThis.length===0||(nowMs-lastFetchThis>CACHE_MS);
+          var needNext=cachedNext.length===0||(nowMs-lastFetchNext>CACHE_MS);
+          if(!needThis&&!needNext){ renderNews(); return; }
+
+          if(list.innerHTML.indexOf('enews-item')===-1)
+            list.innerHTML='<div class="enews-loading"><div class="enews-spinner"></div>Memuat berita...</div>';
+
+          var done=0;
+          function onDone(){ done++; if(done>=2) renderNews(); }
+
+          if(needThis){
+            fetchWeek(false, function(evs, isFallback){
+              cachedThis=evs; lastFetchThis=Date.now();
+              var upd=document.getElementById('enews-updated');
+              if(upd&&isFallback) upd.textContent='⚠ Fallback';
+              onDone();
+            });
+          } else onDone();
+
+          if(needNext){
+            fetchWeek(true, function(evs){ cachedNext=evs; lastFetchNext=Date.now(); onDone(); });
+          } else onDone();
+        }
+
+        // ── INIT ──────────────────────────────────────────────
         function init(){
-          // Filter tabs
-          var tabs = document.querySelectorAll('[data-enews-filter]');
-          tabs.forEach(function(btn){
+          document.querySelectorAll('[data-enews-filter]').forEach(function(btn){
             btn.addEventListener('click',function(){
-              currentFilter = btn.getAttribute('data-enews-filter');
-              tabs.forEach(function(b){b.classList.remove('active');});
+              currentFilter=btn.getAttribute('data-enews-filter');
+              document.querySelectorAll('[data-enews-filter]').forEach(function(b){b.classList.remove('active');});
               btn.classList.add('active');
-              renderNews(cachedEvents);
+              // If switching to upcoming/week and we don't have next week yet, fetch it
+              if(currentFilter==='upcoming'||currentFilter==='week'){
+                fetchAll();
+              } else {
+                renderNews();
+              }
             });
           });
-          // Refresh btn
-          var refBtn = document.getElementById('enews-refresh-btn');
-          if(refBtn) refBtn.addEventListener('click',function(){
-            cachedEvents=[];lastFetch=0;
-            fetchNews();
+
+          var rb=document.getElementById('enews-refresh-btn');
+          if(rb) rb.addEventListener('click',function(){
+            cachedThis=[];cachedNext=[];lastFetchThis=0;lastFetchNext=0;
+            fetchAll();
           });
-          // Initial load
-          fetchNews();
-          // Auto-refresh every 10 minutes
-          setInterval(function(){cachedEvents=[];lastFetch=0;fetchNews();}, 10*60*1000);
-          // Update countdowns every 60s
-          setInterval(function(){if(cachedEvents.length>0)renderNews(cachedEvents);}, 60*1000);
+
+          fetchAll();
+          setInterval(function(){cachedThis=[];cachedNext=[];lastFetchThis=0;lastFetchNext=0;fetchAll();},10*60*1000);
+          setInterval(function(){if(cachedThis.length||cachedNext.length) renderNews();},30*1000);
         }
 
         if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
