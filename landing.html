@@ -411,27 +411,24 @@ footer {
 .tick-val.up { color: var(--green); }
 .tick-val.down { color: var(--red); }
 
-/* ── MODAL OVERLAY ── */
-#demo-overlay {
-  display: none; position: fixed; inset: 0; z-index: 200;
-  background: rgba(0,0,0,.7); backdrop-filter: blur(16px);
-  align-items: center; justify-content: center; padding: 24px;
-}
-#demo-overlay.open { display: flex; }
-.demo-modal {
+/* ── LOGIN SCREEN (identik dengan index.html) ── */
+#login-screen { display: none; }
+#login-screen.open { display: flex; }
+.login-card {
   background: var(--bg2); border: 1px solid var(--border2);
-  border-radius: 20px; padding: 48px 40px; max-width: 420px; width: 100%;
+  border-radius: 22px; padding: 48px 40px; width: 100%; max-width: 400px;
   text-align: center; position: relative;
+  box-shadow: 0 32px 80px rgba(0,0,0,.5);
 }
-.demo-close {
-  position: absolute; top: 16px; right: 16px; background: var(--bg3);
-  border: 1px solid var(--border); border-radius: 8px; color: var(--text2);
-  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 16px; transition: all .2s;
+.login-icon { font-size: 48px; margin-bottom: 20px; }
+.login-title { font-size: 26px; font-weight: 700; letter-spacing: -.6px; margin-bottom: 8px; font-family: var(--font); }
+.login-btn {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  width: 100%; padding: 14px; border-radius: 12px; border: none; cursor: pointer;
+  background: #fff; color: #1a1a1a; font-size: 14px; font-weight: 700;
+  font-family: var(--font); transition: all .2s;
 }
-.demo-close:hover { color: var(--text); }
-.demo-title { font-family: var(--font); font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-.demo-sub { font-size: 13px; color: var(--text2); margin-bottom: 28px; line-height: 1.7; }
+.login-btn:hover { opacity: .9; transform: translateY(-1px); }
 </style>
 </head>
 <body>
@@ -441,18 +438,112 @@ footer {
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
 
-<!-- ── DEMO MODAL ── -->
-<div id="demo-overlay">
-  <div class="demo-modal">
-    <button class="demo-close" onclick="document.getElementById('demo-overlay').classList.remove('open')">✕</button>
-    <div style="font-size:36px;margin-bottom:16px;">📊</div>
-    <div class="demo-title">Coba Dulu, Gratis</div>
-    <div class="demo-sub">Masuk ke app langsung dengan akun Google kamu. Semua fitur tersedia, tidak perlu kartu kredit.</div>
-    <a href="./index.html" class="btn-primary" style="display:flex;justify-content:center;margin-bottom:12px;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-      Masuk dengan Google
+<!-- ══ LOGIN MODAL (identik dengan index.html) ══ -->
+<div id="login-screen" style="position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(12px);">
+
+  <!-- Panel A: Login options -->
+  <div class="login-card" id="login-panel">
+    <div id="login-close-btn" style="position:absolute;top:16px;right:16px;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;transition:color .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕</div>
+
+    <!-- State 1: Login options -->
+    <div id="login-step-email">
+      <div class="login-icon">
+        <img src="data:image/png;base64,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" alt="RPT" style="width:64px;height:64px;object-fit:contain">
+      </div>
+      <div class="login-title">Masuk ke RiskPerTrade</div>
+
+      <!-- Early access notice -->
+      <div style="background:rgba(124,106,247,.08);border:1px solid rgba(124,106,247,.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;text-align:left">
+        <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:3px">🔒 Early Access</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.5">Pastikan Google atau email kamu sudah terdaftar. Belum punya akses? Hubungi kami di Instagram.</div>
+        <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
+          style="display:inline-flex;align-items:center;gap:5px;margin-top:7px;font-size:11px;font-weight:600;color:var(--accent);text-decoration:none">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          @journalingtoolsid →
+        </a>
+      </div>
+
+      <!-- Google login -->
+      <button id="google-login-btn" class="login-btn" style="background:#fff;color:#1a1a1a;border:none;margin-bottom:10px;gap:10px;font-size:14px">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px" alt="G">
+        Masuk dengan Google
+      </button>
+
+      <!-- Divider -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-size:11px;color:var(--text3)">atau dengan email</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <!-- Email magic link -->
+      <div style="margin-bottom:8px">
+        <input id="magic-email-input" type="email" placeholder="emailkamu@gmail.com"
+          style="width:100%;padding:12px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;box-sizing:border-box"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
+      </div>
+      <button class="login-btn" id="send-magic-btn" style="background:var(--accent);border:none;color:#fff;margin-bottom:4px">
+        ✉️ Kirim Link Masuk
+      </button>
+      <div id="login-err" style="margin-top:8px;font-size:12px;color:var(--red);background:rgba(239,68,68,.1);border-radius:9px;padding:9px 12px;display:none">Gagal mengirim. Coba lagi.</div>
+      <div id="login-loading" style="margin-top:8px;font-size:12px;color:var(--text2);display:none">⏳ Memproses…</div>
+
+      <!-- Divider -->
+      <div style="display:flex;align-items:center;gap:10px;margin:10px 0 8px">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <span style="font-size:11px;color:var(--text3)">atau</span>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+
+      <!-- Anonymous -->
+      <button id="anon-btn" style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s"
+        onmouseover="this.style.background='var(--bg4)';this.style.color='var(--text)'"
+        onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text2)'">
+        👻 Coba Tanpa Daftar
+      </button>
+      <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:4px">Maks 10 trade — bisa upgrade ke akun penuh kapan saja</div>
+    </div>
+
+    <!-- State 2: Email sent -->
+    <div id="login-step-sent" style="display:none">
+      <div class="login-icon">📬</div>
+      <div class="login-title" style="font-size:20px">Cek Email Kamu!</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">Link masuk sudah dikirim ke:</p>
+      <div style="background:var(--bg3);border:1px solid rgba(124,106,247,.3);border-radius:8px;padding:10px 16px;margin-bottom:20px;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent);text-align:center" id="sent-email-display">—</div>
+      <p style="font-size:12px;color:var(--text3);line-height:1.7;margin-bottom:20px">
+        Klik link di email tersebut untuk masuk otomatis.<br>
+        Link berlaku selama <strong style="color:var(--text)">15 menit</strong>.<br>
+        Cek folder <strong style="color:var(--text)">spam</strong> kalau tidak muncul.
+      </p>
+      <button class="login-btn" id="resend-btn" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);width:100%;justify-content:center;margin-bottom:8px">Kirim Ulang</button>
+      <button id="change-email-btn" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);padding:4px">← Ganti email</button>
+    </div>
+
+    <button id="login-skip-btn" style="margin-top:12px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);transition:color .15s;padding:4px;display:block" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu →</button>
+  </div>
+
+  <!-- Panel B: Not invited -->
+  <div class="login-card" id="notinvited-panel" style="display:none">
+    <div class="login-icon">🔒</div>
+    <div class="login-title" style="font-size:20px">Akses Terbatas</div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">
+      RiskPerTrade saat ini hanya tersedia untuk pengguna yang diundang.<br>
+      Email kamu belum terdaftar dalam daftar akses.
+    </p>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:20px;font-family:var(--mono);font-size:12px;color:var(--text2);text-align:left">
+      <span style="color:var(--text3);font-size:10px;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px">Email yang dicoba</span>
+      <span id="rejected-email" style="color:var(--text)">—</span>
+    </div>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:20px;line-height:1.6">Hubungi admin untuk mendapatkan akses, atau coba dengan email lain.</p>
+    <button class="login-btn" id="try-other-btn" style="background:var(--accent);border:none;color:#fff;margin-bottom:10px">Coba Email Lain</button>
+    <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
+      style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:12px;font-weight:500;text-decoration:none;margin-bottom:8px;transition:all .15s"
+      onmouseover="this.style.background='var(--bg4)';this.style.color='var(--text)'"
+      onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text2)'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      Hubungi Admin — @journalingtoolsid
     </a>
-    <p style="font-size:11px;color:var(--text3);">Dengan masuk, kamu setuju dengan penggunaan wajar platform ini.</p>
+    <button id="notinvited-skip" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);padding:4px" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu →</button>
   </div>
 </div>
 
@@ -466,8 +557,8 @@ footer {
     <a href="#features" class="nav-link">Fitur</a>
     <a href="#propfirm" class="nav-link">PropFirm</a>
     <a href="#how" class="nav-link">Cara Pakai</a>
-    <a href="./index.html" class="btn-login">Masuk</a>
-    <a href="#" onclick="document.getElementById('demo-overlay').classList.add('open');return false;" class="btn-cta-nav">Mulai Gratis</a>
+    <a href="#" onclick="openLoginScreen();return false;" class="btn-login">Masuk</a>
+    <a href="#" onclick="openLoginScreen();return false;" class="btn-cta-nav">Mulai Gratis</a>
   </div>
 </nav>
 
@@ -486,7 +577,7 @@ footer {
     Catat setiap trade, analisis win rate, profit factor, dan pantau progress PropFirm challenge kamu — semua dalam satu platform yang clean dan cepat.
   </p>
   <div class="hero-actions">
-    <a href="#" onclick="document.getElementById('demo-overlay').classList.add('open');return false;" class="btn-primary">
+    <a href="#" onclick="openLoginScreen();return false;" class="btn-primary">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 3l14 9-14 9V3z"/></svg>
       Mulai Sekarang — Gratis
     </a>
@@ -769,12 +860,12 @@ footer {
       </div>
       <h2 class="cta-title">Mulai journal<br>trading kamu sekarang.</h2>
       <p class="cta-sub">Bergabung dengan trader yang sudah meningkatkan performa mereka. Tidak perlu kartu kredit, tidak ada biaya tersembunyi.</p>
-      <a href="#" onclick="document.getElementById('demo-overlay').classList.add('open');return false;" class="btn-primary" style="display:inline-flex;margin-bottom:16px;">
+      <a href="#" onclick="openLoginScreen();return false;" class="btn-primary" style="display:inline-flex;margin-bottom:16px;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
         Login dengan Google
       </a>
       <br>
-      <a href="./index.html" style="font-size:12px;color:var(--text3);text-decoration:none;">
+      <a href="#" onclick="openLoginScreen();return false;" style="font-size:12px;color:var(--text3);text-decoration:none;">
         Sudah punya akun? <span style="color:var(--accent2);">Masuk langsung →</span>
       </a>
     </div>
@@ -789,26 +880,255 @@ footer {
   </div>
   <div class="footer-text">© 2025 RiskPerTrade · Dibuat untuk trader Indonesia</div>
   <div class="footer-links">
-    <a href="./index.html" class="footer-link">Masuk ke App</a>
+    <a href="#" onclick="openLoginScreen();return false;" class="footer-link">Masuk ke App</a>
     <a href="#features" class="footer-link">Fitur</a>
     <a href="#how" class="footer-link">Cara Pakai</a>
   </div>
 </footer>
 
-<script>
-// ── SCROLL REVEAL ──
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signOut,
+         GoogleAuthProvider, signInWithPopup,
+         signInAnonymously, EmailAuthProvider, linkWithCredential,
+         sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ── FIREBASE INIT (identik dengan index.html) ──────────
+const app = initializeApp({
+  apiKey:            "AIzaSyC3vzvNh4vW4w9bDmVC0dkdtjFn7d2pKrA",
+  authDomain:        "tradelog-regy.firebaseapp.com",
+  projectId:         "tradelog-regy",
+  storageBucket:     "tradelog-regy.firebasestorage.app",
+  messagingSenderId: "659047734617",
+  appId:             "1:659047734617:web:9a15dc87aa9fa393c84048"
+});
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ── MAGIC LINK CONFIG (sama dengan index.html) ─────────
+const ACTION_URL = 'https://riskpertrade.me';
+const EMAIL_KEY  = 'rpt_pending_email';
+
+const $ = id => document.getElementById(id);
+
+// ── INVITE CHECK (identik index.html) ──────────────────
+async function isEmailInvited(email, uid) {
+  if (!email) return false;
+  const inviteRef  = doc(db, 'invites', email.toLowerCase().trim());
+  const inviteSnap = await getDoc(inviteRef);
+  if (inviteSnap.exists() && inviteSnap.data().active !== false) return true;
+  if (uid) {
+    const userSnap = await getDoc(doc(db, 'users', uid));
+    if (userSnap.exists()) {
+      try {
+        await setDoc(inviteRef, {
+          active: true, grandfathered: true,
+          addedAt: new Date().toISOString().slice(0,10), name: email
+        }, { merge: true });
+      } catch(e) {}
+      return true;
+    }
+  }
+  return false;
+}
+
+// ── UI HELPERS ─────────────────────────────────────────
+function showEmailStep() {
+  $('login-step-email').style.display = 'block';
+  $('login-step-sent').style.display  = 'none';
+  $('login-err').style.display        = 'none';
+  $('login-loading').style.display    = 'none';
+  if ($('send-magic-btn'))   $('send-magic-btn').disabled   = false;
+  if ($('google-login-btn')) $('google-login-btn').disabled = false;
+  if ($('anon-btn'))         $('anon-btn').disabled         = false;
+}
+function showSentStep(email) {
+  $('login-step-email').style.display = 'none';
+  $('login-step-sent').style.display  = 'block';
+  $('sent-email-display').textContent = email;
+}
+function showLoginPanel() {
+  $('notinvited-panel').style.display = 'none';
+  $('login-panel').style.display      = 'block';
+  showEmailStep();
+}
+function showNotInvited(email) {
+  $('login-panel').style.display      = 'none';
+  $('notinvited-panel').style.display = 'block';
+  $('rejected-email').textContent     = email || '—';
+  $('login-screen').classList.add('open');
+}
+
+// ── OPEN / CLOSE ───────────────────────────────────────
+window.openLoginScreen = function() {
+  showLoginPanel();
+  $('login-screen').classList.add('open');
+};
+function closeLoginScreen() {
+  $('login-screen').classList.remove('open');
+}
+
+// ── MAGIC LINK: handle jika dibuka dari email link ─────
+if (isSignInWithEmailLink(auth, window.location.href)) {
+  let emailForSignIn = localStorage.getItem(EMAIL_KEY);
+  if (!emailForSignIn) {
+    emailForSignIn = window.prompt('Masukkan email yang kamu gunakan untuk request link masuk:');
+  }
+  if (emailForSignIn) {
+    const cleanUp = () => {
+      localStorage.removeItem(EMAIL_KEY);
+      window.history.replaceState(null, '', window.location.pathname);
+    };
+    const anonUID    = localStorage.getItem('rpt_anon_uid');
+    const currentAnon = auth.currentUser;
+    if (anonUID && currentAnon && currentAnon.isAnonymous) {
+      const credential = EmailAuthProvider.credentialWithLink(emailForSignIn, window.location.href);
+      linkWithCredential(currentAnon, credential)
+        .then(cleanUp)
+        .catch(err => {
+          if (err.code === 'auth/email-already-in-use' || err.code === 'auth/credential-already-in-use') {
+            return signInWithEmailLink(auth, emailForSignIn, window.location.href).then(cleanUp);
+          }
+          cleanUp();
+        });
+    } else {
+      signInWithEmailLink(auth, emailForSignIn, window.location.href).then(cleanUp).catch(cleanUp);
+    }
+  }
+}
+
+// ── onAuthStateChanged: sudah login → redirect ke app ──
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    if (user.isAnonymous) {
+      // Anonymous user → langsung ke app
+      localStorage.setItem('rpt_has_session', '1');
+      window.location.replace('./index.html');
+      return;
+    }
+    // Email/Google user → cek invite dulu
+    const invited = await isEmailInvited(user.email, user.uid);
+    if (!invited) {
+      await signOut(auth);
+      showNotInvited(user.email);
+      return;
+    }
+    // Invited → set flag, redirect ke app
+    localStorage.setItem('rpt_has_session', '1');
+    window.location.replace('./index.html');
+  }
+  // user null → tetap di landing
+});
+
+// ── SEND MAGIC LINK ────────────────────────────────────
+async function sendMagicLink(email) {
+  await sendSignInLinkToEmail(auth, email, { url: ACTION_URL, handleCodeInApp: true });
+  localStorage.setItem(EMAIL_KEY, email);
+}
+
+// ── SEND BUTTON ────────────────────────────────────────
+async function handleSendMagic() {
+  const email = $('magic-email-input').value.trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    $('login-err').style.display = 'block';
+    $('login-err').textContent   = 'Masukkan alamat email yang valid.';
+    return;
+  }
+  $('login-err').style.display     = 'none';
+  $('login-loading').style.display = 'block';
+  $('send-magic-btn').disabled     = true;
+
+  const invited = await isEmailInvited(email, null);
+  if (!invited) {
+    $('login-loading').style.display = 'none';
+    $('send-magic-btn').disabled     = false;
+    showNotInvited(email);
+    return;
+  }
+  try {
+    await sendMagicLink(email);
+    $('login-loading').style.display = 'none';
+    $('send-magic-btn').disabled     = false;
+    showSentStep(email);
+  } catch(e) {
+    $('login-loading').style.display = 'none';
+    $('send-magic-btn').disabled     = false;
+    $('login-err').style.display     = 'block';
+    $('login-err').textContent       = 'Gagal mengirim link. Coba lagi.';
+  }
+}
+
+// ── EVENT LISTENERS ────────────────────────────────────
+$('send-magic-btn').addEventListener('click', handleSendMagic);
+$('magic-email-input').addEventListener('keydown', e => { if (e.key === 'Enter') handleSendMagic(); });
+
+$('resend-btn').addEventListener('click', () => {
+  const email = $('sent-email-display').textContent;
+  if (email && email !== '—') {
+    sendMagicLink(email).then(() => {
+      $('resend-btn').textContent = '✓ Terkirim!';
+      setTimeout(() => { $('resend-btn').textContent = 'Kirim Ulang'; }, 3000);
+    }).catch(() => {});
+  }
+});
+$('change-email-btn').addEventListener('click', () => { showEmailStep(); $('magic-email-input').focus(); });
+
+$('login-close-btn').addEventListener('click', closeLoginScreen);
+$('login-skip-btn').addEventListener('click', closeLoginScreen);
+$('login-screen').addEventListener('click', e => { if (e.target === $('login-screen')) closeLoginScreen(); });
+
+$('try-other-btn').addEventListener('click', () => {
+  showLoginPanel(); showEmailStep();
+  $('magic-email-input').value = '';
+  setTimeout(() => $('magic-email-input').focus(), 80);
+});
+$('notinvited-skip').addEventListener('click', closeLoginScreen);
+
+// ── GOOGLE LOGIN ───────────────────────────────────────
+$('google-login-btn').addEventListener('click', async () => {
+  $('login-err').style.display     = 'none';
+  $('login-loading').style.display = 'block';
+  $('google-login-btn').disabled   = true;
+  try {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+    // onAuthStateChanged handles redirect
+  } catch(e) {
+    $('login-loading').style.display = 'none';
+    $('google-login-btn').disabled   = false;
+    if (e.code !== 'auth/popup-closed-by-user') {
+      $('login-err').style.display = 'block';
+      $('login-err').textContent   = 'Gagal masuk dengan Google. Coba lagi.';
+    }
+  }
+});
+
+// ── ANONYMOUS LOGIN ────────────────────────────────────
+$('anon-btn').addEventListener('click', async () => {
+  $('login-loading').style.display = 'block';
+  $('anon-btn').disabled           = true;
+  try {
+    await signInAnonymously(auth);
+    // onAuthStateChanged handles redirect
+  } catch(e) {
+    $('login-loading').style.display = 'none';
+    $('anon-btn').disabled           = false;
+    $('login-err').style.display     = 'block';
+    $('login-err').textContent       = 'Gagal masuk. Coba lagi.';
+  }
+});
+
+// ── SCROLL REVEAL ──────────────────────────────────────
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      observer.unobserve(e.target);
-    }
+    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
   });
 }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// ── NAVBAR SCROLL EFFECT ──
+// ── NAVBAR SCROLL ──────────────────────────────────────
 window.addEventListener('scroll', () => {
   const nav = document.querySelector('nav');
   if (window.scrollY > 20) {
@@ -820,21 +1140,13 @@ window.addEventListener('scroll', () => {
   }
 });
 
-// ── CLOSE DEMO OVERLAY ON BACKDROP CLICK ──
-document.getElementById('demo-overlay').addEventListener('click', function(e) {
-  if (e.target === this) this.classList.remove('open');
-});
-
-// ── SMOOTH NAV LINKS ──
+// ── SMOOTH SCROLL ──────────────────────────────────────
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', function(e) {
     const href = this.getAttribute('href');
     if (href === '#') return;
     const target = document.querySelector(href);
-    if (target) {
-      e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   });
 });
 </script>
