@@ -1793,6 +1793,429 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           </div>
         </div>
       </div>
+
+      <!-- ── ECONOMIC NEWS WIDGET ── -->
+      <style>
+      .enews-widget{
+        background:linear-gradient(160deg,var(--bg2),var(--bg3));
+        border:1px solid var(--border);border-radius:var(--radius);
+        padding:16px;margin-top:12px;
+      }
+      .enews-header{
+        display:flex;align-items:center;justify-content:space-between;
+        margin-bottom:12px;
+      }
+      .enews-title{
+        font-size:10px;font-weight:700;color:var(--text2);
+        text-transform:uppercase;letter-spacing:1px;
+        display:flex;align-items:center;gap:7px;
+      }
+      .enews-live-dot{
+        width:6px;height:6px;border-radius:50%;
+        background:#f59e0b;box-shadow:0 0 6px rgba(245,158,11,.7);
+        animation:pulse 2s infinite;flex-shrink:0;
+      }
+      .enews-refresh{
+        background:none;border:1px solid var(--border);border-radius:7px;
+        color:var(--text3);font-size:11px;cursor:pointer;
+        width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+        transition:all .15s;flex-shrink:0;
+      }
+      .enews-refresh:hover{border-color:var(--border2);color:var(--text);}
+      .enews-list{display:flex;flex-direction:column;gap:6px;}
+      .enews-item{
+        background:rgba(255,255,255,.02);border:1px solid var(--border);
+        border-radius:10px;padding:9px 11px;
+        transition:background .15s,border-color .15s;cursor:default;
+        position:relative;overflow:hidden;
+      }
+      .enews-item:hover{background:rgba(255,255,255,.04);border-color:var(--border2);}
+      .enews-item.impact-high{border-left:3px solid #ef4444;}
+      .enews-item.impact-medium{border-left:3px solid #f59e0b;}
+      .enews-item-top{display:flex;align-items:center;gap:7px;margin-bottom:4px;}
+      .enews-flag{font-size:14px;line-height:1;flex-shrink:0;}
+      .enews-name{
+        font-size:11px;font-weight:700;color:var(--text);
+        flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+        letter-spacing:-.1px;
+      }
+      .enews-impact{
+        font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+        padding:2px 6px;border-radius:4px;flex-shrink:0;
+      }
+      .enews-impact.high{background:rgba(239,68,68,.15);color:#ef4444;}
+      .enews-impact.medium{background:rgba(245,158,11,.15);color:#f59e0b;}
+      .enews-item-bottom{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+      .enews-time{
+        font-size:10px;font-family:var(--mono);color:var(--accent2);
+        font-weight:600;letter-spacing:.2px;
+      }
+      .enews-time.passed{color:var(--text3);}
+      .enews-time.soon{color:#f59e0b;animation:pulse 1.5s infinite;}
+      .enews-currency{
+        font-size:9px;font-weight:700;color:var(--text3);
+        background:rgba(255,255,255,.05);border-radius:4px;
+        padding:1px 5px;letter-spacing:.4px;
+      }
+      .enews-countdown{
+        font-size:9px;font-family:var(--mono);color:var(--text3);
+        margin-left:auto;
+      }
+      .enews-countdown.soon{color:#f59e0b;font-weight:600;}
+      .enews-empty{
+        text-align:center;padding:20px 0;font-size:12px;color:var(--text3);
+      }
+      .enews-loading{
+        display:flex;align-items:center;justify-content:center;gap:8px;
+        padding:16px 0;font-size:11px;color:var(--text3);
+      }
+      .enews-spinner{
+        width:14px;height:14px;border-radius:50%;
+        border:2px solid rgba(255,255,255,.08);
+        border-top-color:var(--accent2);
+        animation:spin .7s linear infinite;
+      }
+      .enews-footer{
+        margin-top:10px;padding-top:8px;border-top:1px solid var(--border);
+        display:flex;align-items:center;justify-content:space-between;
+      }
+      .enews-source{font-size:9px;color:var(--text3);}
+      .enews-source a{color:var(--text3);text-decoration:none;}
+      .enews-source a:hover{color:var(--text2);}
+      .enews-filter{display:flex;gap:4px;}
+      .enews-ftab{
+        background:none;border:1px solid var(--border);border-radius:5px;
+        color:var(--text3);font-size:9px;cursor:pointer;
+        padding:2px 7px;font-family:var(--font);font-weight:600;
+        transition:all .15s;letter-spacing:.3px;
+      }
+      .enews-ftab.active{background:rgba(139,92,246,.15);border-color:rgba(139,92,246,.35);color:var(--accent2);}
+      </style>
+
+      <div class="enews-widget" id="enews-widget">
+        <div class="enews-header">
+          <div class="enews-title">
+            <div class="enews-live-dot"></div>
+            Economic News
+          </div>
+          <button class="enews-refresh" id="enews-refresh-btn" title="Refresh news">↻</button>
+        </div>
+        <div class="enews-filter" style="margin-bottom:10px;">
+          <button class="enews-ftab active" data-enews-filter="today" id="enews-f-today">Hari Ini</button>
+          <button class="enews-ftab" data-enews-filter="week" id="enews-f-week">Minggu Ini</button>
+        </div>
+        <div class="enews-list" id="enews-list">
+          <div class="enews-loading"><div class="enews-spinner"></div>Memuat berita...</div>
+        </div>
+        <div class="enews-footer">
+          <div class="enews-source">Source: <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">Forex Factory</a></div>
+          <div id="enews-updated" style="font-size:9px;color:var(--text3);"></div>
+        </div>
+      </div>
+
+      <!-- Economic News Script -->
+      <script>
+      (function(){
+        // High-impact forex events by keyword
+        var HIGH_KEYWORDS = [
+          'Non-Farm','NFP','Unemployment','CPI','Interest Rate','Fed','FOMC',
+          'Rate Decision','GDP','Retail Sales','PMI','ECB','BOE','BOJ','RBA',
+          'Payroll','Inflation','PCE','ISM','Trade Balance','Consumer Price',
+          'Producer Price','Employment','Jobs','ADP','Monetary Policy','Press Conference'
+        ];
+        var MEDIUM_KEYWORDS = [
+          'Manufacturing','Services','Housing','Building Permits','Consumer Confidence',
+          'Durable Goods','Industrial','Business','Treasury','Current Account','ZEW','IFO'
+        ];
+
+        // Country flag map
+        var FLAGS = {
+          'USD':'🇺🇸','EUR':'🇪🇺','GBP':'🇬🇧','JPY':'🇯🇵','AUD':'🇦🇺',
+          'CAD':'🇨🇦','CHF':'🇨🇭','NZD':'🇳🇿','CNY':'🇨🇳','CNH':'🇨🇳',
+          'ALL':'🌍'
+        };
+
+        var currentFilter = 'today';
+        var cachedEvents = [];
+        var lastFetch = 0;
+        var CACHE_MS = 5 * 60 * 1000; // 5 min cache
+
+        function getImpact(title){
+          var t = title||'';
+          for(var i=0;i<HIGH_KEYWORDS.length;i++) if(t.toLowerCase().indexOf(HIGH_KEYWORDS[i].toLowerCase())>=0) return 'high';
+          for(var j=0;j<MEDIUM_KEYWORDS.length;j++) if(t.toLowerCase().indexOf(MEDIUM_KEYWORDS[j].toLowerCase())>=0) return 'medium';
+          return null;
+        }
+
+        function getFlag(currency){
+          return FLAGS[currency] || '🏳️';
+        }
+
+        function pad2(n){return String(n).padStart(2,'0');}
+
+        function formatTime(date){
+          var h = date.getHours(), m = date.getMinutes();
+          var ampm = h>=12?'PM':'AM';
+          h = h%12||12;
+          return h+':'+pad2(m)+' '+ampm;
+        }
+
+        function formatCountdown(ms){
+          if(ms<0) return null;
+          var mins = Math.floor(ms/60000);
+          if(mins<60) return mins+'m lagi';
+          var hrs = Math.floor(mins/60);
+          var rm = mins%60;
+          return hrs+'h '+(rm>0?rm+'m ':'')+' lagi';
+        }
+
+        function isToday(date){
+          var now = new Date();
+          return date.getFullYear()===now.getFullYear()&&
+                 date.getMonth()===now.getMonth()&&
+                 date.getDate()===now.getDate();
+        }
+
+        function isThisWeek(date){
+          var now = new Date();
+          var startOfWeek = new Date(now);
+          startOfWeek.setHours(0,0,0,0);
+          startOfWeek.setDate(now.getDate()-now.getDay());
+          var endOfWeek = new Date(startOfWeek);
+          endOfWeek.setDate(startOfWeek.getDate()+6);
+          endOfWeek.setHours(23,59,59,999);
+          return date>=startOfWeek && date<=endOfWeek;
+        }
+
+        function renderNews(events){
+          var list = document.getElementById('enews-list');
+          if(!list) return;
+          var now = new Date();
+          var nowMs = now.getTime();
+
+          var filtered = events.filter(function(ev){
+            if(currentFilter==='today') return isToday(ev.date);
+            return isThisWeek(ev.date);
+          });
+
+          // Sort by time
+          filtered.sort(function(a,b){return a.date-b.date;});
+
+          if(filtered.length===0){
+            list.innerHTML = '<div class="enews-empty">📭 Tidak ada berita high-impact<br><span style="font-size:10px;color:var(--text3)">'+
+              (currentFilter==='today'?'Hari ini':'Minggu ini')+'</span></div>';
+            return;
+          }
+
+          var html = '';
+          filtered.forEach(function(ev){
+            var diff = ev.date.getTime() - nowMs;
+            var passed = diff < 0;
+            var soon = diff>=0 && diff < 30*60*1000; // within 30min
+            var timeStr = formatTime(ev.date);
+            var countdownStr = passed ? null : formatCountdown(diff);
+
+            var impactCls = ev.impact==='high'?'high':'medium';
+            var impactLabel = ev.impact==='high'?'HIGH':'MEDIUM';
+            var itemCls = 'enews-item impact-'+ev.impact;
+            var timeCls = 'enews-time'+(passed?' passed':soon?' soon':'');
+            var countCls = 'enews-countdown'+(soon?' soon':'');
+
+            html += '<div class="'+itemCls+'">'
+              +'<div class="enews-item-top">'
+              +'<span class="enews-flag">'+getFlag(ev.currency)+'</span>'
+              +'<span class="enews-name" title="'+ev.title+'">'+ev.title+'</span>'
+              +'<span class="enews-impact '+impactCls+'">'+impactLabel+'</span>'
+              +'</div>'
+              +'<div class="enews-item-bottom">'
+              +'<span class="'+timeCls+'">'+timeStr+'</span>'
+              +'<span class="enews-currency">'+ev.currency+'</span>'
+              +(countdownStr?'<span class="'+countCls+'">'+countdownStr+'</span>':'<span style="font-size:9px;color:var(--text3);margin-left:auto;">✔ Selesai</span>')
+              +'</div>'
+              +'</div>';
+          });
+
+          list.innerHTML = html;
+
+          // Update timestamp
+          var updEl = document.getElementById('enews-updated');
+          if(updEl) updEl.textContent = 'Update '+formatTime(now);
+        }
+
+        function buildFallbackEvents(){
+          // Hardcoded weekly events as reliable fallback
+          // These are recurring high-impact events that happen every week/month
+          var now = new Date();
+          var year = now.getFullYear();
+          var month = now.getMonth();
+          var day = now.getDate();
+
+          // Get Mon-Fri of current week
+          var monday = new Date(now);
+          monday.setDate(day - now.getDay() + 1);
+          monday.setHours(0,0,0,0);
+
+          var schedule = [
+            // Every Tuesday
+            {dayOffset:1, hour:8,  min:30, currency:'USD', title:'JOLTS Job Openings',    impact:'high'},
+            {dayOffset:1, hour:10, min:0,  currency:'EUR', title:'ZEW Economic Sentiment',impact:'medium'},
+            // Every Wednesday
+            {dayOffset:2, hour:8,  min:15, currency:'USD', title:'ADP Nonfarm Employment',impact:'high'},
+            {dayOffset:2, hour:10, min:0,  currency:'USD', title:'ISM Services PMI',      impact:'medium'},
+            {dayOffset:2, hour:14, min:0,  currency:'USD', title:'FOMC Meeting Minutes',   impact:'high'},
+            {dayOffset:2, hour:10, min:30, currency:'USD', title:'Crude Oil Inventories',  impact:'medium'},
+            // Every Thursday
+            {dayOffset:3, hour:8,  min:30, currency:'USD', title:'Initial Jobless Claims', impact:'high'},
+            {dayOffset:3, hour:10, min:0,  currency:'USD', title:'Factory Orders',          impact:'medium'},
+            // Every Friday — NFP first Friday of month
+            {dayOffset:4, hour:8,  min:30, currency:'USD', title:'Nonfarm Payrolls (NFP)', impact:'high'},
+            {dayOffset:4, hour:8,  min:30, currency:'USD', title:'Unemployment Rate',      impact:'high'},
+            {dayOffset:4, hour:8,  min:30, currency:'USD', title:'Average Hourly Earnings',impact:'high'},
+            {dayOffset:4, hour:10, min:0,  currency:'USD', title:'Michigan Consumer Sentiment',impact:'medium'},
+          ];
+
+          // Add monthly events based on approximate timing
+          var monthlyEvents = [
+            {dayOfMonth:null, weekday:2, weekNum:1, hour:14,min:0,  currency:'USD', title:'Fed Interest Rate Decision',impact:'high'},
+            {dayOfMonth:null, weekday:4, weekNum:1, hour:8, min:30, currency:'USD', title:'Nonfarm Payrolls (NFP)',    impact:'high'},
+            {dayOfMonth:null, weekday:4, weekNum:1, hour:8, min:30, currency:'USD', title:'Unemployment Rate',        impact:'high'},
+            {dayOfMonth:12,   weekday:null,          hour:8, min:30, currency:'USD', title:'Consumer Price Index (CPI)',impact:'high'},
+            {dayOfMonth:15,   weekday:null,          hour:8, min:30, currency:'USD', title:'Retail Sales',            impact:'high'},
+            {dayOfMonth:28,   weekday:null,          hour:8, min:30, currency:'USD', title:'GDP Growth Rate',         impact:'high'},
+            {dayOfMonth:1,    weekday:null,          hour:10,min:0,  currency:'USD', title:'ISM Manufacturing PMI',   impact:'high'},
+            {dayOfMonth:null, weekday:4, weekNum:3, hour:12,min:0,  currency:'GBP', title:'BOE Interest Rate Decision',impact:'high'},
+            {dayOfMonth:null, weekday:4, weekNum:2, hour:13,min:15, currency:'EUR', title:'ECB Rate Decision',        impact:'high'},
+          ];
+
+          var events = [];
+          var added = {};
+
+          schedule.forEach(function(s){
+            var d = new Date(monday);
+            d.setDate(monday.getDate()+s.dayOffset);
+            d.setHours(s.hour,s.min,0,0);
+            var key = s.title+d.getDate();
+            if(!added[key]){ events.push({date:d,currency:s.currency,title:s.title,impact:s.impact}); added[key]=1; }
+          });
+
+          return events.sort(function(a,b){return a.date-b.date;});
+        }
+
+        function fetchNews(){
+          var list = document.getElementById('enews-list');
+          if(!list) return;
+
+          // Use cache if fresh
+          var nowMs = Date.now();
+          if(cachedEvents.length>0 && nowMs-lastFetch < CACHE_MS){
+            renderNews(cachedEvents); return;
+          }
+
+          list.innerHTML = '<div class="enews-loading"><div class="enews-spinner"></div>Memuat berita...</div>';
+
+          // Try to fetch from Forex Factory via RSS (multiple CORS proxies)
+          var proxies = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?'
+          ];
+          var ffUrl = 'https://nfs.faireconomy.media/ff_calendar_thisweek.json';
+
+          var tryProxy = function(idx){
+            if(idx>=proxies.length){
+              // All proxies failed - use smart fallback
+              cachedEvents = buildFallbackEvents();
+              lastFetch = Date.now();
+              renderNews(cachedEvents);
+              return;
+            }
+            var url = proxies[idx] + encodeURIComponent(ffUrl);
+            fetch(url, {method:'GET'})
+              .then(function(r){
+                if(!r.ok) throw new Error('HTTP '+r.status);
+                return r.json();
+              })
+              .then(function(data){
+                var events = [];
+                var arr = Array.isArray(data)?data:(data.data||data.results||[]);
+                arr.forEach(function(item){
+                  var impact = (item.impact||'').toLowerCase();
+                  if(impact!=='high' && impact!=='medium') return;
+                  var dateStr = item.date; // format: "04-03-2026 8:30am"
+                  var d = parseFFDate(dateStr);
+                  if(!d || isNaN(d.getTime())) return;
+                  events.push({
+                    date:d,
+                    currency:item.currency||'USD',
+                    title:item.title||item.name||'—',
+                    impact:impact
+                  });
+                });
+                if(events.length===0) throw new Error('no events');
+                cachedEvents = events;
+                lastFetch = Date.now();
+                renderNews(cachedEvents);
+              })
+              .catch(function(){
+                tryProxy(idx+1);
+              });
+          };
+
+          tryProxy(0);
+        }
+
+        function parseFFDate(str){
+          if(!str) return null;
+          // Format: "04-03-2026 8:30am" or "04-03-2026 All Day"
+          try{
+            var parts = str.trim().split(' ');
+            var dateParts = parts[0].split('-');
+            var month = parseInt(dateParts[0])-1;
+            var day = parseInt(dateParts[1]);
+            var year = parseInt(dateParts[2]);
+            var hour=0,min=0;
+            if(parts[1] && parts[1]!=='All'){
+              var timeStr = parts[1].toLowerCase();
+              var isPm = timeStr.indexOf('pm')>=0;
+              var timeParts = timeStr.replace(/[ap]m/,'').split(':');
+              hour = parseInt(timeParts[0]);
+              min = parseInt(timeParts[1]||0);
+              if(isPm && hour!==12) hour+=12;
+              if(!isPm && hour===12) hour=0;
+            }
+            return new Date(year,month,day,hour,min,0,0);
+          }catch(e){return null;}
+        }
+
+        function init(){
+          // Filter tabs
+          var tabs = document.querySelectorAll('[data-enews-filter]');
+          tabs.forEach(function(btn){
+            btn.addEventListener('click',function(){
+              currentFilter = btn.getAttribute('data-enews-filter');
+              tabs.forEach(function(b){b.classList.remove('active');});
+              btn.classList.add('active');
+              renderNews(cachedEvents);
+            });
+          });
+          // Refresh btn
+          var refBtn = document.getElementById('enews-refresh-btn');
+          if(refBtn) refBtn.addEventListener('click',function(){
+            cachedEvents=[];lastFetch=0;
+            fetchNews();
+          });
+          // Initial load
+          fetchNews();
+          // Auto-refresh every 10 minutes
+          setInterval(function(){cachedEvents=[];lastFetch=0;fetchNews();}, 10*60*1000);
+          // Update countdowns every 60s
+          setInterval(function(){if(cachedEvents.length>0)renderNews(cachedEvents);}, 60*1000);
+        }
+
+        if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+        else init();
+      })();
+      </script>
+
     </div><!-- end .dash-cal-col -->
 
     </div><!-- end .dash-layout -->
@@ -4488,7 +4911,7 @@ function renderDNA(){
     data:{
       labels:['Consistency','Discipline','Aggression','Execution','Endurance','Vision'],
       datasets:[
-        {data:scores,backgroundColor:'rgba(0,217,126,0.09)',borderColor:'rgba(0,217,126,0.8)',borderWidth:1.5,pointRadius:3.5,pointBackgroundColor:colors,pointBorderColor:'rgba(0,0,0,0.4)',pointBorderWidth:1,pointHoverRadius:5.5,fill:true,tension:0.05},
+        {data:scores,backgroundColor:'rgba(0,217,126,0.09)',borderColor:'rgba(0,217,126,0.8)',borderWidth:1.5,pointRadius:5,pointBackgroundColor:colors,pointBorderColor:'rgba(0,0,0,0.4)',pointBorderWidth:1.5,pointHoverRadius:9,pointHitRadius:22,fill:true,tension:0.05},
         {data:scores.map(s=>s*0.68),backgroundColor:'rgba(139,92,246,0.05)',borderColor:'rgba(139,92,246,0.3)',borderWidth:1,pointRadius:0,fill:true,tension:0.05}
       ]
     },
@@ -4499,14 +4922,14 @@ function renderDNA(){
       plugins:{
         legend:{display:false},
         tooltip:{
-          backgroundColor:'rgba(9,9,11,0.96)',borderColor:'rgba(0,217,126,0.2)',borderWidth:1,
-          bodyColor:'#f0f0f0',titleColor:'rgba(255,255,255,0.35)',
-          bodyFont:{family:"'JetBrains Mono','Courier New',monospace",size:11,weight:'700'},
-          titleFont:{family:"'DM Sans',-apple-system,sans-serif",size:9,weight:'600'},
-          padding:9,cornerRadius:8,
+          backgroundColor:'rgba(9,9,11,0.97)',borderColor:'rgba(0,217,126,0.35)',borderWidth:1,
+          bodyColor:'#f0f0f0',titleColor:'#00d97e',
+          bodyFont:{family:"'JetBrains Mono','Courier New',monospace",size:13,weight:'700'},
+          titleFont:{family:"'DM Sans',-apple-system,sans-serif",size:10,weight:'700'},
+          padding:12,cornerRadius:10,caretSize:6,displayColors:false,
           callbacks:{
             title:(items)=>['Consistency','Discipline','Aggression','Execution','Endurance','Vision'][items[0].dataIndex],
-            label:(item)=>item.datasetIndex===1?null:' '+item.raw+' / 100'
+            label:(item)=>item.datasetIndex===1?null:'  Score: '+item.raw+' / 100'
           },
           filter:(item)=>item.datasetIndex===0
         }
