@@ -1,0 +1,96 @@
+<!-- 
+====================================================================
+  ROUTING PATCH — TAMBAHKAN KE index.html
+  
+  Tempel snippet ini di dalam <head> pada index.html,
+  SEBELUM tag </head> penutup.
+  
+  Cara kerja:
+  - Script ini berjalan SEBELUM app Firebase load
+  - Cek localStorage untuk "rpt_seen_app" (flag user pernah login)
+  - Jika BELUM pernah login → redirect ke landing.html
+  - Jika SUDAH login sebelumnya → biarkan app load normal
+  - Firebase onAuthStateChanged nanti yang konfirmasi final
+====================================================================
+-->
+
+<!-- ── AUTH GATE: Redirect ke landing jika belum pernah login ── -->
+<script>
+(function() {
+  // Halaman ini = app utama. Hanya tampilkan ke user yang sudah/pernah login.
+  // Cek apakah user pernah login (Firebase menyimpan session di localStorage/IndexedDB)
+  
+  var isOnLandingPage = window.location.pathname.includes('landing');
+  if (isOnLandingPage) return; // jangan loop redirect
+  
+  // Cek flag sederhana — akan di-set oleh onAuthStateChanged saat login sukses
+  var hasLoginSession = localStorage.getItem('rpt_has_session');
+  
+  // Cek juga Firebase auth persistence key (otomatis ada jika pernah login)
+  var firebaseKeys = Object.keys(localStorage).filter(function(k) {
+    return k.startsWith('firebase:authUser:');
+  });
+  
+  var hasFirebaseSession = firebaseKeys.length > 0;
+  
+  if (!hasLoginSession && !hasFirebaseSession) {
+    // User belum pernah login sama sekali → arahkan ke landing page
+    window.location.replace('./landing.html');
+  }
+})();
+</script>
+
+<!--
+====================================================================
+  PATCH KE onAuthStateChanged di index.html
+  
+  Cari baris ini di index.html (sekitar baris 3843):
+  
+    onAuthStateChanged(auth, async user => {
+  
+  Di dalam callback-nya, saat user BERHASIL LOGIN (bukan null),
+  tambahkan 1 baris ini:
+  
+    localStorage.setItem('rpt_has_session', '1');
+  
+  Dan saat user LOGOUT (user === null), hapus flag-nya:
+  
+    localStorage.removeItem('rpt_has_session');
+  
+  Contoh lokasi yang tepat (cari bagian ini di index.html):
+  
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        // ... existing code ...
+        currentUser = user;
+        localStorage.setItem('rpt_has_session', '1');  // ← TAMBAHKAN INI
+        // ... rest of existing code ...
+      } else {
+        // ... existing code (logout) ...
+        currentUser = null;
+        localStorage.removeItem('rpt_has_session');    // ← TAMBAHKAN INI
+        // ... rest of existing code ...
+      }
+    });
+====================================================================
+
+  OPSIONAL: Tombol "Lihat App Dulu" di landing page
+  
+  Jika kamu ingin pengunjung bisa preview app tanpa login,
+  tambahkan tombol di landing.html yang set flag sementara:
+  
+  <button onclick="
+    sessionStorage.setItem('rpt_preview', '1');
+    window.location.href = './index.html';
+  ">
+    Lihat App (Guest)
+  </button>
+  
+  Dan di routing patch atas, tambahkan kondisi:
+  
+  var isPreview = sessionStorage.getItem('rpt_preview');
+  if (!hasLoginSession && !hasFirebaseSession && !isPreview) {
+    window.location.replace('./landing.html');
+  }
+====================================================================
+-->
