@@ -79,6 +79,27 @@ body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFo
 /* Hide all content until app JS initializes (avoids layout flash) */
 #onboard-overlay,#login-screen{display:none;}
 </style>
+<!-- ── AUTH GATE: Redirect ke landing jika belum pernah login ── -->
+<script>
+(function() {
+  // Jangan redirect jika user datang dari landing page (via preview/login flow)
+  var fromLanding = sessionStorage.getItem('rpt_from_landing');
+  if (fromLanding) { sessionStorage.removeItem('rpt_from_landing'); return; }
+
+  // Cek flag yang di-set saat login sukses
+  var hasSession = localStorage.getItem('rpt_has_session');
+
+  // Cek Firebase auth persistence key (otomatis ada jika pernah login)
+  var hasFirebase = Object.keys(localStorage).some(function(k) {
+    return k.startsWith('firebase:authUser:');
+  });
+
+  if (!hasSession && !hasFirebase) {
+    window.location.replace('./landing.html');
+  }
+})();
+</script>
+
 <!-- ── DNS prefetch + preconnect untuk Firebase & external services ── -->
 <link rel="preconnect" href="https://tradelog-regy.firebaseapp.com">
 <link rel="preconnect" href="https://firestore.googleapis.com">
@@ -3845,6 +3866,7 @@ onAuthStateChanged(auth, async user => {
     // ── Anonymous user — skip invite check ─────────────
     if (user.isAnonymous) {
       currentUser = user;
+      localStorage.setItem('rpt_has_session', '1');
       closeLoginScreen();
       showLoginPanel();
       setAuthUI(true);
@@ -3871,6 +3893,7 @@ onAuthStateChanged(auth, async user => {
     }
     // ── Invited email user — proceed ───────────────────
     currentUser = user;
+    localStorage.setItem('rpt_has_session', '1');
     closeLoginScreen();
     showLoginPanel();
     setAuthUI(true);
@@ -3890,6 +3913,7 @@ onAuthStateChanged(auth, async user => {
     // User signed out — reset to guest mode, keep app visible
     const wasLoggedIn = currentUser !== null;
     currentUser = null;
+    localStorage.removeItem('rpt_has_session');
     $('login-loading').style.display = 'none';
     if (unsubTrades) { unsubTrades(); unsubTrades = null; }
     setAuthUI(false);
