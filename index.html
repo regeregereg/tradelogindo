@@ -79,28 +79,14 @@ body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFo
 /* Hide all content until app JS initializes (avoids layout flash) */
 #onboard-overlay,#login-screen{display:none;}
 </style>
-<!-- ── AUTH GATE: Redirect ke landing jika belum pernah login ── -->
+<!-- ── MAGIC LINK GUARD: Jangan redirect saat proses email link ── -->
 <script>
 (function() {
-  // Jangan redirect jika URL mengandung magic link params (oobCode)
+  // Hanya block redirect jika ada magic link params — biarkan Firebase proses
   var href = window.location.href;
   if (href.indexOf('oobCode') !== -1 || href.indexOf('apiKey') !== -1) return;
-
-  // Jangan redirect jika user datang dari landing page (via preview/login flow)
-  var fromLanding = sessionStorage.getItem('rpt_from_landing');
-  if (fromLanding) { sessionStorage.removeItem('rpt_from_landing'); return; }
-
-  // Cek flag yang di-set saat login sukses
-  var hasSession = localStorage.getItem('rpt_has_session');
-
-  // Cek Firebase auth persistence key (otomatis ada jika pernah login)
-  var hasFirebase = Object.keys(localStorage).some(function(k) {
-    return k.startsWith('firebase:authUser:');
-  });
-
-  if (!hasSession && !hasFirebase) {
-    window.location.replace('./landing.html');
-  }
+  // App terbuka untuk semua — guest mode tersedia tanpa login
+  // onAuthStateChanged akan handle state user (login / anonymous / guest)
 })();
 </script>
 
