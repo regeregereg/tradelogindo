@@ -79,14 +79,28 @@ body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFo
 /* Hide all content until app JS initializes (avoids layout flash) */
 #onboard-overlay,#login-screen{display:none;}
 </style>
-<!-- ── MAGIC LINK GUARD: Jangan redirect saat proses email link ── -->
+<!-- ── AUTH GATE: Redirect ke landing jika belum pernah login ── -->
 <script>
 (function() {
-  // Hanya block redirect jika ada magic link params — biarkan Firebase proses
+  // Jangan redirect jika URL mengandung magic link params (oobCode)
   var href = window.location.href;
   if (href.indexOf('oobCode') !== -1 || href.indexOf('apiKey') !== -1) return;
-  // App terbuka untuk semua — guest mode tersedia tanpa login
-  // onAuthStateChanged akan handle state user (login / anonymous / guest)
+
+  // Jangan redirect jika user datang dari landing page (via preview/login flow)
+  var fromLanding = sessionStorage.getItem('rpt_from_landing');
+  if (fromLanding) { sessionStorage.removeItem('rpt_from_landing'); return; }
+
+  // Cek flag yang di-set saat login sukses
+  var hasSession = localStorage.getItem('rpt_has_session');
+
+  // Cek Firebase auth persistence key (otomatis ada jika pernah login)
+  var hasFirebase = Object.keys(localStorage).some(function(k) {
+    return k.startsWith('firebase:authUser:');
+  });
+
+  if (!hasSession && !hasFirebase) {
+    window.location.replace('./landing.html');
+  }
 })();
 </script>
 
@@ -1273,10 +1287,10 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <div id="guest-banner" style="background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(124,58,237,.05));border:1px solid rgba(139,92,246,.2);border-radius:16px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:relative;overflow:hidden">
       <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.12),transparent 70%);pointer-events:none"></div>
       <div style="position:relative">
-        <div style="font-size:13px;font-weight:700;margin-bottom:4px;letter-spacing:-.1px">👋 Selamat datang di RiskPerTrade</div>
-        <div style="font-size:12px;color:var(--text2)">Kamu sedang melihat sebagai guest. Login untuk mulai mencatat trade dan menyimpan journal kamu.</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px;letter-spacing:-.1px">🎭 Ini adalah data demo</div>
+        <div style="font-size:12px;color:var(--text2)">Semua angka di bawah adalah contoh. Login untuk mulai mencatat trade kamu sendiri — gratis, tersimpan di cloud.</div>
       </div>
-      <button id="guest-banner-login" style="background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0;box-shadow:0 4px 12px rgba(139,92,246,.3);letter-spacing:.2px">Masuk Sekarang</button>
+      <button id="guest-banner-login" style="background:linear-gradient(135deg,var(--accent),#7c3aed);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;flex-shrink:0;box-shadow:0 4px 12px rgba(139,92,246,.3);letter-spacing:.2px">Mulai Gratis →</button>
     </div>
 
     <!-- Balance banner -->
@@ -3327,6 +3341,92 @@ function showLoginPanel() {
 
 // ── STATE ─────────────────────────────────────────────
 let trades = [], bal = 0, calOff = 0, sbOpen = false;
+
+// ── DEMO DATA — shown to guests so app feels alive ────
+const DEMO_BAL = 10000;
+const DEMO_TRADES = (function() {
+  const today = new Date();
+  function d(offset) {
+    const dt = new Date(today);
+    dt.setDate(dt.getDate() - offset);
+    return dt.toISOString().slice(0,10);
+  }
+  return [
+    { firestoreId:'demo-1',  date:d(42), pair:'XAUUSD', dir:'Long',  session:'London', entry:1985.50, exit:2010.30, sl:1975.00, risk:100, pnl:248,  r:2.48, result:'Win',  setup:'Break of structure', emotion:'Focused',   notes:'Perfect entry at demand zone, held through news.' },
+    { firestoreId:'demo-2',  date:d(39), pair:'EURUSD', dir:'Short', session:'NY',     entry:1.0920,  exit:1.0885,  sl:1.0940,  risk:100, pnl:175,  r:1.75, result:'Win',  setup:'Order block retest',  emotion:'Calm',      notes:'Clean retest, SL never threatened.' },
+    { firestoreId:'demo-3',  date:d(37), pair:'GBPUSD', dir:'Long',  session:'London', entry:1.2650,  exit:1.2620,  sl:1.2630,  risk:100, pnl:-100, r:-1.0, result:'Loss', setup:'Break of structure', emotion:'Anxious',   notes:'Entered too early, structure not confirmed.' },
+    { firestoreId:'demo-4',  date:d(35), pair:'XAUUSD', dir:'Short', session:'Asian',  entry:2025.00, exit:2008.50, sl:2032.00, risk:100, pnl:235,  r:2.35, result:'Win',  setup:'Liquidity sweep',     emotion:'Focused',   notes:'Swept highs, beautiful reaction.' },
+    { firestoreId:'demo-5',  date:d(32), pair:'NASDAQ', dir:'Long',  session:'NY',     entry:18200,   exit:18350,   sl:18130,   risk:150, pnl:321,  r:2.14, result:'Win',  setup:'VWAP reclaim',        emotion:'Calm',      notes:'Gap fill setup, took partials at 1R.' },
+    { firestoreId:'demo-6',  date:d(30), pair:'EURUSD', dir:'Long',  session:'London', entry:1.0855,  exit:1.0840,  sl:1.0840,  risk:100, pnl:-100, r:-1.0, result:'Loss', setup:'Order block retest',  emotion:'FOMO',      notes:'Chased after missing the initial move.' },
+    { firestoreId:'demo-7',  date:d(28), pair:'XAUUSD', dir:'Long',  session:'NY',     entry:2015.00, exit:2043.00, sl:2005.00, risk:120, pnl:336,  r:2.80, result:'Win',  setup:'Break of structure', emotion:'Focused',   notes:'Strong momentum, moved SL to BE at 1R.' },
+    { firestoreId:'demo-8',  date:d(26), pair:'GBPJPY', dir:'Short', session:'London', entry:192.50,  exit:191.80,  sl:193.00,  risk:100, pnl:140,  r:1.40, result:'Win',  setup:'Liquidity sweep',     emotion:'Calm',      notes:'Clean sweep + reversal.' },
+    { firestoreId:'demo-9',  date:d(24), pair:'GBPUSD', dir:'Long',  session:'London', entry:1.2700,  exit:1.2670,  sl:1.2685,  risk:100, pnl:-100, r:-1.0, result:'Loss', setup:'Break of structure', emotion:'Revenge',   notes:'Revenge trade after yesterday loss. Violated rules.' },
+    { firestoreId:'demo-10', date:d(22), pair:'XAUUSD', dir:'Long',  session:'NY',     entry:2030.00, exit:2058.50, sl:2020.00, risk:130, pnl:370,  r:2.85, result:'Win',  setup:'Break of structure', emotion:'Focused',   notes:'HTF aligned, patience paid off.' },
+    { firestoreId:'demo-11', date:d(20), pair:'EURUSD', dir:'Short', session:'London', entry:1.0905,  exit:1.0875,  sl:1.0920,  risk:100, pnl:200,  r:2.00, result:'Win',  setup:'Order block retest',  emotion:'Calm',      notes:'Textbook setup.' },
+    { firestoreId:'demo-12', date:d(18), pair:'NASDAQ', dir:'Short', session:'NY',     entry:18420,   exit:18380,   sl:18450,   risk:150, pnl:-150, r:-1.0, result:'Loss', setup:'VWAP rejection',      emotion:'Uncertain', notes:'Setup was there but timed poorly.' },
+    { firestoreId:'demo-13', date:d(15), pair:'XAUUSD', dir:'Long',  session:'London', entry:2042.00, exit:2068.00, sl:2032.00, risk:120, pnl:312,  r:2.60, result:'Win',  setup:'Break of structure', emotion:'Focused',   notes:'Third consecutive winner on Gold.' },
+    { firestoreId:'demo-14', date:d(12), pair:'GBPUSD', dir:'Short', session:'NY',     entry:1.2740,  exit:1.2700,  sl:1.2760,  risk:100, pnl:200,  r:2.00, result:'Win',  setup:'Liquidity sweep',     emotion:'Calm',      notes:'Daily bearish engulfing confirmed.' },
+    { firestoreId:'demo-15', date:d(10), pair:'EURUSD', dir:'Long',  session:'London', entry:1.0870,  exit:1.0855,  sl:1.0855,  risk:100, pnl:-100, r:-1.0, result:'Loss', setup:'Order block retest',  emotion:'Anxious',   notes:'SL was too tight, whipsawed out.' },
+    { firestoreId:'demo-16', date:d(8),  pair:'XAUUSD', dir:'Short', session:'Asian',  entry:2070.00, exit:2048.00, sl:2080.00, risk:130, pnl:286,  r:2.20, result:'Win',  setup:'Liquidity sweep',     emotion:'Focused',   notes:'Weekly high swept, strong sell-off followed.' },
+    { firestoreId:'demo-17', date:d(6),  pair:'NASDAQ', dir:'Long',  session:'NY',     entry:18600,   exit:18780,   sl:18520,   risk:150, pnl:338,  r:2.25, result:'Win',  setup:'VWAP reclaim',        emotion:'Calm',      notes:'Strong CPI reaction, momentum trade.' },
+    { firestoreId:'demo-18', date:d(5),  pair:'GBPJPY', dir:'Long',  session:'London', entry:193.00,  exit:192.60,  sl:192.80,  risk:100, pnl:-100, r:-1.0, result:'Loss', setup:'Break of structure', emotion:'FOMO',      notes:'NFP week, should have stayed out.' },
+    { firestoreId:'demo-19', date:d(3),  pair:'XAUUSD', dir:'Long',  session:'NY',     entry:2055.00, exit:2082.00, sl:2044.00, risk:130, pnl:319,  r:2.45, result:'Win',  setup:'Break of structure', emotion:'Focused',   notes:'Higher highs confirmed on H4.' },
+    { firestoreId:'demo-20', date:d(1),  pair:'EURUSD', dir:'Short', session:'London', entry:1.0890,  exit:1.0862,  sl:1.0905,  risk:100, pnl:187,  r:1.87, result:'Win',  setup:'Order block retest',  emotion:'Calm',      notes:'Clean setup, no hesitation on entry.' },
+  ];
+})();
+
+let _isDemoMode = false;
+
+function loadDemoData() {
+  _isDemoMode = true;
+  bal = DEMO_BAL;
+  trades = DEMO_TRADES.map(t => ({ ...t }));
+  $('user-name').textContent  = 'Demo Trader';
+  $('user-email').textContent = 'Login untuk simpan data kamu';
+  $('user-avatar').textContent = '👤';
+  $('sbf-bal').textContent = 'Demo Mode';
+  // ftmo demo
+  ftmo = { size: 10000, pp: 10, dp: 5, ddp: 10 };
+  if ($('ft-sz')) $('ft-sz').value = ftmo.size;
+  if ($('ft-pp')) $('ft-pp').value = ftmo.pp;
+  if ($('ft-dp')) $('ft-dp').value = ftmo.dp;
+  if ($('ft-ddp')) $('ft-ddp').value = ftmo.ddp;
+  updateAll();
+  // Show demo banner
+  showDemoBanner();
+}
+
+function showDemoBanner() {
+  const existing = document.getElementById('demo-banner');
+  if (existing) return;
+  const banner = document.createElement('div');
+  banner.id = 'demo-banner';
+  banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:500;background:linear-gradient(90deg,rgba(139,92,246,.92),rgba(124,58,237,.92));backdrop-filter:blur(8px);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;';
+  banner.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#fff;">
+      <span style="font-size:16px;">🎭</span>
+      <span><strong>Mode Demo</strong> — Kamu sedang melihat data contoh. Login untuk mulai mencatat trade kamu sendiri.</span>
+    </div>
+    <button id="demo-login-btn" style="background:#fff;color:#7c3aed;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:var(--font);">Mulai Sekarang →</button>
+  `;
+  document.body.prepend(banner);
+  // Push content down
+  const main = document.getElementById('main');
+  const sb   = document.getElementById('sb');
+  if (main) main.style.marginTop = '44px';
+  if (sb)   sb.style.paddingTop  = '44px';
+  document.getElementById('demo-login-btn').addEventListener('click', () => openLoginScreen('general'));
+}
+
+function hideDemoBanner() {
+  const banner = document.getElementById('demo-banner');
+  if (banner) banner.remove();
+  const main = document.getElementById('main');
+  const sb   = document.getElementById('sb');
+  if (main) main.style.marginTop = '';
+  if (sb)   sb.style.paddingTop  = '';
+}
+// ─────────────────────────────────────────────────────
 let ftmo = {size:10000,pp:10,dp:5,ddp:10};
 let currentUser = null, unsubTrades = null;
 let eqCh, pnlCh, dnCh, ddCh, rCh, ftCh;
@@ -3857,6 +3957,8 @@ onAuthStateChanged(auth, async user => {
     // ── Anonymous user — skip invite check ─────────────
     if (user.isAnonymous) {
       currentUser = user;
+      _isDemoMode = false;
+      hideDemoBanner();
       localStorage.setItem('rpt_has_session', '1');
       closeLoginScreen();
       showLoginPanel();
@@ -3884,6 +3986,8 @@ onAuthStateChanged(auth, async user => {
     }
     // ── Invited email user — proceed ───────────────────
     currentUser = user;
+    _isDemoMode = false;
+    hideDemoBanner();
     localStorage.setItem('rpt_has_session', '1');
     closeLoginScreen();
     showLoginPanel();
@@ -3904,6 +4008,8 @@ onAuthStateChanged(auth, async user => {
     // User signed out — reset to guest mode, keep app visible
     const wasLoggedIn = currentUser !== null;
     currentUser = null;
+    _isDemoMode = false;
+    hideDemoBanner();
     localStorage.removeItem('rpt_has_session');
     $('login-loading').style.display = 'none';
     if (unsubTrades) { unsubTrades(); unsubTrades = null; }
@@ -3942,6 +4048,9 @@ function openLoginScreen(reason) {
 }
 
 function updateGuestUI() {
+  // Guest sees demo data — app feels alive immediately
+  loadDemoData();
+  return;
   // ── Reset period filter to Overview ──
   currentPeriod = 'all';
   document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
@@ -4118,6 +4227,7 @@ function listenTrades(uid) {
 // ── SAVE TRADE TO FIRESTORE ───────────────────────────
 async function saveTradeToCloud(trade) {
   if (!currentUser) return;
+  if (_isDemoMode) return; // demo mode — jangan save ke Firestore
   setSyncState('syncing');
   try {
     const { firestoreId, ...data } = trade;
