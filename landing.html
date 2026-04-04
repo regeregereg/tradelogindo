@@ -3,1180 +3,1084 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RiskPerTrade — Trading Journal & PropFirm Tracker</title>
-<meta name="description" content="Catat setiap trade, analisis performa, dan pantau PropFirm challenge kamu dalam satu platform yang clean dan powerful.">
-
-<!-- ── AUTH GATE: Jika sudah punya session, langsung ke app ── -->
-<script>
-(function() {
-  // Jika URL mengandung magic link parameters, JANGAN redirect — biarkan Firebase proses
-  var href = window.location.href;
-  if (href.indexOf('oobCode') !== -1 || href.indexOf('apiKey') !== -1) return;
-
-  // Cek flag session
-  var hasSession = localStorage.getItem('rpt_has_session');
-  var hasFirebase = Object.keys(localStorage).some(function(k) {
-    return k.startsWith('firebase:authUser:');
-  });
-  if (hasSession && hasFirebase) {
-    window.location.replace('./index.html');
-  }
-})();
-</script>
-
+<title>RiskPerTrade — Trading Journal untuk Trader Serius</title>
+<meta name="description" content="Catat trade, analisis performa, dan pantau challenge PropFirm. Bayar sekali, akses selamanya.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg: #09090b;
-  --bg2: #111114;
-  --bg3: #18181c;
-  --bg4: #222227;
-  --border: rgba(255,255,255,0.06);
-  --border2: rgba(255,255,255,0.1);
-  --text: #f4f4f5;
-  --text2: #71717a;
-  --text3: #3f3f46;
-  --accent: #8b5cf6;
-  --accent2: #a78bfa;
-  --green: #22c55e;
-  --red: #ef4444;
-  --gold: #f59e0b;
-  --font: 'Syne', sans-serif;
-  --body: 'DM Sans', sans-serif;
-  --mono: 'DM Mono', monospace;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#09090b;
+  --bg2:#0f0f12;
+  --bg3:#141418;
+  --bg4:#1c1c22;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.1);
+  --text:#f0f0f2;
+  --text2:#8b8b99;
+  --text3:#3f3f46;
+  --green:#22c55e;
+  --green-dim:rgba(34,197,94,0.08);
+  --red:#ef4444;
+  --accent:#8b5cf6;
+  --accent2:#a78bfa;
+  --accent-dim:rgba(139,92,246,0.08);
+  --accent-glow:rgba(139,92,246,0.2);
+  --gold:#f59e0b;
+  --font:'Syne',sans-serif;
+  --body:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth;background:var(--bg);}
+body{
+  font-family:var(--body);
+  background:var(--bg);
+  color:var(--text);
+  font-size:15px;
+  line-height:1.6;
+  overflow-x:hidden;
 }
 
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--body);
-  font-size: 15px;
-  line-height: 1.6;
-  overflow-x: hidden;
+/* ── NOISE TEXTURE ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.5;
 }
-
-/* ── NOISE ── */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-  pointer-events: none; z-index: 0; opacity: .5;
-}
-
-/* ── GLOW ORBS ── */
-.orb {
-  position: fixed; border-radius: 50%;
-  filter: blur(80px); pointer-events: none; z-index: 0;
-}
-.orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(139,92,246,0.12), transparent 70%); top: -100px; right: -100px; }
-.orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(34,197,94,0.07), transparent 70%); bottom: 20%; left: -100px; }
-.orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%); bottom: -50px; right: 20%; }
 
 /* ── NAV ── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  padding: 0 32px; height: 60px;
-  display: flex; align-items: center; justify-content: space-between;
-  background: rgba(9,9,11,0.8);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  transition: all .3s;
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:16px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(9,9,11,0.8);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  transition:all .3s;
 }
-.nav-logo {
-  font-family: var(--font); font-weight: 700; font-size: 15px;
-  letter-spacing: -.3px; display: flex; align-items: center; gap: 8px;
-  text-decoration: none; color: var(--text);
+.nav-logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--font);font-size:17px;font-weight:700;
+  color:var(--text);text-decoration:none;letter-spacing:-.3px;
 }
-.nav-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), #a78bfa);
-  box-shadow: 0 0 8px rgba(139,92,246,.6);
+.nav-logo-icon{
+  width:32px;height:32px;border-radius:9px;
+  background:linear-gradient(135deg,var(--accent),#5b21b6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;box-shadow:0 0 16px var(--accent-glow);
 }
-.nav-links { display: flex; align-items: center; gap: 8px; }
-.nav-link {
-  font-family: var(--body); font-size: 13px; font-weight: 500;
-  color: var(--text2); text-decoration: none;
-  padding: 7px 14px; border-radius: 8px;
-  transition: all .2s;
+.nav-links{display:flex;align-items:center;gap:8px;}
+.nav-link{
+  padding:8px 16px;border-radius:8px;
+  font-family:var(--body);font-size:13px;font-weight:500;
+  color:var(--text2);text-decoration:none;
+  transition:color .2s;
 }
-.nav-link:hover { color: var(--text); background: rgba(255,255,255,.05); }
-.btn-login {
-  font-family: var(--font); font-size: 13px; font-weight: 600;
-  color: var(--text); text-decoration: none;
-  padding: 8px 18px; border-radius: 10px;
-  background: rgba(139,92,246,.15);
-  border: 1px solid rgba(139,92,246,.3);
-  transition: all .2s; cursor: pointer;
+.nav-link:hover{color:var(--text);}
+.nav-cta{
+  padding:8px 18px;border-radius:9px;
+  background:var(--accent);color:#fff;
+  font-family:var(--body);font-size:13px;font-weight:600;
+  text-decoration:none;
+  transition:all .2s;
+  box-shadow:0 0 0 0 var(--accent-glow);
 }
-.btn-login:hover { background: rgba(139,92,246,.25); border-color: rgba(139,92,246,.5); }
-.btn-cta-nav {
-  font-family: var(--font); font-size: 13px; font-weight: 700;
-  color: #fff; text-decoration: none;
-  padding: 8px 20px; border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), #7c3aed);
-  transition: all .2s; cursor: pointer;
-  box-shadow: 0 4px 14px rgba(139,92,246,.3);
+.nav-cta:hover{
+  background:#7c3aed;
+  box-shadow:0 4px 20px var(--accent-glow);
+  transform:translateY(-1px);
 }
-.btn-cta-nav:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,92,246,.4); }
 
 /* ── HERO ── */
-.hero {
-  position: relative; z-index: 1;
-  min-height: 100vh;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center;
-  padding: 100px 24px 80px;
+#hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:120px 24px 80px;
+  text-align:center;
+  overflow:hidden;
 }
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(139,92,246,.1); border: 1px solid rgba(139,92,246,.25);
-  border-radius: 100px; padding: 5px 14px 5px 10px;
-  font-size: 11px; font-weight: 600; color: var(--accent2);
-  margin-bottom: 32px; letter-spacing: .3px;
-  animation: fadeUp .6s ease both;
+.hero-glow{
+  position:absolute;
+  top:50%;left:50%;transform:translate(-50%,-55%);
+  width:700px;height:700px;
+  background:radial-gradient(circle,rgba(139,92,246,0.12) 0%,transparent 70%);
+  pointer-events:none;
 }
-.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.hero-glow2{
+  position:absolute;
+  top:20%;right:-10%;
+  width:400px;height:400px;
+  background:radial-gradient(circle,rgba(34,197,94,0.05) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 14px;border-radius:20px;
+  background:rgba(139,92,246,0.1);
+  border:1px solid rgba(139,92,246,0.25);
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  color:var(--accent2);letter-spacing:.3px;
+  margin-bottom:28px;
+  animation:fadeUp .6s ease both;
+}
+.hero-badge-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 6px var(--green);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+h1{
+  font-family:var(--font);
+  font-size:clamp(40px,7vw,76px);
+  font-weight:800;
+  line-height:1.05;
+  letter-spacing:-2px;
+  color:var(--text);
+  max-width:780px;
+  margin:0 auto 20px;
+  animation:fadeUp .7s .1s ease both;
+}
+h1 span{
+  background:linear-gradient(135deg,var(--accent2),#c4b5fd);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{
+  font-size:clamp(15px,2vw,18px);
+  color:var(--text2);
+  max-width:520px;
+  margin:0 auto 40px;
+  line-height:1.7;
+  font-weight:300;
+  animation:fadeUp .7s .2s ease both;
+}
+.hero-actions{
+  display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+  animation:fadeUp .7s .3s ease both;
+  margin-bottom:64px;
+}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 28px;border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  color:#fff;font-family:var(--body);font-size:15px;font-weight:600;
+  text-decoration:none;
+  transition:all .25s;
+  box-shadow:0 4px 24px rgba(139,92,246,0.35);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(139,92,246,0.5);}
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 28px;border-radius:12px;
+  background:transparent;
+  border:1px solid var(--border2);
+  color:var(--text2);font-family:var(--body);font-size:15px;font-weight:500;
+  text-decoration:none;
+  transition:all .25s;
+}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent2);background:var(--accent-dim);}
 
-.hero-title {
-  font-family: var(--font); font-size: clamp(44px, 7vw, 84px);
-  font-weight: 800; line-height: 1.04; letter-spacing: -2.5px;
-  margin-bottom: 24px;
-  animation: fadeUp .7s .1s ease both;
+/* hero stats */
+.hero-stats{
+  display:flex;gap:0;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  animation:fadeUp .7s .4s ease both;
 }
-.hero-title span { color: var(--accent2); }
-.hero-title .line2 { color: var(--text2); }
-
-.hero-sub {
-  font-size: 16px; color: var(--text2); max-width: 520px;
-  line-height: 1.7; margin-bottom: 40px;
-  animation: fadeUp .7s .2s ease both;
+.hero-stat{
+  padding:16px 28px;
+  text-align:center;
+  border-right:1px solid var(--border);
 }
-
-.hero-actions {
-  display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center;
-  animation: fadeUp .7s .3s ease both;
-  margin-bottom: 60px;
+.hero-stat:last-child{border-right:none;}
+.hero-stat-val{
+  font-family:var(--mono);font-size:22px;font-weight:500;
+  color:var(--text);display:block;
 }
-.btn-primary {
-  font-family: var(--font); font-size: 14px; font-weight: 700;
-  color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
-  padding: 14px 28px; border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent), #7c3aed);
-  box-shadow: 0 4px 24px rgba(139,92,246,.35);
-  transition: all .25s; cursor: pointer;
-}
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(139,92,246,.45); }
-.btn-secondary {
-  font-family: var(--body); font-size: 14px; font-weight: 500;
-  color: var(--text2); text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
-  padding: 14px 24px; border-radius: 12px;
-  border: 1px solid var(--border2);
-  background: rgba(255,255,255,.04);
-  transition: all .25s; cursor: pointer;
-}
-.btn-secondary:hover { color: var(--text); border-color: var(--accent2); background: rgba(139,92,246,.07); }
-
-/* ── STATS BAR ── */
-.stats-bar {
-  display: flex; gap: 0; align-items: stretch;
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 16px; overflow: hidden;
-  animation: fadeUp .7s .4s ease both;
-  max-width: 680px; width: 100%;
-}
-.stat-item {
-  flex: 1; padding: 20px 24px; text-align: center;
-  border-right: 1px solid var(--border);
-}
-.stat-item:last-child { border-right: none; }
-.stat-val {
-  font-family: var(--mono); font-size: 22px; font-weight: 500;
-  color: var(--text); display: block;
-}
-.stat-val.green { color: var(--green); }
-.stat-val.purple { color: var(--accent2); }
-.stat-label { font-size: 11px; color: var(--text3); margin-top: 4px; letter-spacing: .3px; }
-
-/* ── SECTION ── */
-section { position: relative; z-index: 1; padding: 80px 24px; }
-.section-inner { max-width: 1100px; margin: 0 auto; }
-
-.section-tag {
-  display: inline-block; font-size: 10px; font-weight: 700;
-  color: var(--accent2); text-transform: uppercase; letter-spacing: 1.5px;
-  margin-bottom: 14px;
-}
-.section-title {
-  font-family: var(--font); font-size: clamp(28px, 4vw, 44px);
-  font-weight: 800; letter-spacing: -1.2px; line-height: 1.1;
-  margin-bottom: 16px;
-}
-.section-sub {
-  font-size: 15px; color: var(--text2); max-width: 480px; line-height: 1.7;
+.hero-stat-label{
+  font-size:11px;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.8px;
+  margin-top:3px;display:block;
 }
 
-/* ── FEATURES GRID ── */
-.features-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
-  background: var(--border); border: 1px solid var(--border);
-  border-radius: 20px; overflow: hidden; margin-top: 60px;
+/* hero mockup */
+.hero-mockup{
+  margin-top:72px;
+  position:relative;
+  width:100%;max-width:860px;
+  animation:fadeUp .8s .5s ease both;
 }
-.feat-card {
-  background: var(--bg2); padding: 36px 32px;
-  transition: background .2s;
-  position: relative; overflow: hidden;
+.mockup-frame{
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 32px 80px rgba(0,0,0,0.6),
+    0 0 80px rgba(139,92,246,0.06);
 }
-.feat-card:hover { background: var(--bg3); }
-.feat-card::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at top left, rgba(139,92,246,.05), transparent 60%);
-  pointer-events: none;
+.mockup-bar{
+  padding:12px 16px;
+  background:var(--bg3);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
 }
-.feat-icon {
-  width: 44px; height: 44px; border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; margin-bottom: 20px;
-}
-.feat-title { font-family: var(--font); font-size: 16px; font-weight: 700; margin-bottom: 10px; }
-.feat-desc { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.mockup-dot{width:10px;height:10px;border-radius:50%;}
+.mockup-inner{padding:24px;background:var(--bg2);}
 
-/* ── MOCKUP / APP PREVIEW ── */
-.mockup-section { padding: 80px 24px; }
-.mockup-wrap {
-  max-width: 1100px; margin: 0 auto;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+/* Mini dashboard mockup */
+.mock-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:20px;
 }
-.mockup-box {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 20px; overflow: hidden;
-  box-shadow: 0 40px 80px rgba(0,0,0,.5);
-  position: relative;
+.mock-title{font-family:var(--font);font-size:18px;font-weight:700;color:var(--text);}
+.mock-badge{
+  padding:4px 12px;border-radius:6px;
+  background:rgba(34,197,94,0.1);
+  border:1px solid rgba(34,197,94,0.2);
+  font-family:var(--mono);font-size:11px;color:var(--green);
 }
-.mockup-bar {
-  height: 40px; background: var(--bg3); border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; padding: 0 16px; gap: 8px;
+.mock-stats-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:10px;margin-bottom:20px;
 }
-.mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
-.mockup-content { padding: 20px; }
+@media(max-width:600px){.mock-stats-grid{grid-template-columns:repeat(2,1fr);}}
+.mock-stat-card{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:11px;padding:12px 14px;
+}
+.mock-stat-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px;}
+.mock-stat-val{font-family:var(--mono);font-size:17px;font-weight:500;}
+.mock-stat-val.green{color:var(--green);}
+.mock-stat-val.accent{color:var(--accent2);}
+.mock-stat-val.gold{color:var(--gold);}
+/* mini chart */
+.mock-chart{
+  background:var(--bg3);border:1px solid var(--border);border-radius:11px;
+  padding:16px;height:100px;position:relative;overflow:hidden;
+}
+.mock-chart-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;}
+svg.chart-line{width:100%;height:64px;display:block;}
+/* trades list */
+.mock-trades{margin-top:10px;}
+.mock-trade-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 0;border-bottom:1px solid var(--border);
+}
+.mock-trade-row:last-child{border-bottom:none;}
+.mock-trade-pair{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);min-width:60px;}
+.mock-trade-dir{
+  font-size:10px;font-weight:600;padding:2px 8px;border-radius:5px;
+}
+.dir-long{background:rgba(34,197,94,0.1);color:var(--green);}
+.dir-short{background:rgba(239,68,68,0.1);color:var(--red);}
+.mock-trade-pnl{font-family:var(--mono);font-size:12px;margin-left:auto;}
+.pnl-pos{color:var(--green);}
+.pnl-neg{color:var(--red);}
+.mock-trade-r{font-family:var(--mono);font-size:10px;color:var(--text3);min-width:44px;text-align:right;}
 
-/* Mini stat cards in mockup */
-.mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-.mini-card {
-  background: var(--bg3); border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px 14px;
-}
-.mini-label { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
-.mini-val { font-family: var(--mono); font-size: 16px; font-weight: 500; }
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 
-/* Mini chart */
-.mini-chart-wrap {
-  background: var(--bg3); border: 1px solid var(--border);
-  border-radius: 10px; padding: 14px; margin-bottom: 12px;
+/* ── SECTION COMMONS ── */
+section{position:relative;z-index:1;}
+.container{max-width:1080px;margin:0 auto;padding:0 24px;}
+.section-label{
+  font-family:var(--mono);font-size:11px;font-weight:500;
+  color:var(--accent2);letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:14px;
 }
-.mini-chart-title { font-size: 10px; color: var(--text3); margin-bottom: 10px; font-weight: 600; }
-.mini-chart-svg { width: 100%; height: 60px; }
+.section-title{
+  font-family:var(--font);
+  font-size:clamp(28px,4vw,44px);
+  font-weight:800;letter-spacing:-1px;
+  color:var(--text);line-height:1.1;
+  margin-bottom:16px;
+}
+.section-sub{
+  font-size:16px;color:var(--text2);
+  max-width:520px;line-height:1.7;font-weight:300;
+}
 
-/* Mini trades */
-.mini-trade-row {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 0; border-bottom: 1px solid var(--border);
-  font-size: 11px;
+/* ── BADGES ── */
+#badges{padding:40px 0;border-bottom:1px solid var(--border);}
+.badges-inner{
+  display:flex;gap:0;
+  flex-wrap:wrap;
+  justify-content:center;
 }
-.mini-trade-row:last-child { border-bottom: none; }
+.badge-item{
+  padding:14px 28px;
+  display:flex;align-items:center;gap:9px;
+  font-size:12px;font-weight:500;color:var(--text2);
+  border-right:1px solid var(--border);
+  white-space:nowrap;
+}
+.badge-item:last-child{border-right:none;}
+.badge-icon{font-size:16px;}
 
-/* ── PROPFIRM SECTION ── */
-.propfirm-cards {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 48px;
+/* ── FEATURES ── */
+#features{padding:100px 0;}
+.features-header{text-align:center;margin-bottom:64px;}
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+  border-radius:20px;
+  overflow:hidden;
 }
-.pf-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  border-radius: 16px; padding: 24px; position: relative; overflow: hidden;
-  transition: all .2s;
+@media(max-width:768px){.features-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.features-grid{grid-template-columns:1fr;}}
+.feat-card{
+  background:var(--bg2);
+  padding:32px 28px;
+  transition:background .2s;
+  position:relative;
+  overflow:hidden;
 }
-.pf-card:hover { border-color: rgba(139,92,246,.3); transform: translateY(-2px); }
-.pf-card::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at bottom right, rgba(139,92,246,.06), transparent 60%);
-  pointer-events: none;
+.feat-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 0% 0%,var(--accent-dim),transparent 60%);
+  opacity:0;transition:opacity .3s;
 }
-.pf-name { font-family: var(--font); font-size: 14px; font-weight: 700; margin-bottom: 16px; }
-.pf-progress-label { font-size: 10px; color: var(--text3); margin-bottom: 6px; display: flex; justify-content: space-between; }
-.pf-bar { height: 4px; background: var(--bg4); border-radius: 2px; margin-bottom: 14px; }
-.pf-fill { height: 100%; border-radius: 2px; transition: width .5s; }
-.pf-stats { display: flex; gap: 16px; }
-.pf-stat-val { font-family: var(--mono); font-size: 13px; font-weight: 500; }
-.pf-stat-l { font-size: 9px; color: var(--text3); margin-top: 2px; }
+.feat-card:hover{background:var(--bg3);}
+.feat-card:hover::before{opacity:1;}
+.feat-icon{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;margin-bottom:18px;
+  transition:transform .2s;
+}
+.feat-card:hover .feat-icon{transform:scale(1.05);}
+.feat-name{
+  font-family:var(--font);font-size:16px;font-weight:700;
+  color:var(--text);margin-bottom:8px;letter-spacing:-.2px;
+}
+.feat-desc{
+  font-size:13px;color:var(--text2);line-height:1.65;font-weight:300;
+}
 
-/* ── TESTIMONIAL / HOW ── */
-.how-steps {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px;
-  position: relative;
+/* ── HOW IT WORKS ── */
+#how{padding:100px 0;border-top:1px solid var(--border);}
+.how-inner{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:center;
 }
-.how-steps::before {
-  content: ''; position: absolute; top: 28px; left: calc(16.66% + 24px); right: calc(16.66% + 24px);
-  height: 1px; background: linear-gradient(90deg, transparent, var(--border2), transparent);
+@media(max-width:768px){.how-inner{grid-template-columns:1fr;gap:48px;}}
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{
+  display:flex;gap:20px;padding:24px 0;
+  border-bottom:1px solid var(--border);
+  position:relative;
 }
-.step-card { text-align: center; }
-.step-num {
-  width: 56px; height: 56px; border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--mono); font-size: 18px; font-weight: 500;
-  color: var(--accent2); margin: 0 auto 20px;
-  background: rgba(139,92,246,.1); border: 1px solid rgba(139,92,246,.2);
+.step:last-child{border-bottom:none;}
+.step-num{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:var(--bg3);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text2);
+  margin-top:2px;transition:all .2s;
 }
-.step-title { font-family: var(--font); font-size: 15px; font-weight: 700; margin-bottom: 10px; }
-.step-desc { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.step:hover .step-num{
+  background:var(--accent-dim);border-color:rgba(139,92,246,0.3);
+  color:var(--accent2);
+}
+.step-title{
+  font-family:var(--font);font-size:17px;font-weight:700;
+  color:var(--text);margin-bottom:6px;letter-spacing:-.2px;
+}
+.step-desc{font-size:13px;color:var(--text2);line-height:1.65;font-weight:300;}
+/* step visual */
+.step-visual{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:18px;padding:24px;
+  box-shadow:0 24px 60px rgba(0,0,0,0.4);
+}
+.step-vis-title{
+  font-family:var(--mono);font-size:10px;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;
+}
+.propfirm-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:12px;padding:16px;
+}
+.pf-name{font-family:var(--font);font-size:15px;font-weight:700;margin-bottom:14px;}
+.pf-row{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px;font-size:12px;
+}
+.pf-label{color:var(--text2);}
+.pf-val{font-family:var(--mono);font-size:13px;font-weight:500;}
+.pf-bar-wrap{
+  margin-top:4px;
+  height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;
+}
+.pf-bar{height:100%;border-radius:3px;transition:width .6s ease;}
+.pf-status{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:12px;padding:4px 10px;border-radius:6px;
+  font-size:10px;font-weight:600;font-family:var(--mono);
+  background:rgba(34,197,94,0.1);color:var(--green);
+  border:1px solid rgba(34,197,94,0.2);
+}
 
-/* ── CTA SECTION ── */
-.cta-section {
-  padding: 80px 24px;
+/* ── PRICING ── */
+#pricing{padding:100px 0;border-top:1px solid var(--border);}
+.pricing-inner{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:48px;align-items:start;
 }
-.cta-box {
-  max-width: 680px; margin: 0 auto; text-align: center;
-  background: var(--bg2); border: 1px solid var(--border2);
-  border-radius: 24px; padding: 64px 48px;
-  position: relative; overflow: hidden;
+@media(max-width:768px){.pricing-inner{grid-template-columns:1fr;}}
+.pricing-card{
+  background:var(--bg2);
+  border:1px solid rgba(139,92,246,0.3);
+  border-radius:22px;padding:40px;
+  position:relative;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(139,92,246,0.08),0 24px 60px rgba(0,0,0,0.4);
 }
-.cta-box::before {
-  content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
-  width: 300px; height: 300px;
-  background: radial-gradient(circle, rgba(139,92,246,.15), transparent 70%);
-  pointer-events: none;
+.pricing-card::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,0.12),transparent 70%);
+  pointer-events:none;
 }
-.cta-title { font-family: var(--font); font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
-.cta-sub { font-size: 14px; color: var(--text2); margin-bottom: 36px; line-height: 1.7; }
-.free-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 11px; font-weight: 600; color: var(--green);
-  background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.2);
-  border-radius: 100px; padding: 4px 12px; margin-bottom: 24px;
+.pricing-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 12px;border-radius:6px;
+  background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);
+  font-family:var(--mono);font-size:10px;color:var(--accent2);
+  letter-spacing:.5px;margin-bottom:20px;
 }
+.pricing-price{
+  font-family:var(--font);font-size:48px;font-weight:800;
+  color:var(--text);letter-spacing:-2px;margin-bottom:4px;line-height:1;
+}
+.pricing-price span{font-size:20px;font-weight:400;color:var(--text2);letter-spacing:0;}
+.pricing-note{font-size:12px;color:var(--text3);margin-bottom:28px;font-style:italic;}
+.pricing-divider{height:1px;background:var(--border);margin:24px 0;}
+.feat-list{display:flex;flex-direction:column;gap:12px;margin-bottom:32px;}
+.feat-item{
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;color:var(--text2);
+}
+.feat-check{
+  width:18px;height:18px;border-radius:5px;flex-shrink:0;
+  background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:var(--green);
+}
+.btn-buy{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:15px;border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  color:#fff;font-family:var(--body);font-size:15px;font-weight:600;
+  text-decoration:none;
+  transition:all .25s;
+  box-shadow:0 4px 20px rgba(139,92,246,0.4);
+}
+.btn-buy:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(139,92,246,0.55);}
+.btn-ig{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:12px;border-radius:10px;
+  background:transparent;border:1px solid var(--border2);
+  color:var(--text2);font-family:var(--body);font-size:13px;font-weight:500;
+  text-decoration:none;margin-top:10px;
+  transition:all .2s;
+}
+.btn-ig:hover{border-color:rgba(139,92,246,0.3);color:var(--text);background:var(--accent-dim);}
+/* pricing right side */
+.pricing-right{padding-top:8px;}
+.pricing-right-title{
+  font-family:var(--font);font-size:28px;font-weight:800;
+  letter-spacing:-.5px;margin-bottom:12px;color:var(--text);
+}
+.pricing-right-sub{
+  font-size:15px;color:var(--text2);line-height:1.7;
+  font-weight:300;margin-bottom:32px;
+}
+.try-free-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:14px;padding:20px 22px;margin-bottom:20px;
+}
+.try-free-title{font-family:var(--font);font-size:14px;font-weight:700;margin-bottom:4px;}
+.try-free-sub{font-size:12px;color:var(--text2);}
+.btn-try{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:11px;border-radius:10px;
+  background:transparent;border:1px solid var(--border2);
+  color:var(--text);font-family:var(--body);font-size:13px;font-weight:500;
+  text-decoration:none;margin-top:14px;
+  transition:all .2s;
+}
+.btn-try:hover{border-color:var(--border2);background:var(--bg4);}
+
+/* ── FAQ ── */
+#faq{padding:100px 0;border-top:1px solid var(--border);}
+.faq-inner{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:start;
+}
+@media(max-width:768px){.faq-inner{grid-template-columns:1fr;gap:40px;}}
+.faq-list{display:flex;flex-direction:column;gap:0;}
+.faq-item{
+  border-bottom:1px solid var(--border);
+  padding:20px 0;cursor:pointer;
+}
+.faq-item:first-child{border-top:1px solid var(--border);}
+.faq-q{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  font-family:var(--font);font-size:15px;font-weight:600;
+  color:var(--text);
+  transition:color .2s;
+}
+.faq-item:hover .faq-q{color:var(--accent2);}
+.faq-icon{
+  width:24px;height:24px;border-radius:6px;flex-shrink:0;
+  background:var(--bg3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--text2);
+  transition:all .2s;
+}
+.faq-item.open .faq-icon{
+  background:var(--accent-dim);border-color:rgba(139,92,246,0.25);
+  color:var(--accent2);transform:rotate(45deg);
+}
+.faq-a{
+  font-size:13px;color:var(--text2);line-height:1.7;
+  font-weight:300;
+  max-height:0;overflow:hidden;
+  transition:max-height .3s ease,padding .3s ease;
+}
+.faq-item.open .faq-a{max-height:200px;padding-top:12px;}
+
+/* ── FINAL CTA ── */
+#final-cta{padding:120px 24px;}
+.final-cta-inner{
+  max-width:640px;margin:0 auto;text-align:center;
+  position:relative;
+}
+.final-glow{
+  position:absolute;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  width:500px;height:300px;
+  background:radial-gradient(ellipse,rgba(139,92,246,0.1),transparent 70%);
+  pointer-events:none;
+}
+.final-cta-inner h2{
+  font-family:var(--font);
+  font-size:clamp(32px,5vw,52px);
+  font-weight:800;letter-spacing:-1.5px;
+  line-height:1.1;margin-bottom:18px;
+}
+.final-cta-inner p{
+  font-size:16px;color:var(--text2);
+  line-height:1.7;margin-bottom:36px;font-weight:300;
+}
+.final-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
 
 /* ── FOOTER ── */
-footer {
-  position: relative; z-index: 1;
-  padding: 32px 24px;
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 16px;
+footer{
+  border-top:1px solid var(--border);
+  padding:40px 24px;
 }
-.footer-logo { font-family: var(--font); font-size: 14px; font-weight: 700; color: var(--text2); display: flex; align-items: center; gap: 8px; }
-.footer-text { font-size: 12px; color: var(--text3); }
-.footer-links { display: flex; gap: 20px; }
-.footer-link { font-size: 12px; color: var(--text3); text-decoration: none; transition: color .2s; }
-.footer-link:hover { color: var(--text2); }
+.footer-inner{
+  max-width:1080px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+}
+.footer-logo{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font);font-size:15px;font-weight:700;
+  color:var(--text2);text-decoration:none;
+}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap;}
+.footer-link{
+  font-size:12px;color:var(--text3);text-decoration:none;
+  transition:color .2s;
+}
+.footer-link:hover{color:var(--text2);}
+.footer-copy{font-size:12px;color:var(--text3);}
 
-/* ── ANIMATIONS ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-delay-1{transition-delay:.1s;}
+.reveal-delay-2{transition-delay:.2s;}
+.reveal-delay-3{transition-delay:.3s;}
 
-.reveal {
-  opacity: 0; transform: translateY(24px);
-  transition: opacity .6s ease, transform .6s ease;
-}
-.reveal.visible { opacity: 1; transform: translateY(0); }
-
-/* ── DIVIDER ── */
-.divider { height: 1px; background: var(--border); max-width: 1100px; margin: 0 auto; }
-
-/* ── MOBILE ── */
-@media (max-width: 768px) {
-  nav { padding: 0 16px; }
-  .nav-links .nav-link { display: none; }
-  .hero { padding: 80px 16px 60px; }
-  .hero-title { letter-spacing: -1.5px; }
-  .hero-actions { flex-direction: column; align-items: stretch; text-align: center; }
-  .stats-bar { flex-direction: column; }
-  .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
-  .stat-item:last-child { border-bottom: none; }
-  .features-grid { grid-template-columns: 1fr; }
-  .mockup-wrap { grid-template-columns: 1fr; gap: 40px; }
-  .propfirm-cards { grid-template-columns: 1fr; }
-  .how-steps { grid-template-columns: 1fr; gap: 24px; }
-  .how-steps::before { display: none; }
-  .cta-box { padding: 40px 24px; }
-  section { padding: 60px 16px; }
-  footer { flex-direction: column; align-items: flex-start; }
-}
-
-/* ── TICKER SCROLL ── */
-.ticker-wrap {
-  overflow: hidden; position: relative; z-index: 1;
-  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-  padding: 12px 0; background: var(--bg2);
-}
-.ticker {
-  display: flex; gap: 0; width: max-content;
-  animation: ticker 24s linear infinite;
-}
-@keyframes ticker { from { transform: translateX(0) } to { transform: translateX(-50%) } }
-.tick-item {
-  display: flex; align-items: center; gap: 6px;
-  padding: 0 28px; font-size: 12px; font-family: var(--mono);
-  white-space: nowrap; color: var(--text3);
-  border-right: 1px solid var(--border);
-}
-.tick-val { font-weight: 500; }
-.tick-val.up { color: var(--green); }
-.tick-val.down { color: var(--red); }
-
-/* ── LOGIN SCREEN (identik dengan index.html) ── */
-#login-screen { display: none; }
-#login-screen.open { display: flex; }
-.login-card {
-  background: var(--bg2); border: 1px solid var(--border2);
-  border-radius: 22px; padding: 48px 40px; width: 100%; max-width: 400px;
-  text-align: center; position: relative;
-  box-shadow: 0 32px 80px rgba(0,0,0,.5);
-}
-.login-icon { font-size: 48px; margin-bottom: 20px; }
-.login-title { font-size: 26px; font-weight: 700; letter-spacing: -.6px; margin-bottom: 8px; font-family: var(--font); }
-.login-btn {
-  display: flex; align-items: center; justify-content: center; gap: 12px;
-  width: 100%; padding: 14px; border-radius: 12px; border: none; cursor: pointer;
-  background: #fff; color: #1a1a1a; font-size: 14px; font-weight: 700;
-  font-family: var(--font); transition: all .2s;
-}
-.login-btn:hover { opacity: .9; transform: translateY(-1px); }
-.login-err {
-  display: none; margin-top: 8px; font-size: 12px; color: var(--red);
-  background: rgba(239,68,68,.1); border-radius: 9px; padding: 9px 12px;
-}
-.login-loading {
-  display: none; margin-top: 8px; font-size: 12px; color: var(--text2);
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  nav{padding:12px 16px;}
+  .nav-links .nav-link{display:none;}
+  .hero-stats{flex-direction:column;}
+  .hero-stat{border-right:none;border-bottom:1px solid var(--border);}
+  .hero-stat:last-child{border-bottom:none;}
+  .badge-item{border-right:none;border-bottom:1px solid var(--border);width:50%;}
+  .badge-item:nth-child(even){border-right:none;}
 }
 </style>
 </head>
 <body>
 
-<!-- ── GLOW ORBS ── -->
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
-
-<!-- ══ LOGIN MODAL (identik dengan index.html) ══ -->
-<div id="login-screen" style="position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(12px);">
-
-  <!-- Panel A: Login options -->
-  <div class="login-card" id="login-panel">
-    <div id="login-close-btn" style="position:absolute;top:16px;right:16px;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;transition:color .15s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">✕</div>
-
-    <!-- State 1: Login options -->
-    <div id="login-step-email">
-      <div class="login-icon">
-        <img src="data:image/png;base64,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" alt="RPT" style="width:64px;height:64px;object-fit:contain">
-      </div>
-      <div class="login-title">Masuk ke RiskPerTrade</div>
-
-      <!-- Early access notice -->
-      <div style="background:rgba(124,106,247,.08);border:1px solid rgba(124,106,247,.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;text-align:left">
-        <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:3px">🔒 Early Access</div>
-        <div style="font-size:11px;color:var(--text2);line-height:1.5">Pastikan Google atau email kamu sudah terdaftar. Belum punya akses? Hubungi kami di Instagram.</div>
-        <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
-          style="display:inline-flex;align-items:center;gap:5px;margin-top:7px;font-size:11px;font-weight:600;color:var(--accent);text-decoration:none">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-          @journalingtoolsid →
-        </a>
-      </div>
-
-      <!-- Google login -->
-      <button id="google-login-btn" class="login-btn" style="background:#fff;color:#1a1a1a;border:none;margin-bottom:10px;gap:10px;font-size:14px">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:18px;height:18px" alt="G">
-        Masuk dengan Google
-      </button>
-
-      <!-- Divider -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-        <span style="font-size:11px;color:var(--text3)">atau dengan email</span>
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-      </div>
-
-      <!-- Email magic link -->
-      <div style="margin-bottom:8px">
-        <input id="magic-email-input" type="email" placeholder="emailkamu@gmail.com"
-          style="width:100%;padding:12px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .15s;box-sizing:border-box"
-          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
-      </div>
-      <button class="login-btn" id="send-magic-btn" style="background:var(--accent);border:none;color:#fff;margin-bottom:4px">
-        ✉️ Kirim Link Masuk
-      </button>
-      <div id="login-err" class="login-err">Gagal mengirim. Coba lagi.</div>
-      <div id="login-loading" class="login-loading">⏳ Memproses…</div>
-
-      <!-- Divider -->
-      <div style="display:flex;align-items:center;gap:10px;margin:10px 0 8px">
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-        <span style="font-size:11px;color:var(--text3)">atau</span>
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-      </div>
-
-      <!-- Anonymous -->
-      <button id="anon-btn" style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font);transition:all .15s"
-        onmouseover="this.style.background='var(--bg4)';this.style.color='var(--text)'"
-        onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text2)'">
-        👻 Coba Tanpa Daftar
-      </button>
-      <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:4px">Maks 10 trade — bisa upgrade ke akun penuh kapan saja</div>
-    </div>
-
-    <!-- State 2: Email sent -->
-    <div id="login-step-sent" style="display:none">
-      <div class="login-icon">📬</div>
-      <div class="login-title" style="font-size:20px">Cek Email Kamu!</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">Link masuk sudah dikirim ke:</p>
-      <div style="background:var(--bg3);border:1px solid rgba(124,106,247,.3);border-radius:8px;padding:10px 16px;margin-bottom:20px;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent);text-align:center" id="sent-email-display">—</div>
-      <p style="font-size:12px;color:var(--text3);line-height:1.7;margin-bottom:20px">
-        Klik link di email tersebut untuk masuk otomatis.<br>
-        Link berlaku selama <strong style="color:var(--text)">15 menit</strong>.<br>
-        Cek folder <strong style="color:var(--text)">spam</strong> kalau tidak muncul.
-      </p>
-      <button class="login-btn" id="resend-btn" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);width:100%;justify-content:center;margin-bottom:8px">Kirim Ulang</button>
-      <button id="change-email-btn" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);padding:4px">← Ganti email</button>
-    </div>
-
-    <button id="login-skip-btn" style="margin-top:12px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);transition:color .15s;padding:4px;display:block" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu →</button>
-  </div>
-
-  <!-- Panel B: Not invited -->
-  <div class="login-card" id="notinvited-panel" style="display:none">
-    <div class="login-icon">🔒</div>
-    <div class="login-title" style="font-size:20px">Akses Terbatas</div>
-    <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">
-      RiskPerTrade saat ini hanya tersedia untuk pengguna yang diundang.<br>
-      Email kamu belum terdaftar dalam daftar akses.
-    </p>
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:20px;font-family:var(--mono);font-size:12px;color:var(--text2);text-align:left">
-      <span style="color:var(--text3);font-size:10px;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px">Email yang dicoba</span>
-      <span id="rejected-email" style="color:var(--text)">—</span>
-    </div>
-    <p style="font-size:12px;color:var(--text3);margin-bottom:20px;line-height:1.6">Hubungi admin untuk mendapatkan akses, atau coba dengan email lain.</p>
-    <button class="login-btn" id="try-other-btn" style="background:var(--accent);border:none;color:#fff;margin-bottom:10px">Coba Email Lain</button>
-    <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
-      style="display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:12px;font-weight:500;text-decoration:none;margin-bottom:8px;transition:all .15s"
-      onmouseover="this.style.background='var(--bg4)';this.style.color='var(--text)'"
-      onmouseout="this.style.background='var(--bg3)';this.style.color='var(--text2)'">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-      Hubungi Admin — @journalingtoolsid
-    </a>
-    <button id="notinvited-skip" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--font);padding:4px" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text3)'">Lihat-lihat dulu →</button>
-  </div>
-</div>
-
 <!-- ── NAV ── -->
-<nav>
-  <a class="nav-logo" href="#">
-    <div class="nav-dot"></div>
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">📊</div>
     RiskPerTrade
   </a>
   <div class="nav-links">
     <a href="#features" class="nav-link">Fitur</a>
-    <a href="#propfirm" class="nav-link">PropFirm</a>
-    <a href="#how" class="nav-link">Cara Pakai</a>
-    <a href="#" onclick="openLoginScreen();return false;" class="btn-login">Masuk</a>
-    <a href="#" onclick="openLoginScreen();return false;" class="btn-cta-nav">Mulai Gratis</a>
+    <a href="#how" class="nav-link">Cara Kerja</a>
+    <a href="#pricing" class="nav-link">Harga</a>
+    <a href="#faq" class="nav-link">FAQ</a>
+    <a href="https://riskpertrade.me" class="nav-cta" target="_blank">Buka App →</a>
   </div>
 </nav>
 
 <!-- ── HERO ── -->
-<section class="hero">
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
   <div class="hero-badge">
-    <span class="badge-dot"></span>
-    Gratis selamanya · Cloud-based · Mobile friendly
+    <div class="hero-badge-dot"></div>
+    Tersedia sekarang · Early Access
   </div>
-  <h1 class="hero-title">
-    Trading Journal<br>
-    <span>untuk trader</span><br>
-    <span class="line2">yang serius.</span>
-  </h1>
+
+  <h1>Trading Journal untuk<br><span>Trader Serius</span></h1>
+
   <p class="hero-sub">
-    Catat setiap trade, analisis win rate, profit factor, dan pantau progress PropFirm challenge kamu — semua dalam satu platform yang clean dan cepat.
+    Catat trade, analisis performa, dan pantau challenge PropFirm —
+    semua dalam satu platform. Dibuat khusus untuk trader Indonesia.
   </p>
+
   <div class="hero-actions">
-    <a href="#" onclick="openLoginScreen();return false;" class="btn-primary">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 3l14 9-14 9V3z"/></svg>
-      Mulai Sekarang — Gratis
+    <a href="https://riskpertrade.me" class="btn-primary" target="_blank">
+      🔓 Coba Gratis Sekarang
     </a>
-    <a href="./index.html" class="btn-secondary">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      Lihat Demo App
+    <a href="#features" class="btn-secondary">
+      Lihat Semua Fitur ↓
     </a>
   </div>
 
-  <!-- STATS BAR -->
-  <div class="stats-bar">
-    <div class="stat-item">
-      <span class="stat-val green">+68.4%</span>
-      <div class="stat-label">Avg Win Rate Users</div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="hero-stat-val">6+</span>
+      <span class="hero-stat-label">Fitur Lengkap</span>
     </div>
-    <div class="stat-item">
-      <span class="stat-val purple">12 Fitur</span>
-      <div class="stat-label">Tools dalam 1 App</div>
+    <div class="hero-stat">
+      <span class="hero-stat-val">1×</span>
+      <span class="hero-stat-label">Bayar Sekali</span>
     </div>
-    <div class="stat-item">
-      <span class="stat-val">100% Gratis</span>
-      <div class="stat-label">Tidak ada biaya tersembunyi</div>
+    <div class="hero-stat">
+      <span class="hero-stat-val">∞</span>
+      <span class="hero-stat-label">Akses Selamanya</span>
+    </div>
+    <div class="hero-stat">
+      <span class="hero-stat-val">☁️</span>
+      <span class="hero-stat-label">Cloud Sync</span>
+    </div>
+  </div>
+
+  <!-- MOCKUP -->
+  <div class="hero-mockup">
+    <div class="mockup-frame">
+      <div class="mockup-bar">
+        <div class="mockup-dot" style="background:#ff5f57"></div>
+        <div class="mockup-dot" style="background:#febc2e"></div>
+        <div class="mockup-dot" style="background:#28c840"></div>
+        <div style="flex:1;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text3)">riskpertrade.me — Dashboard</div>
+      </div>
+      <div class="mockup-inner">
+        <div class="mock-header">
+          <div class="mock-title">Dashboard</div>
+          <div class="mock-badge">● Live</div>
+        </div>
+        <div class="mock-stats-grid">
+          <div class="mock-stat-card">
+            <div class="mock-stat-label">Total P&L</div>
+            <div class="mock-stat-val green">+$2,840</div>
+          </div>
+          <div class="mock-stat-card">
+            <div class="mock-stat-label">Win Rate</div>
+            <div class="mock-stat-val accent">68.4%</div>
+          </div>
+          <div class="mock-stat-card">
+            <div class="mock-stat-label">Profit Factor</div>
+            <div class="mock-stat-val gold">2.14</div>
+          </div>
+          <div class="mock-stat-card">
+            <div class="mock-stat-label">Total Trade</div>
+            <div class="mock-stat-val" style="color:var(--text)">57</div>
+          </div>
+        </div>
+        <!-- Equity chart -->
+        <div class="mock-chart">
+          <div class="mock-chart-label">Equity Curve</div>
+          <svg class="chart-line" viewBox="0 0 820 64" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#8b5cf6" stop-opacity=".25"/>
+                <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,58 C40,55 80,50 120,46 C160,42 190,44 230,38 C270,32 300,35 340,28 C380,21 410,24 450,18 C490,12 520,15 560,10 C600,5 640,8 680,6 C720,4 760,7 820,4" fill="none" stroke="#8b5cf6" stroke-width="2" opacity=".8"/>
+            <path d="M0,58 C40,55 80,50 120,46 C160,42 190,44 230,38 C270,32 300,35 340,28 C380,21 410,24 450,18 C490,12 520,15 560,10 C600,5 640,8 680,6 C720,4 760,7 820,4 L820,64 L0,64 Z" fill="url(#cg)"/>
+          </svg>
+        </div>
+        <!-- Trade list -->
+        <div class="mock-trades">
+          <div class="mock-trade-row">
+            <span class="mock-trade-pair">XAUUSD</span>
+            <span class="mock-trade-dir dir-long">LONG</span>
+            <span style="font-size:11px;color:var(--text3);margin-left:4px">London</span>
+            <span class="mock-trade-pnl pnl-pos mock-trade-r">+2.4R</span>
+            <span class="mock-trade-pnl pnl-pos">+$480</span>
+          </div>
+          <div class="mock-trade-row">
+            <span class="mock-trade-pair">EURUSD</span>
+            <span class="mock-trade-dir dir-short">SHORT</span>
+            <span style="font-size:11px;color:var(--text3);margin-left:4px">NY</span>
+            <span class="mock-trade-pnl pnl-neg mock-trade-r">-1.0R</span>
+            <span class="mock-trade-pnl pnl-neg">-$100</span>
+          </div>
+          <div class="mock-trade-row">
+            <span class="mock-trade-pair">GBPUSD</span>
+            <span class="mock-trade-dir dir-long">LONG</span>
+            <span style="font-size:11px;color:var(--text3);margin-left:4px">Asia</span>
+            <span class="mock-trade-pnl pnl-pos mock-trade-r">+1.8R</span>
+            <span class="mock-trade-pnl pnl-pos">+$360</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ── TICKER ── -->
-<div class="ticker-wrap">
-  <div class="ticker">
-    <!-- Set 1 -->
-    <div class="tick-item">📈 Dashboard <span class="tick-val up">Live Stats</span></div>
-    <div class="tick-item">🏆 PropFirm Tracker <span class="tick-val up">FTMO · MFF · E8</span></div>
-    <div class="tick-item">🧠 AI Trade Review <span class="tick-val up">Analisis Otomatis</span></div>
-    <div class="tick-item">📓 Daily Journal <span class="tick-val">Refleksi Harian</span></div>
-    <div class="tick-item">🎯 Risk Calculator <span class="tick-val up">Per Trade</span></div>
-    <div class="tick-item">📊 Equity Curve <span class="tick-val up">Visual Performa</span></div>
-    <div class="tick-item">🧬 Trader DNA <span class="tick-val">Profil Trading Kamu</span></div>
-    <div class="tick-item">💰 Finance Tracker <span class="tick-val up">P&L Real</span></div>
-    <!-- Set 2 (sama, buat loop mulus) -->
-    <div class="tick-item">📈 Dashboard <span class="tick-val up">Live Stats</span></div>
-    <div class="tick-item">🏆 PropFirm Tracker <span class="tick-val up">FTMO · MFF · E8</span></div>
-    <div class="tick-item">🧠 AI Trade Review <span class="tick-val up">Analisis Otomatis</span></div>
-    <div class="tick-item">📓 Daily Journal <span class="tick-val">Refleksi Harian</span></div>
-    <div class="tick-item">🎯 Risk Calculator <span class="tick-val up">Per Trade</span></div>
-    <div class="tick-item">📊 Equity Curve <span class="tick-val up">Visual Performa</span></div>
-    <div class="tick-item">🧬 Trader DNA <span class="tick-val">Profil Trading Kamu</span></div>
-    <div class="tick-item">💰 Finance Tracker <span class="tick-val up">P&L Real</span></div>
+<!-- ── BADGES ── -->
+<div id="badges" class="reveal">
+  <div class="container">
+    <div class="badges-inner">
+      <div class="badge-item"><span class="badge-icon">☁️</span> Cloud Sync Real-time</div>
+      <div class="badge-item"><span class="badge-icon">📱</span> Mobile Friendly</div>
+      <div class="badge-item"><span class="badge-icon">🔒</span> Login dengan Google</div>
+      <div class="badge-item"><span class="badge-icon">🇮🇩</span> Dibuat untuk Trader Indonesia</div>
+      <div class="badge-item"><span class="badge-icon">⚡</span> Bayar Sekali, Akses Selamanya</div>
+    </div>
   </div>
 </div>
 
 <!-- ── FEATURES ── -->
 <section id="features">
-  <div class="section-inner">
-    <div class="reveal" style="text-align:center;margin-bottom:60px;">
-      <div class="section-tag">Fitur Lengkap</div>
-      <h2 class="section-title">Semua yang kamu butuhkan<br>ada di sini.</h2>
-      <p class="section-sub" style="margin:0 auto;">Dari catat trade sampai analisis mendalam — dirancang khusus untuk trader yang ingin berkembang.</p>
+  <div class="container">
+    <div class="features-header reveal">
+      <div class="section-label">Fitur Lengkap</div>
+      <h2 class="section-title">Semua yang kamu butuhkan<br>dalam satu platform</h2>
+      <p class="section-sub" style="margin:0 auto">Dari mencatat trade pertama sampai lulus challenge PropFirm — RiskPerTrade mendampingi setiap langkah.</p>
     </div>
 
     <div class="features-grid reveal">
       <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(34,197,94,.12);color:var(--green);">📊</div>
-        <div class="feat-title">Dashboard Analytics</div>
-        <div class="feat-desc">Lihat ringkasan performa kamu secara real-time. Win rate, profit factor, average RR, dan equity curve semuanya dalam satu tampilan.</div>
+        <div class="feat-icon" style="background:rgba(34,197,94,0.1);">📝</div>
+        <div class="feat-name">Trade Journal</div>
+        <div class="feat-desc">Log trade dengan detail lengkap — pair, direction, session, entry/exit, risk, P&L, dan R-multiple. Setiap trade otomatis masuk ke equity curve kamu.</div>
       </div>
       <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(139,92,246,.12);color:var(--accent2);">✏️</div>
-        <div class="feat-title">Trade Journal</div>
-        <div class="feat-desc">Catat setiap trade dengan detail: pasangan mata uang, entry/exit, screenshot chart, dan tag strategi. Cari dan filter dengan cepat.</div>
+        <div class="feat-icon" style="background:rgba(139,92,246,0.12);">📈</div>
+        <div class="feat-name">Analytics Mendalam</div>
+        <div class="feat-desc">Win rate, profit factor, avg R:R, dan breakdown performa per pair, session, serta setup. Filter berdasarkan periode: 7 hari, 30 hari, 6 bulan, atau semua waktu.</div>
       </div>
       <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(245,158,11,.12);color:var(--gold);">🏆</div>
-        <div class="feat-title">PropFirm Tracker</div>
-        <div class="feat-desc">Monitor progress challenge FTMO, MyForexFunds, E8 dan lainnya. Pantau drawdown, target profit, dan status challenge secara otomatis.</div>
+        <div class="feat-icon" style="background:rgba(239,68,68,0.1);">🏢</div>
+        <div class="feat-name">PropFirm Tracker</div>
+        <div class="feat-desc">Monitor progress challenge PropFirm secara real-time — profit target, daily loss limit, max drawdown, dan trading days. Visualisasi equity vs limit PropFirm.</div>
       </div>
       <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(139,92,246,.12);color:#c084fc);">🧠</div>
-        <div class="feat-title">AI Trade Review</div>
-        <div class="feat-desc">Upload screenshot chart kamu dan dapatkan analisis mendalam dari AI. Identifikasi pola, kelemahan, dan peluang improvement. <span style="font-size:10px;color:var(--accent2);font-weight:600;background:rgba(139,92,246,.15);padding:1px 6px;border-radius:4px;">PRO</span></div>
+        <div class="feat-icon" style="background:rgba(245,158,11,0.1);">📔</div>
+        <div class="feat-name">Daily Journal</div>
+        <div class="feat-desc">Tulis bias harian, catat mood trading, dan buat review end-of-day. Bangun konsistensi mental yang jadi pondasi performa jangka panjang.</div>
       </div>
       <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(239,68,68,.12);color:var(--red);">🎯</div>
-        <div class="feat-title">Risk Calculator</div>
-        <div class="feat-desc">Hitung ukuran posisi yang tepat berdasarkan risk per trade dan stop loss. Jangan pernah over-leverage lagi.</div>
+        <div class="feat-icon" style="background:rgba(99,102,241,0.12);">🧮</div>
+        <div class="feat-name">Risk Calculator</div>
+        <div class="feat-desc">Hitung lot size dan R:R secara otomatis berdasarkan balance, risk %, dan jarak SL. Tidak perlu lagi hitung manual sebelum entry.</div>
       </div>
       <div class="feat-card">
-        <div class="feat-icon" style="background:rgba(34,197,94,.12);color:var(--green);">🧬</div>
-        <div class="feat-title">Trader DNA</div>
-        <div class="feat-desc">Visualisasi profil trading kamu dalam bentuk radar chart. Temukan kekuatan dan area improvement berdasarkan data trade nyata kamu.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── APP MOCKUP ── -->
-<section class="mockup-section" style="padding:40px 24px 80px;">
-  <div class="mockup-wrap section-inner">
-    <div class="reveal">
-      <div class="section-tag">Live Preview</div>
-      <h2 class="section-title">Tampilan yang clean,<br>data yang powerful.</h2>
-      <p class="section-sub">Interface dirancang agar kamu bisa fokus trading, bukan bingung pakai app-nya.</p>
-      <div style="margin-top:32px;display:flex;flex-direction:column;gap:14px;">
-        <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text2);">
-          <div style="width:24px;height:24px;border-radius:6px;background:rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">✓</div>
-          Dark mode premium, nyaman di mata trader malam
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text2);">
-          <div style="width:24px;height:24px;border-radius:6px;background:rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">✓</div>
-          Mobile-friendly, bisa dicatat langsung dari HP
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text2);">
-          <div style="width:24px;height:24px;border-radius:6px;background:rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">✓</div>
-          Cloud sync real-time lewat Firebase
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text2);">
-          <div style="width:24px;height:24px;border-radius:6px;background:rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">✓</div>
-          Export data kapan saja, data kamu selalu aman
-        </div>
-      </div>
-    </div>
-
-    <!-- MOCKUP UI -->
-    <div class="mockup-box reveal" style="transition-delay:.15s;">
-      <div class="mockup-bar">
-        <div class="mockup-dot" style="background:#ef4444;"></div>
-        <div class="mockup-dot" style="background:#f59e0b;"></div>
-        <div class="mockup-dot" style="background:#22c55e;"></div>
-        <div style="flex:1;text-align:center;font-size:10px;color:var(--text3);font-family:var(--mono);">riskpertrade.me</div>
-      </div>
-      <div class="mockup-content">
-        <div style="font-size:10px;color:var(--text3);margin-bottom:10px;font-weight:600;letter-spacing:.5px;">DASHBOARD — JUNE 2025</div>
-        <div class="mini-grid">
-          <div class="mini-card">
-            <div class="mini-label">Win Rate</div>
-            <div class="mini-val" style="color:var(--green);">68.4%</div>
-          </div>
-          <div class="mini-card">
-            <div class="mini-label">Profit Factor</div>
-            <div class="mini-val" style="color:var(--accent2);">2.14</div>
-          </div>
-          <div class="mini-card">
-            <div class="mini-label">Net P&L</div>
-            <div class="mini-val" style="color:var(--green);">+$840</div>
-          </div>
-        </div>
-        <!-- Equity curve mini SVG -->
-        <div class="mini-chart-wrap">
-          <div class="mini-chart-title">EQUITY CURVE</div>
-          <svg class="mini-chart-svg" viewBox="0 0 280 60" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="gcurve" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#22c55e" stop-opacity=".3"/>
-                <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-            <path d="M0,55 L20,50 L40,46 L60,48 L80,40 L100,34 L120,36 L140,28 L160,22 L180,24 L200,18 L220,12 L240,8 L260,6 L280,4" fill="none" stroke="#22c55e" stroke-width="1.5" opacity=".8"/>
-            <path d="M0,55 L20,50 L40,46 L60,48 L80,40 L100,34 L120,36 L140,28 L160,22 L180,24 L200,18 L220,12 L240,8 L260,6 L280,4 L280,60 L0,60 Z" fill="url(#gcurve)"/>
-          </svg>
-        </div>
-        <!-- Recent trades -->
-        <div style="font-size:9px;color:var(--text3);margin-bottom:8px;font-weight:600;letter-spacing:.5px;">TRADE TERBARU</div>
-        <div class="mini-trade-row">
-          <span style="color:var(--text2);">EURUSD</span>
-          <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">Long · 1R</span>
-          <span style="color:var(--green);font-family:var(--mono);font-size:11px;font-weight:500;">+$120</span>
-        </div>
-        <div class="mini-trade-row">
-          <span style="color:var(--text2);">XAUUSD</span>
-          <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">Short · 0.5R</span>
-          <span style="color:var(--red);font-family:var(--mono);font-size:11px;font-weight:500;">-$60</span>
-        </div>
-        <div class="mini-trade-row">
-          <span style="color:var(--text2);">GBPJPY</span>
-          <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">Long · 2R</span>
-          <span style="color:var(--green);font-family:var(--mono);font-size:11px;font-weight:500;">+$240</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── PROPFIRM ── -->
-<section id="propfirm" style="padding:80px 24px;">
-  <div class="section-inner">
-    <div class="reveal" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px;margin-bottom:0;">
-      <div>
-        <div class="section-tag">PropFirm Tracker</div>
-        <h2 class="section-title">Pantau Challenge<br>PropFirm kamu.</h2>
-      </div>
-      <p class="section-sub" style="max-width:360px;">Monitor drawdown, target profit, dan hari trading secara real-time. Tidak perlu buka platform lain.</p>
-    </div>
-
-    <div class="propfirm-cards reveal" style="transition-delay:.1s;">
-      <div class="pf-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <div class="pf-name">FTMO Challenge</div>
-          <span style="font-size:9px;background:rgba(34,197,94,.12);color:var(--green);padding:2px 8px;border-radius:100px;font-weight:600;">AKTIF</span>
-        </div>
-        <div class="pf-progress-label"><span>Target Profit</span><span style="color:var(--text);">$680 / $1,000</span></div>
-        <div class="pf-bar"><div class="pf-fill" style="width:68%;background:var(--green);"></div></div>
-        <div class="pf-progress-label"><span>Max Drawdown</span><span style="color:var(--gold);">$420 / $500</span></div>
-        <div class="pf-bar"><div class="pf-fill" style="width:84%;background:var(--gold);"></div></div>
-        <div class="pf-stats">
-          <div><div class="pf-stat-val">12</div><div class="pf-stat-l">Hari Sisa</div></div>
-          <div><div class="pf-stat-val" style="color:var(--green);">6.8%</div><div class="pf-stat-l">Progress</div></div>
-          <div><div class="pf-stat-val">$10k</div><div class="pf-stat-l">Akun Size</div></div>
-        </div>
-      </div>
-
-      <div class="pf-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <div class="pf-name">MyForexFunds</div>
-          <span style="font-size:9px;background:rgba(139,92,246,.12);color:var(--accent2);padding:2px 8px;border-radius:100px;font-weight:600;">FASE 2</span>
-        </div>
-        <div class="pf-progress-label"><span>Target Profit</span><span style="color:var(--text);">$340 / $500</span></div>
-        <div class="pf-bar"><div class="pf-fill" style="width:68%;background:var(--accent);"></div></div>
-        <div class="pf-progress-label"><span>Max Drawdown</span><span style="color:var(--green);">$80 / $300</span></div>
-        <div class="pf-bar"><div class="pf-fill" style="width:27%;background:var(--green);"></div></div>
-        <div class="pf-stats">
-          <div><div class="pf-stat-val">8</div><div class="pf-stat-l">Hari Sisa</div></div>
-          <div><div class="pf-stat-val" style="color:var(--accent2);">3.4%</div><div class="pf-stat-l">Progress</div></div>
-          <div><div class="pf-stat-val">$25k</div><div class="pf-stat-l">Akun Size</div></div>
-        </div>
-      </div>
-
-      <div class="pf-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <div class="pf-name">E8 Markets</div>
-          <span style="font-size:9px;background:rgba(34,197,94,.12);color:var(--green);padding:2px 8px;border-radius:100px;font-weight:600;">PASSED ✓</span>
-        </div>
-        <div class="pf-progress-label"><span>Target Profit</span><span style="color:var(--green);">$820 / $800</span></div>
-        <div class="pf-bar"><div class="pf-fill" style="width:100%;background:var(--green);"></div></div>
-        <div class="pf-progress-label"><span>Max Drawdown</span><span style="color:var(--green);">$110 / $400</span></div>
-        <div class="pf-bar"><div class="pf-fill" style="width:28%;background:var(--green);"></div></div>
-        <div class="pf-stats">
-          <div><div class="pf-stat-val" style="color:var(--green);">✓</div><div class="pf-stat-l">Lulus</div></div>
-          <div><div class="pf-stat-val" style="color:var(--green);">8.2%</div><div class="pf-stat-l">Profit</div></div>
-          <div><div class="pf-stat-val">$10k</div><div class="pf-stat-l">Akun Size</div></div>
-        </div>
+        <div class="feat-icon" style="background:rgba(6,182,212,0.1);">📅</div>
+        <div class="feat-name">Trading Calendar</div>
+        <div class="feat-desc">Heatmap P&L bulanan — lihat pola trading kamu dari perspektif kalender. Hari terbaik, hari terburuk, dan konsistensi sekaligus.</div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ── HOW IT WORKS ── -->
-<section id="how" style="padding:80px 24px;background:var(--bg2);">
-  <div class="section-inner">
-    <div class="reveal" style="text-align:center;margin-bottom:0;">
-      <div class="section-tag">Cara Mulai</div>
-      <h2 class="section-title">Mulai dalam 3 langkah.</h2>
-      <p class="section-sub" style="margin:0 auto;">Tidak perlu setup rumit. Langsung catat, langsung lihat hasilnya.</p>
-    </div>
+<section id="how">
+  <div class="container">
+    <div class="how-inner">
+      <div>
+        <div class="section-label reveal">Cara Kerja</div>
+        <h2 class="section-title reveal">Mulai dalam<br>3 langkah</h2>
+        <p class="section-sub reveal" style="margin-bottom:40px">Tidak perlu setup rumit. Buka app, langsung bisa dipakai.</p>
 
-    <div class="how-steps reveal" style="transition-delay:.1s;">
-      <div class="step-card">
-        <div class="step-num">01</div>
-        <div class="step-title">Login dengan Google</div>
-        <div class="step-desc">Satu klik, data kamu langsung tersimpan di cloud. Tidak perlu buat akun baru, tidak perlu ingat password.</div>
+        <div class="steps">
+          <div class="step reveal">
+            <div class="step-num">01</div>
+            <div>
+              <div class="step-title">Coba gratis sebagai guest</div>
+              <div class="step-desc">Akses langsung tanpa daftar. Eksplorasi semua fitur, input hingga 10 trade, lihat bagaimana analytics bekerja.</div>
+            </div>
+          </div>
+          <div class="step reveal reveal-delay-1">
+            <div class="step-num">02</div>
+            <div>
+              <div class="step-title">Beli akses, login dengan Google</div>
+              <div class="step-desc">Bayar sekali, email kamu langsung di-whitelist. Login dengan Google — semua data tersimpan di cloud secara otomatis.</div>
+            </div>
+          </div>
+          <div class="step reveal reveal-delay-2">
+            <div class="step-num">03</div>
+            <div>
+              <div class="step-title">Catat, analisis, berkembang</div>
+              <div class="step-desc">Mulai jurnal trading serius kamu. Analytics akan menunjukkan pola yang tidak kamu sadari — dan di situlah pertumbuhan dimulai.</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="step-card">
-        <div class="step-num">02</div>
-        <div class="step-title">Catat Trade Kamu</div>
-        <div class="step-desc">Input trade setelah market close. Tambahkan screenshot, notes, dan tag strategi untuk analisis yang lebih dalam.</div>
-      </div>
-      <div class="step-card">
-        <div class="step-num">03</div>
-        <div class="step-title">Analisis & Berkembang</div>
-        <div class="step-desc">Lihat pola dari data trademu. Dashboard akan otomatis menghitung statistik dan membantu kamu trading lebih baik.</div>
+
+      <!-- PropFirm card visual -->
+      <div class="step-visual reveal">
+        <div class="step-vis-title">PropFirm Tracker — Live Preview</div>
+        <div class="propfirm-card">
+          <div class="pf-name">🏢 FTMO $100K Challenge</div>
+          <div class="pf-row">
+            <span class="pf-label">Profit Target</span>
+            <span class="pf-val" style="color:var(--green)">$6,240 / $10,000</span>
+          </div>
+          <div class="pf-bar-wrap">
+            <div class="pf-bar" style="width:62.4%;background:var(--green);"></div>
+          </div>
+          <div class="pf-row" style="margin-top:12px;">
+            <span class="pf-label">Daily Loss Used</span>
+            <span class="pf-val" style="color:var(--gold)">$280 / $500</span>
+          </div>
+          <div class="pf-bar-wrap">
+            <div class="pf-bar" style="width:56%;background:var(--gold);"></div>
+          </div>
+          <div class="pf-row" style="margin-top:12px;">
+            <span class="pf-label">Max Drawdown</span>
+            <span class="pf-val" style="color:var(--text2)">$1,240 / $5,000</span>
+          </div>
+          <div class="pf-bar-wrap">
+            <div class="pf-bar" style="width:24.8%;background:var(--accent);"></div>
+          </div>
+          <div class="pf-row" style="margin-top:12px;">
+            <span class="pf-label">Trading Days</span>
+            <span class="pf-val" style="color:var(--text)">14 / 30 hari</span>
+          </div>
+          <div class="pf-bar-wrap">
+            <div class="pf-bar" style="width:46.7%;background:var(--text3);"></div>
+          </div>
+          <div class="pf-status">
+            <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 5px var(--green)"></span>
+            On Track — 62.4% menuju target
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:12px 14px;background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.1);border-radius:10px;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-family:var(--mono)">EQUITY vs PROPFIRM LIMITS</div>
+          <svg width="100%" height="50" viewBox="0 0 300 50">
+            <path d="M0,40 C30,36 60,32 90,26 C120,20 150,22 180,16 C210,10 240,12 270,8 L300,6" fill="none" stroke="#22c55e" stroke-width="1.5" opacity=".7"/>
+            <path d="M0,48 L300,48" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3" opacity=".3"/>
+            <path d="M0,44 L300,44" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,3" opacity=".3"/>
+          </svg>
+          <div style="display:flex;gap:14px;margin-top:6px;">
+            <span style="font-size:9px;color:var(--green);font-family:var(--mono)">— Equity</span>
+            <span style="font-size:9px;color:var(--red);font-family:var(--mono);">-- Max DD</span>
+            <span style="font-size:9px;color:var(--gold);font-family:var(--mono);">-- Daily Loss</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── CTA ── -->
-<section class="cta-section">
-  <div class="cta-box reveal">
-    <div style="position:relative;z-index:1;">
-      <div class="free-badge">
-        ✦ 100% Gratis Selamanya
+<!-- ── PRICING ── -->
+<section id="pricing">
+  <div class="container">
+    <div class="pricing-inner">
+      <div class="pricing-card reveal">
+        <div class="pricing-tag">🔓 Akses Full</div>
+        <div class="pricing-price">1×<span> bayar</span></div>
+        <div class="pricing-note">Akses selamanya — tidak ada langganan bulanan.</div>
+
+        <div class="pricing-divider"></div>
+
+        <div class="feat-list">
+          <div class="feat-item"><div class="feat-check">✓</div>Journal trade unlimited + cloud sync</div>
+          <div class="feat-item"><div class="feat-check">✓</div>Analytics lengkap — win rate, profit factor, equity curve</div>
+          <div class="feat-item"><div class="feat-check">✓</div>PropFirm tracker & challenge monitor</div>
+          <div class="feat-item"><div class="feat-check">✓</div>Daily Journal — bias, mood, review harian</div>
+          <div class="feat-item"><div class="feat-check">✓</div>Risk Calculator — lot size & R:R otomatis</div>
+          <div class="feat-item"><div class="feat-check">✓</div>Trading Calendar — heatmap P&L bulanan</div>
+          <div class="feat-item"><div class="feat-check">✓</div>Export CSV / JSON + Share Stats card</div>
+        </div>
+
+        <a href="http://lynk.id/riskpertrade/ok7m3y56myz2/checkout" class="btn-buy" target="_blank">
+          🛒 Beli Akses Sekarang
+        </a>
+        <a href="https://www.instagram.com/journalingtoolsid/" class="btn-ig" target="_blank">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          Ada pertanyaan? DM @journalingtoolsid
+        </a>
       </div>
-      <h2 class="cta-title">Mulai journal<br>trading kamu sekarang.</h2>
-      <p class="cta-sub">Bergabung dengan trader yang sudah meningkatkan performa mereka. Tidak perlu kartu kredit, tidak ada biaya tersembunyi.</p>
-      <a href="#" onclick="openLoginScreen();return false;" class="btn-primary" style="display:inline-flex;margin-bottom:16px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Login dengan Google
-      </a>
-      <br>
-      <a href="#" onclick="openLoginScreen();return false;" style="font-size:12px;color:var(--text3);text-decoration:none;">
-        Sudah punya akun? <span style="color:var(--accent2);">Masuk langsung →</span>
-      </a>
+
+      <div class="pricing-right reveal reveal-delay-1">
+        <div class="section-label">Harga</div>
+        <h2 class="pricing-right-title">Bayar sekali,<br>akses selamanya</h2>
+        <p class="pricing-right-sub">Tidak ada biaya bulanan, tidak ada fitur yang dikunci di belakang paywall tambahan. Satu kali investasi untuk perjalanan trading kamu.</p>
+
+        <div class="try-free-card">
+          <div class="try-free-title">💡 Belum yakin?</div>
+          <div class="try-free-sub">Coba dulu gratis sebagai guest — tidak perlu daftar, langsung buka app dan eksplorasi semua fitur. Sampai 10 trade bisa dicatat tanpa bayar.</div>
+          <a href="https://riskpertrade.me" class="btn-try" target="_blank">
+            Coba Gratis Sekarang →
+          </a>
+        </div>
+
+        <div style="padding:16px 0;border-top:1px solid var(--border);">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;">Sudah beli? Cara akses:</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)">
+              <span style="font-family:var(--mono);color:var(--accent2);font-size:11px">01</span>
+              Selesaikan pembayaran via Lynk.id
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)">
+              <span style="font-family:var(--mono);color:var(--accent2);font-size:11px">02</span>
+              Email kamu langsung di-whitelist
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)">
+              <span style="font-family:var(--mono);color:var(--accent2);font-size:11px">03</span>
+              Login di riskpertrade.me dengan Google
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ── -->
+<section id="faq">
+  <div class="container">
+    <div class="faq-inner">
+      <div>
+        <div class="section-label reveal">FAQ</div>
+        <h2 class="section-title reveal">Ada pertanyaan?</h2>
+        <p class="section-sub reveal" style="margin-bottom:32px">Kalau tidak ada di sini, langsung DM aja di Instagram.</p>
+        <a href="https://www.instagram.com/journalingtoolsid/" class="btn-ig reveal" target="_blank" style="max-width:260px;margin-top:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          @journalingtoolsid
+        </a>
+      </div>
+
+      <div class="faq-list reveal">
+        <div class="faq-item">
+          <div class="faq-q">Apakah data trading saya aman? <span class="faq-icon">+</span></div>
+          <div class="faq-a">Ya. Data disimpan di Firebase Firestore milik Google dengan enkripsi standar industry. Login menggunakan Google Account yang sudah kamu percaya — tidak ada password tambahan yang perlu diingat.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Bisa dicoba dulu sebelum beli? <span class="faq-icon">+</span></div>
+          <div class="faq-a">Bisa. Buka riskpertrade.me langsung tanpa daftar — kamu bisa eksplorasi semua fitur sebagai guest dan mencatat hingga 10 trade secara gratis. Tidak perlu bayar untuk mulai mencoba.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Apakah ada biaya langganan bulanan? <span class="faq-icon">+</span></div>
+          <div class="faq-a">Tidak ada. Bayar sekali, akses selamanya. Tidak ada biaya tersembunyi, tidak ada langganan bulanan, tidak ada fitur premium yang dikunci belakangan.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Bagaimana cara dapat akses setelah bayar? <span class="faq-icon">+</span></div>
+          <div class="faq-a">Setelah pembayaran selesai via Lynk.id, email kamu akan di-whitelist secara manual. Setelah itu, buka riskpertrade.me dan login menggunakan Google dengan email yang sama. Jika ada kendala, DM langsung di Instagram.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Pair dan instrumen apa saja yang bisa dicatat? <span class="faq-icon">+</span></div>
+          <div class="faq-a">Bebas — tidak ada batasan instrumen. Forex, crypto, saham, komoditi, indeks, semuanya bisa. Kamu bisa ketik pair apapun saat input trade.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Apakah bisa digunakan di HP? <span class="faq-icon">+</span></div>
+          <div class="faq-a">Ya, RiskPerTrade didesain mobile-first dengan bottom navigation yang nyaman di HP. Semua fitur berfungsi penuh di browser mobile — tidak perlu instal aplikasi apapun.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FINAL CTA ── -->
+<section id="final-cta">
+  <div class="final-cta-inner">
+    <div class="final-glow"></div>
+    <div class="section-label reveal" style="text-align:center">Mulai Sekarang</div>
+    <h2 class="reveal">Catat trade pertamamu<br>hari ini.</h2>
+    <p class="reveal">Gratis untuk dicoba. Tidak perlu daftar dulu.<br>Cukup buka app dan mulai jurnal trading kamu.</p>
+    <div class="final-actions reveal">
+      <a href="https://riskpertrade.me" class="btn-primary" target="_blank">🔓 Buka App Gratis</a>
+      <a href="http://lynk.id/riskpertrade/ok7m3y56myz2/checkout" class="btn-secondary" target="_blank">🛒 Beli Akses Full</a>
     </div>
   </div>
 </section>
 
 <!-- ── FOOTER ── -->
 <footer>
-  <div class="footer-logo">
-    <div class="nav-dot"></div>
-    RiskPerTrade
-  </div>
-  <div class="footer-text">© 2025 RiskPerTrade · Dibuat untuk trader Indonesia</div>
-  <div class="footer-links">
-    <a href="#" onclick="openLoginScreen();return false;" class="footer-link">Masuk ke App</a>
-    <a href="#features" class="footer-link">Fitur</a>
-    <a href="#how" class="footer-link">Cara Pakai</a>
+  <div class="footer-inner">
+    <a href="#" class="footer-logo">
+      <div style="width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,var(--accent),#5b21b6);display:flex;align-items:center;justify-content:center;font-size:12px;">📊</div>
+      RiskPerTrade
+    </a>
+    <div class="footer-links">
+      <a href="https://riskpertrade.me" class="footer-link" target="_blank">Buka App</a>
+      <a href="https://www.instagram.com/journalingtoolsid/" class="footer-link" target="_blank">Instagram</a>
+      <a href="http://lynk.id/riskpertrade/ok7m3y56myz2/checkout" class="footer-link" target="_blank">Beli Akses</a>
+    </div>
+    <div class="footer-copy">© 2025 RiskPerTrade · Made for traders 🇮🇩</div>
   </div>
 </footer>
 
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, signOut,
-         GoogleAuthProvider, signInWithPopup,
-         signInAnonymously, EmailAuthProvider, linkWithCredential,
-         sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink }
-  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc }
-  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-// ── FIREBASE INIT (identik dengan index.html) ──────────
-const app = initializeApp({
-  apiKey:            "AIzaSyC3vzvNh4vW4w9bDmVC0dkdtjFn7d2pKrA",
-  authDomain:        "tradelog-regy.firebaseapp.com",
-  projectId:         "tradelog-regy",
-  storageBucket:     "tradelog-regy.firebasestorage.app",
-  messagingSenderId: "659047734617",
-  appId:             "1:659047734617:web:9a15dc87aa9fa393c84048"
-});
-const auth = getAuth(app);
-const db   = getFirestore(app);
-
-// ── MAGIC LINK CONFIG ─────────────────────────────────
-// ACTION_URL harus ke landing.html supaya magic link diproses di sini
-// lalu onAuthStateChanged redirect ke index.html otomatis
-const ACTION_URL = 'https://riskpertrade.me/landing.html';
-const EMAIL_KEY  = 'rpt_pending_email';
-
-const $ = id => document.getElementById(id);
-
-// ── INVITE CHECK (identik index.html) ──────────────────
-async function isEmailInvited(email, uid) {
-  if (!email) return false;
-  const inviteRef  = doc(db, 'invites', email.toLowerCase().trim());
-  const inviteSnap = await getDoc(inviteRef);
-  if (inviteSnap.exists() && inviteSnap.data().active !== false) return true;
-  if (uid) {
-    const userSnap = await getDoc(doc(db, 'users', uid));
-    if (userSnap.exists()) {
-      try {
-        await setDoc(inviteRef, {
-          active: true, grandfathered: true,
-          addedAt: new Date().toISOString().slice(0,10), name: email
-        }, { merge: true });
-      } catch(e) {}
-      return true;
-    }
-  }
-  return false;
-}
-
-// ── UI HELPERS ─────────────────────────────────────────
-function showEmailStep() {
-  $('login-step-email').style.display = 'block';
-  $('login-step-sent').style.display  = 'none';
-  $('login-err').style.display        = 'none';
-  $('login-loading').style.display    = 'none';
-  if ($('send-magic-btn'))   $('send-magic-btn').disabled   = false;
-  if ($('google-login-btn')) $('google-login-btn').disabled = false;
-  if ($('anon-btn'))         $('anon-btn').disabled         = false;
-}
-function showSentStep(email) {
-  $('login-step-email').style.display = 'none';
-  $('login-step-sent').style.display  = 'block';
-  $('sent-email-display').textContent = email;
-}
-function showLoginPanel() {
-  $('notinvited-panel').style.display = 'none';
-  $('login-panel').style.display      = 'block';
-  showEmailStep();
-}
-function showNotInvited(email) {
-  $('login-panel').style.display      = 'none';
-  $('notinvited-panel').style.display = 'block';
-  $('rejected-email').textContent     = email || '—';
-  $('login-screen').classList.add('open');
-}
-
-// ── OPEN / CLOSE ───────────────────────────────────────
-window.openLoginScreen = function() {
-  showLoginPanel();
-  $('login-screen').classList.add('open');
-};
-function closeLoginScreen() {
-  $('login-screen').classList.remove('open');
-}
-
-// ── MAGIC LINK: handle jika dibuka dari email link ─────
-if (isSignInWithEmailLink(auth, window.location.href)) {
-  let emailForSignIn = localStorage.getItem(EMAIL_KEY);
-  if (!emailForSignIn) {
-    emailForSignIn = window.prompt('Masukkan email yang kamu gunakan untuk request link masuk:');
-  }
-  if (emailForSignIn) {
-    const cleanUp = () => {
-      localStorage.removeItem(EMAIL_KEY);
-      window.history.replaceState(null, '', window.location.pathname);
-    };
-    const anonUID    = localStorage.getItem('rpt_anon_uid');
-    const currentAnon = auth.currentUser;
-    if (anonUID && currentAnon && currentAnon.isAnonymous) {
-      const credential = EmailAuthProvider.credentialWithLink(emailForSignIn, window.location.href);
-      linkWithCredential(currentAnon, credential)
-        .then(cleanUp)
-        .catch(err => {
-          if (err.code === 'auth/email-already-in-use' || err.code === 'auth/credential-already-in-use') {
-            return signInWithEmailLink(auth, emailForSignIn, window.location.href).then(cleanUp);
-          }
-          cleanUp();
-        });
-    } else {
-      signInWithEmailLink(auth, emailForSignIn, window.location.href).then(cleanUp).catch(cleanUp);
-    }
-  }
-}
-
-// ── onAuthStateChanged: sudah login → redirect ke app ──
-onAuthStateChanged(auth, async user => {
-  if (user) {
-    if (user.isAnonymous) {
-      // Anonymous user → langsung ke app
-      localStorage.setItem('rpt_has_session', '1');
-      window.location.replace('./index.html');
-      return;
-    }
-    // Email/Google user → cek invite dulu
-    const invited = await isEmailInvited(user.email, user.uid);
-    if (!invited) {
-      await signOut(auth);
-      showNotInvited(user.email);
-      return;
-    }
-    // Invited → set flag, redirect ke app
-    localStorage.setItem('rpt_has_session', '1');
-    window.location.replace('./index.html');
-  }
-  // user null → tetap di landing
-});
-
-// ── SEND MAGIC LINK ────────────────────────────────────
-async function sendMagicLink(email) {
-  await sendSignInLinkToEmail(auth, email, { url: ACTION_URL, handleCodeInApp: true });
-  localStorage.setItem(EMAIL_KEY, email);
-}
-
-// ── SEND BUTTON ────────────────────────────────────────
-async function handleSendMagic() {
-  const email = $('magic-email-input').value.trim().toLowerCase();
-  if (!email || !email.includes('@')) {
-    $('login-err').style.display = 'block';
-    $('login-err').textContent   = 'Masukkan alamat email yang valid.';
-    return;
-  }
-  $('login-err').style.display     = 'none';
-  $('login-loading').style.display = 'block';
-  $('send-magic-btn').disabled     = true;
-
-  const invited = await isEmailInvited(email, null);
-  if (!invited) {
-    $('login-loading').style.display = 'none';
-    $('send-magic-btn').disabled     = false;
-    showNotInvited(email);
-    return;
-  }
-  try {
-    await sendMagicLink(email);
-    $('login-loading').style.display = 'none';
-    $('send-magic-btn').disabled     = false;
-    showSentStep(email);
-  } catch(e) {
-    $('login-loading').style.display = 'none';
-    $('send-magic-btn').disabled     = false;
-    $('login-err').style.display     = 'block';
-    $('login-err').textContent       = 'Gagal mengirim link. Coba lagi.';
-  }
-}
-
-// ── EVENT LISTENERS ────────────────────────────────────
-$('send-magic-btn').addEventListener('click', handleSendMagic);
-$('magic-email-input').addEventListener('keydown', e => { if (e.key === 'Enter') handleSendMagic(); });
-
-$('resend-btn').addEventListener('click', () => {
-  const email = $('sent-email-display').textContent;
-  if (email && email !== '—') {
-    sendMagicLink(email).then(() => {
-      $('resend-btn').textContent = '✓ Terkirim!';
-      setTimeout(() => { $('resend-btn').textContent = 'Kirim Ulang'; }, 3000);
-    }).catch(() => {});
-  }
-});
-$('change-email-btn').addEventListener('click', () => { showEmailStep(); $('magic-email-input').focus(); });
-
-$('login-close-btn').addEventListener('click', closeLoginScreen);
-$('login-skip-btn').addEventListener('click', closeLoginScreen);
-$('login-screen').addEventListener('click', e => { if (e.target === $('login-screen')) closeLoginScreen(); });
-
-$('try-other-btn').addEventListener('click', () => {
-  showLoginPanel(); showEmailStep();
-  $('magic-email-input').value = '';
-  setTimeout(() => $('magic-email-input').focus(), 80);
-});
-$('notinvited-skip').addEventListener('click', closeLoginScreen);
-
-// ── GOOGLE LOGIN ───────────────────────────────────────
-$('google-login-btn').addEventListener('click', async () => {
-  $('login-err').style.display     = 'none';
-  $('login-loading').style.display = 'block';
-  $('google-login-btn').disabled   = true;
-  try {
-    await signInWithPopup(auth, new GoogleAuthProvider());
-    // onAuthStateChanged handles redirect
-  } catch(e) {
-    $('login-loading').style.display = 'none';
-    $('google-login-btn').disabled   = false;
-    if (e.code !== 'auth/popup-closed-by-user') {
-      $('login-err').style.display = 'block';
-      $('login-err').textContent   = 'Gagal masuk dengan Google. Coba lagi.';
-    }
-  }
-});
-
-// ── ANONYMOUS LOGIN ────────────────────────────────────
-$('anon-btn').addEventListener('click', async () => {
-  $('login-loading').style.display = 'block';
-  $('anon-btn').disabled           = true;
-  try {
-    await signInAnonymously(auth);
-    // onAuthStateChanged handles redirect
-  } catch(e) {
-    $('login-loading').style.display = 'none';
-    $('anon-btn').disabled           = false;
-    $('login-err').style.display     = 'block';
-    $('login-err').textContent       = 'Gagal masuk. Coba lagi.';
-  }
-});
-
-// ── SCROLL REVEAL ──────────────────────────────────────
+<script>
+// ── Scroll reveal ──
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
   });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+}, { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// ── NAVBAR SCROLL ──────────────────────────────────────
-window.addEventListener('scroll', () => {
-  const nav = document.querySelector('nav');
-  if (window.scrollY > 20) {
-    nav.style.background = 'rgba(9,9,11,0.95)';
-    nav.style.borderBottomColor = 'rgba(255,255,255,0.08)';
-  } else {
-    nav.style.background = 'rgba(9,9,11,0.8)';
-    nav.style.borderBottomColor = 'rgba(255,255,255,0.06)';
-  }
-});
-
-// ── SMOOTH SCROLL ──────────────────────────────────────
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', function(e) {
-    const href = this.getAttribute('href');
-    if (href === '#') return;
-    const target = document.querySelector(href);
-    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+// ── FAQ accordion ──
+document.querySelectorAll('.faq-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
   });
 });
-</script>
 
+// ── Navbar scroll ──
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 40) {
+    navbar.style.background = 'rgba(9,9,11,0.95)';
+    navbar.style.borderBottomColor = 'rgba(255,255,255,0.08)';
+  } else {
+    navbar.style.background = 'rgba(9,9,11,0.8)';
+    navbar.style.borderBottomColor = 'rgba(255,255,255,0.06)';
+  }
+});
+</script>
 </body>
 </html>
