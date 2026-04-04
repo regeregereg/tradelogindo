@@ -6,6 +6,24 @@
 <title>RiskPerTrade — Trading Journal & PropFirm Tracker</title>
 <meta name="description" content="Catat setiap trade, analisis performa, dan pantau PropFirm challenge kamu dalam satu platform yang clean dan powerful.">
 
+<!-- ── AUTH GATE: Jika sudah punya session, langsung ke app ── -->
+<script>
+(function() {
+  // Jika URL mengandung magic link parameters, JANGAN redirect — biarkan Firebase proses
+  var href = window.location.href;
+  if (href.indexOf('oobCode') !== -1 || href.indexOf('apiKey') !== -1) return;
+
+  // Cek flag session
+  var hasSession = localStorage.getItem('rpt_has_session');
+  var hasFirebase = Object.keys(localStorage).some(function(k) {
+    return k.startsWith('firebase:authUser:');
+  });
+  if (hasSession && hasFirebase) {
+    window.location.replace('./index.html');
+  }
+})();
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -429,6 +447,13 @@ footer {
   font-family: var(--font); transition: all .2s;
 }
 .login-btn:hover { opacity: .9; transform: translateY(-1px); }
+.login-err {
+  display: none; margin-top: 8px; font-size: 12px; color: var(--red);
+  background: rgba(239,68,68,.1); border-radius: 9px; padding: 9px 12px;
+}
+.login-loading {
+  display: none; margin-top: 8px; font-size: 12px; color: var(--text2);
+}
 </style>
 </head>
 <body>
@@ -485,8 +510,8 @@ footer {
       <button class="login-btn" id="send-magic-btn" style="background:var(--accent);border:none;color:#fff;margin-bottom:4px">
         ✉️ Kirim Link Masuk
       </button>
-      <div id="login-err" style="margin-top:8px;font-size:12px;color:var(--red);background:rgba(239,68,68,.1);border-radius:9px;padding:9px 12px;display:none">Gagal mengirim. Coba lagi.</div>
-      <div id="login-loading" style="margin-top:8px;font-size:12px;color:var(--text2);display:none">⏳ Memproses…</div>
+      <div id="login-err" class="login-err">Gagal mengirim. Coba lagi.</div>
+      <div id="login-loading" class="login-loading">⏳ Memproses…</div>
 
       <!-- Divider -->
       <div style="display:flex;align-items:center;gap:10px;margin:10px 0 8px">
@@ -908,8 +933,10 @@ const app = initializeApp({
 const auth = getAuth(app);
 const db   = getFirestore(app);
 
-// ── MAGIC LINK CONFIG (sama dengan index.html) ─────────
-const ACTION_URL = 'https://riskpertrade.me';
+// ── MAGIC LINK CONFIG ─────────────────────────────────
+// ACTION_URL harus ke landing.html supaya magic link diproses di sini
+// lalu onAuthStateChanged redirect ke index.html otomatis
+const ACTION_URL = 'https://riskpertrade.me/landing.html';
 const EMAIL_KEY  = 'rpt_pending_email';
 
 const $ = id => document.getElementById(id);
