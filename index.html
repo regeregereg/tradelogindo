@@ -2059,6 +2059,14 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <div id="eq-tt-pnl" style="font-size:11px;font-family:var(--mono);margin-top:3px;font-weight:600;"></div>
         </div>
       </div>
+
+      <!-- ── Last 3 Trades ── -->
+      <div id="eq-last-trades" style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px;">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.9px;font-weight:600;margin-bottom:8px;">Recent Trades</div>
+        <div id="eq-last-trades-list" style="display:flex;flex-direction:column;gap:5px;">
+          <!-- populated by renderEqLastTrades() -->
+        </div>
+      </div>
     </div>
 
     <!-- ── TRADER DNA RADAR ── -->
@@ -6029,26 +6037,121 @@ function renderEq(){
 
   // ── Premium scrub plugin: gray overlay right of cursor ──
   let _scrubIdx = null;
-  const scrubPlugin = {
-    id: 'eqScrub',
-    afterDatasetsDraw(chart) {
-      if (_scrubIdx === null || _scrubIdx >= D.length - 1) return;
+
+  // ── Wipe animation state ──
+  let _wipeProgress = 0;        // 0..1: how far the reveal has gone (left→right)
+  let _wipeGlow = 0;            // 0..1: glow intensity (peaks then fades)
+  let _wipeRaf = null;
+  let _wipeGlowPhase = 'rise';  // 'rise' | 'fall'
+  let _wipeShowFill = false;    // only show fill after wipe completes
+  const WIPE_DUR = 680;         // ms for line reveal
+  const GLOW_RISE = 220;        // ms to peak glow
+  const GLOW_FALL = 420;        // ms to fade glow after peak
+
+  function easeInOutQuart(t){ return t<.5?8*t*t*t*t:1-Math.pow(-2*t+2,4)/2; }
+
+  const wipePlugin = {
+    id: 'eqWipe',
+    beforeDatasetsDraw(chart) {
       const { ctx: c, chartArea: ca } = chart;
-      const meta = chart.getDatasetMeta(0);
-      if (!meta || !meta.data[_scrubIdx]) return;
-      const ptX = meta.data[_scrubIdx].x;
-      if (ptX >= ca.right) return;
-      c.save();
-      c.fillStyle = 'rgba(20,20,26,0.72)';
-      c.fillRect(ptX, ca.top, ca.right - ptX, ca.bottom - ca.top);
-      const fadeGrad = c.createLinearGradient(ptX, 0, ptX + 28, 0);
-      fadeGrad.addColorStop(0, 'rgba(20,20,26,0.5)');
-      fadeGrad.addColorStop(1, 'rgba(20,20,26,0)');
-      c.fillStyle = fadeGrad;
-      c.fillRect(ptX, ca.top, 28, ca.bottom - ca.top);
-      c.restore();
+      if (!ca) return;
+
+      // ── Scrub dark overlay ──
+      if (_scrubIdx !== null && _scrubIdx < D.length - 1) {
+        const meta = chart.getDatasetMeta(0);
+        if (meta && meta.data[_scrubIdx]) {
+          const ptX = meta.data[_scrubIdx].x;
+          if (ptX < ca.right) {
+            c.save();
+            c.fillStyle = 'rgba(20,20,26,0.72)';
+            c.fillRect(ptX, ca.top, ca.right - ptX, ca.bottom - ca.top);
+            const fadeGrad = c.createLinearGradient(ptX, 0, ptX + 28, 0);
+            fadeGrad.addColorStop(0, 'rgba(20,20,26,0.5)');
+            fadeGrad.addColorStop(1, 'rgba(20,20,26,0)');
+            c.fillStyle = fadeGrad;
+            c.fillRect(ptX, ca.top, 28, ca.bottom - ca.top);
+            c.restore();
+          }
+        }
+      }
+
+      // ── Wipe: clip to revealed portion, then draw glow streak ──
+      if (_wipeProgress < 1) {
+        const revealX = ca.left + (ca.right - ca.left) * _wipeProgress;
+        // Clip everything right of revealX — hides unrevealed line
+        c.save();
+        c.beginPath();
+        c.rect(revealX, 0, ca.right + 60, chart.height);
+        c.fillStyle = 'rgba(9,9,11,1)'; // match --bg
+        c.fill();
+        c.restore();
+
+        // Glow streak at reveal edge
+        if (_wipeGlow > 0.01) {
+          const streakW = 28 + _wipeGlow * 18;
+          c.save();
+          const glowGrad = c.createLinearGradient(revealX - streakW, 0, revealX + 6, 0);
+          const alpha = _wipeGlow * 0.82;
+          glowGrad.addColorStop(0, `rgba(${colRgb},0)`);
+          glowGrad.addColorStop(0.55, `rgba(${colRgb},${(alpha*0.55).toFixed(3)})`);
+          glowGrad.addColorStop(1, `rgba(${colRgb},${alpha.toFixed(3)})`);
+          c.fillStyle = glowGrad;
+          c.fillRect(revealX - streakW, ca.top, streakW + 6, ca.bottom - ca.top);
+
+          // Bright leading edge line
+          c.beginPath();
+          c.moveTo(revealX, ca.top);
+          c.lineTo(revealX, ca.bottom);
+          c.lineWidth = 2;
+          c.strokeStyle = `rgba(${colRgb},${(_wipeGlow * 0.9).toFixed(3)})`;
+          c.shadowColor = col;
+          c.shadowBlur = 12 * _wipeGlow;
+          c.stroke();
+          c.restore();
+        }
+      }
+    },
+    afterDatasetsDraw(chart) {
+      // After wipe completes, suppress fill until _wipeShowFill is true
+      // (fill is always in the dataset, wipe coverage handles hiding)
     }
   };
+
+  function startWipeAnimation(chart) {
+    if (_wipeRaf) cancelAnimationFrame(_wipeRaf);
+    _wipeProgress = 0;
+    _wipeGlow = 0;
+    _wipeShowFill = false;
+    _wipeGlowPhase = 'rise';
+    const startTime = performance.now();
+    let glowPeakTime = null;
+
+    function tick(now) {
+      const elapsed = now - startTime;
+      _wipeProgress = Math.min(1, easeInOutQuart(elapsed / WIPE_DUR));
+
+      // Glow: rises with wipe, peaks ~60% through, then fades
+      if (_wipeGlowPhase === 'rise') {
+        _wipeGlow = Math.min(1, elapsed / GLOW_RISE);
+        if (elapsed >= GLOW_RISE) { _wipeGlowPhase = 'fall'; glowPeakTime = now; }
+      } else {
+        const fallElapsed = now - glowPeakTime;
+        _wipeGlow = Math.max(0, 1 - fallElapsed / GLOW_FALL);
+      }
+
+      if (chart && chart.ctx) chart.draw();
+
+      if (_wipeProgress < 1 || _wipeGlow > 0.01) {
+        _wipeRaf = requestAnimationFrame(tick);
+      } else {
+        _wipeProgress = 1;
+        _wipeGlow = 0;
+        _wipeShowFill = true;
+        if (chart && chart.ctx) chart.draw();
+      }
+    }
+    _wipeRaf = requestAnimationFrame(tick);
+  }
 
   if(eqCh) eqCh.destroy();
   eqCh = new Chart(ctx, {
@@ -6066,11 +6169,13 @@ function renderEq(){
         tension: .38,
       }]
     },
-    plugins: [scrubPlugin],
+    plugins: [wipePlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: { duration: 350, easing: 'easeInOutQuart' },
+      animation: {
+        duration: 0, // disable Chart.js default — we handle it manually
+      },
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       interaction: { mode: 'index', intersect: false },
       scales: {
@@ -6091,6 +6196,9 @@ function renderEq(){
       layout: { padding: { top: 6, right: 52, bottom: 0, left: 0 } }
     }
   });
+
+  // Trigger wipe animation after chart renders
+  requestAnimationFrame(() => startWipeAnimation(eqCh));
 
   // ── Smooth scrubbing: continuous crosshair + live header update + auto-restore ──
   const area = $('eq-chart-area');
@@ -6197,6 +6305,57 @@ function renderEq(){
   area.ontouchmove  = (e) => { e.preventDefault(); if(e.touches[0]) doScrub(e.touches[0].clientX); };
   area.ontouchend   = ()  => hideScrub();
   area.ontouchcancel= ()  => hideScrub();
+
+  // ── Render last 3 trades ──
+  renderEqLastTrades(ft);
+}
+// ── renderEqLastTrades ────────────────────────────────────────────────────
+function renderEqLastTrades(ft) {
+  const wrap = document.getElementById('eq-last-trades-list');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const last3 = ft.slice(-3).reverse();
+  if (last3.length === 0) {
+    wrap.innerHTML = '<div style="font-size:11px;color:var(--text3);text-align:center;padding:6px 0;">No trades yet</div>';
+    return;
+  }
+  last3.forEach((t, i) => {
+    const isWin  = t.pnl >= 0;
+    const pnlCol = isWin ? '#00d97e' : '#ef4444';
+    const pnlBg  = isWin ? 'rgba(0,217,126,0.08)' : 'rgba(239,68,68,0.08)';
+    const pnlBorder = isWin ? 'rgba(0,217,126,0.18)' : 'rgba(239,68,68,0.18)';
+    const dirCol = (t.dir||'').toLowerCase() === 'long' ? '#00d97e' : '#ef4444';
+    const pnlSign  = isWin ? '+' : '';
+    const dateStr  = t.date ? t.date.slice(5) : '—';
+    const pairStr  = t.pair || '—';
+    const rStr     = (t.r != null && t.r !== '') ? (t.r >= 0 ? '+' : '') + parseFloat(t.r).toFixed(1) + 'R' : '';
+    const row = document.createElement('div');
+    row.style.cssText = [
+      'display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:9px;',
+      'background:' + pnlBg + ';border:1px solid ' + pnlBorder + ';',
+      'opacity:0;transform:translateY(6px);',
+      'transition:opacity .28s ease ' + (i*80) + 'ms, transform .28s ease ' + (i*80) + 'ms;'
+    ].join('');
+    row.innerHTML =
+      '<div style="width:3px;height:28px;border-radius:3px;background:' + pnlCol + ';flex-shrink:0;"></div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="display:flex;align-items:center;gap:5px;">' +
+          '<span style="font-size:11px;font-weight:700;font-family:var(--mono);color:var(--text);letter-spacing:.2px;">' + pairStr + '</span>' +
+          (t.dir ? '<span style="font-size:9px;font-weight:700;color:' + dirCol + ';letter-spacing:.4px;text-transform:uppercase;">' + t.dir + '</span>' : '') +
+          (rStr  ? '<span style="font-size:9px;font-weight:600;color:var(--text3);font-family:var(--mono);margin-left:auto;">' + rStr + '</span>' : '') +
+        '</div>' +
+        '<div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:1px;">' + dateStr + (t.session ? ' · ' + t.session : '') + '</div>' +
+      '</div>' +
+      '<div style="text-align:right;flex-shrink:0;">' +
+        '<div style="font-size:12px;font-weight:700;font-family:var(--mono);color:' + pnlCol + ';">' + pnlSign + '$' + Math.abs(t.pnl).toFixed(2) + '</div>' +
+        (t.result ? '<div style="font-size:9px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;">' + t.result + '</div>' : '') +
+      '</div>';
+    wrap.appendChild(row);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      row.style.opacity = '1';
+      row.style.transform = 'translateY(0)';
+    }));
+  });
 }
 // ── TRADER DNA RADAR ────────────────────────────────────────────────────
 let dnaCh = null;
