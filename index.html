@@ -2062,7 +2062,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
       <!-- ── Last 3 Trades ── -->
       <div id="eq-last-trades" style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px;">
-        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.9px;font-weight:600;margin-bottom:8px;">Recent Trades</div>
+        <div id="eq-best-trades-label" style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.9px;font-weight:600;margin-bottom:8px;">Best Trades — All Time</div>
         <div id="eq-last-trades-list" style="display:flex;flex-direction:column;gap:5px;">
           <!-- populated by renderEqLastTrades() -->
         </div>
@@ -6035,28 +6035,48 @@ function renderEq(){
   g.addColorStop(0.65, `rgba(${colRgb},.04)`);
   g.addColorStop(1, 'rgba(0,0,0,0)');
 
-  // ── Premium scrub plugin: gray overlay right of cursor ──
+  // ── Scrub plugin ──
   let _scrubIdx = null;
 
-  // ── Wipe animation state ──
-  let _wipeProgress = 0;        // 0..1: how far the reveal has gone (left→right)
-  let _wipeGlow = 0;            // 0..1: glow intensity (peaks then fades)
-  let _wipeRaf = null;
-  let _wipeGlowPhase = 'rise';  // 'rise' | 'fall'
-  let _wipeShowFill = false;    // only show fill after wipe completes
-  const WIPE_DUR = 680;         // ms for line reveal
-  const GLOW_RISE = 220;        // ms to peak glow
-  const GLOW_FALL = 420;        // ms to fade glow after peak
+  // ── Premium draw-on animation: renders line point-by-point with glowing tip ──
+  let _drawRaf = null;
+  let _drawT    = 0;   // 0..1 progress through data points
+  let _tipGlow  = 1;   // glow at leading tip, fades after line done
+  let _fillAlpha = 0;  // gradient fill fades in after line finishes
 
-  function easeInOutQuart(t){ return t<.5?8*t*t*t*t:1-Math.pow(-2*t+2,4)/2; }
+  // Cubic ease-out: fast start, smooth landing
+  function _easeOut3(t){ return 1 - Math.pow(1 - t, 3); }
 
-  const wipePlugin = {
-    id: 'eqWipe',
+  // Pre-compute pixel coordinates of the bezier path at any t ∈ [0,1]
+  // We'll interpolate over the dataset points
+  function _lerpPath(meta, t) {
+    if (!meta || !meta.data.length) return null;
+    const pts = meta.data;
+    const n   = pts.length - 1;
+    if (n <= 0) return { x: pts[0].x, y: pts[0].y };
+    const fi  = t * n;
+    const i   = Math.min(Math.floor(fi), n - 1);
+    const frac = fi - i;
+    // Cubic hermite blend between adjacent points
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[i];
+    const p2 = pts[Math.min(n, i + 1)];
+    const p3 = pts[Math.min(n, i + 2)];
+    const t2 = frac * frac, t3 = t2 * frac;
+    const cx = 0.5*((p2.x-p0.x)*frac + (2*p0.x-5*p1.x+4*p2.x-p3.x)*t2 + (3*p1.x-p0.x-3*p2.x+p3.x)*t3) + p1.x;
+    const cy = 0.5*((p2.y-p0.y)*frac + (2*p0.y-5*p1.y+4*p2.y-p3.y)*t2 + (3*p1.y-p0.y-3*p2.y+p3.y)*t3) + p1.y;
+    return { x: cx, y: cy };
+  }
+
+  // ─ Draw plugin: renders partial path + glowing tip + fill fade-in ──
+  const drawPlugin = {
+    id: 'eqDraw',
+    // Hide the dataset's own draw until we take over
     beforeDatasetsDraw(chart) {
       const { ctx: c, chartArea: ca } = chart;
       if (!ca) return;
 
-      // ── Scrub dark overlay ──
+      // Scrub overlay
       if (_scrubIdx !== null && _scrubIdx < D.length - 1) {
         const meta = chart.getDatasetMeta(0);
         if (meta && meta.data[_scrubIdx]) {
@@ -6065,92 +6085,149 @@ function renderEq(){
             c.save();
             c.fillStyle = 'rgba(20,20,26,0.72)';
             c.fillRect(ptX, ca.top, ca.right - ptX, ca.bottom - ca.top);
-            const fadeGrad = c.createLinearGradient(ptX, 0, ptX + 28, 0);
-            fadeGrad.addColorStop(0, 'rgba(20,20,26,0.5)');
-            fadeGrad.addColorStop(1, 'rgba(20,20,26,0)');
-            c.fillStyle = fadeGrad;
+            const fadeG = c.createLinearGradient(ptX, 0, ptX + 28, 0);
+            fadeG.addColorStop(0, 'rgba(20,20,26,0.5)');
+            fadeG.addColorStop(1, 'rgba(20,20,26,0)');
+            c.fillStyle = fadeG;
             c.fillRect(ptX, ca.top, 28, ca.bottom - ca.top);
             c.restore();
           }
         }
       }
-
-      // ── Wipe: clip to revealed portion, then draw glow streak ──
-      if (_wipeProgress < 1) {
-        const revealX = ca.left + (ca.right - ca.left) * _wipeProgress;
-        // Clip everything right of revealX — hides unrevealed line
-        c.save();
-        c.beginPath();
-        c.rect(revealX, 0, ca.right + 60, chart.height);
-        c.fillStyle = 'rgba(9,9,11,1)'; // match --bg
-        c.fill();
-        c.restore();
-
-        // Glow streak at reveal edge
-        if (_wipeGlow > 0.01) {
-          const streakW = 28 + _wipeGlow * 18;
-          c.save();
-          const glowGrad = c.createLinearGradient(revealX - streakW, 0, revealX + 6, 0);
-          const alpha = _wipeGlow * 0.82;
-          glowGrad.addColorStop(0, `rgba(${colRgb},0)`);
-          glowGrad.addColorStop(0.55, `rgba(${colRgb},${(alpha*0.55).toFixed(3)})`);
-          glowGrad.addColorStop(1, `rgba(${colRgb},${alpha.toFixed(3)})`);
-          c.fillStyle = glowGrad;
-          c.fillRect(revealX - streakW, ca.top, streakW + 6, ca.bottom - ca.top);
-
-          // Bright leading edge line
-          c.beginPath();
-          c.moveTo(revealX, ca.top);
-          c.lineTo(revealX, ca.bottom);
-          c.lineWidth = 2;
-          c.strokeStyle = `rgba(${colRgb},${(_wipeGlow * 0.9).toFixed(3)})`;
-          c.shadowColor = col;
-          c.shadowBlur = 12 * _wipeGlow;
-          c.stroke();
-          c.restore();
-        }
-      }
     },
     afterDatasetsDraw(chart) {
-      // After wipe completes, suppress fill until _wipeShowFill is true
-      // (fill is always in the dataset, wipe coverage handles hiding)
+      if (_drawT >= 1 && _tipGlow <= 0 && _fillAlpha >= 1) return; // fully done — Chart.js handles it
+      const { ctx: c, chartArea: ca } = chart;
+      if (!ca) return;
+      const meta = chart.getDatasetMeta(0);
+      if (!meta || !meta.data.length) return;
+      const pts = meta.data;
+      const n   = pts.length;
+      if (n < 2) return;
+
+      const endIdx = Math.min(n - 1, Math.floor(_drawT * (n - 1)));
+      const tip    = _lerpPath(meta, _drawT);
+
+      c.save();
+
+      // ── 1. Clip: only draw left of tip ──
+      c.beginPath();
+      c.rect(ca.left - 2, ca.top - 2, (tip ? tip.x : ca.right) - ca.left + 4, ca.bottom - ca.top + 4);
+      c.clip();
+
+      // ── 2. Fill area under revealed line (fade in) ──
+      if (_fillAlpha > 0) {
+        c.save();
+        c.globalAlpha = Math.min(1, _fillAlpha);
+        c.fillStyle   = g;
+        c.beginPath();
+        c.moveTo(pts[0].x, ca.bottom);
+        for (let i = 0; i <= endIdx; i++) {
+          if (i === 0) c.lineTo(pts[0].x, pts[0].y);
+          else {
+            const prev = pts[i - 1];
+            const cur  = pts[i];
+            const cpx  = (prev.x + cur.x) / 2;
+            c.bezierCurveTo(cpx, prev.y, cpx, cur.y, cur.x, cur.y);
+          }
+        }
+        if (tip && endIdx < n - 1) {
+          c.lineTo(tip.x, tip.y);
+          c.lineTo(tip.x, ca.bottom);
+        } else {
+          c.lineTo(pts[endIdx].x, ca.bottom);
+        }
+        c.closePath();
+        c.fill();
+        c.restore();
+      }
+
+      // ── 3. Draw the line up to tip ──
+      c.beginPath();
+      c.strokeStyle = col;
+      c.lineWidth   = 2.5;
+      c.lineJoin    = 'round';
+      c.lineCap     = 'round';
+      for (let i = 0; i <= endIdx; i++) {
+        if (i === 0) c.moveTo(pts[0].x, pts[0].y);
+        else {
+          const prev = pts[i - 1];
+          const cur  = pts[i];
+          const cpx  = (prev.x + cur.x) / 2;
+          c.bezierCurveTo(cpx, prev.y, cpx, cur.y, cur.x, cur.y);
+        }
+      }
+      if (tip && endIdx < n - 1) c.lineTo(tip.x, tip.y);
+      c.stroke();
+
+      // ── 4. Glowing tip dot ──
+      if (tip && _tipGlow > 0) {
+        const gl = _tipGlow;
+        // Outer halo
+        const halo = c.createRadialGradient(tip.x, tip.y, 0, tip.x, tip.y, 22 * gl);
+        halo.addColorStop(0, `rgba(${colRgb},${(0.35 * gl).toFixed(3)})`);
+        halo.addColorStop(1, `rgba(${colRgb},0)`);
+        c.fillStyle = halo;
+        c.beginPath();
+        c.arc(tip.x, tip.y, 22 * gl, 0, Math.PI * 2);
+        c.fill();
+        // Core dot
+        c.shadowColor = col;
+        c.shadowBlur  = 14 * gl;
+        c.fillStyle   = `rgba(${colRgb},${(0.9 * gl + 0.1).toFixed(3)})`;
+        c.beginPath();
+        c.arc(tip.x, tip.y, 3.5, 0, Math.PI * 2);
+        c.fill();
+        c.shadowBlur = 0;
+      }
+
+      c.restore();
     }
   };
 
-  function startWipeAnimation(chart) {
-    if (_wipeRaf) cancelAnimationFrame(_wipeRaf);
-    _wipeProgress = 0;
-    _wipeGlow = 0;
-    _wipeShowFill = false;
-    _wipeGlowPhase = 'rise';
-    const startTime = performance.now();
-    let glowPeakTime = null;
+  // ── Animation loop ──
+  function _startDrawAnim(chart) {
+    if (_drawRaf) cancelAnimationFrame(_drawRaf);
+    _drawT     = 0;
+    _tipGlow   = 1;
+    _fillAlpha = 0;
+    const T_LINE  = 900;   // ms: line draw duration
+    const T_GLOW  = 500;   // ms: tip glow fade after line done
+    const T_FILL  = 480;   // ms: fill fade-in after line done
+    let lineStart = null;
+    let glowStart = null;
+    let fillStart = null;
+    let lineDone  = false;
 
     function tick(now) {
-      const elapsed = now - startTime;
-      _wipeProgress = Math.min(1, easeInOutQuart(elapsed / WIPE_DUR));
+      if (!lineStart) lineStart = now;
+      const lineEl = now - lineStart;
+      _drawT = Math.min(1, _easeOut3(lineEl / T_LINE));
 
-      // Glow: rises with wipe, peaks ~60% through, then fades
-      if (_wipeGlowPhase === 'rise') {
-        _wipeGlow = Math.min(1, elapsed / GLOW_RISE);
-        if (elapsed >= GLOW_RISE) { _wipeGlowPhase = 'fall'; glowPeakTime = now; }
-      } else {
-        const fallElapsed = now - glowPeakTime;
-        _wipeGlow = Math.max(0, 1 - fallElapsed / GLOW_FALL);
+      if (_drawT >= 1 && !lineDone) {
+        lineDone  = true;
+        glowStart = now;
+        fillStart = now;
+      }
+
+      if (lineDone) {
+        const gEl = now - glowStart;
+        _tipGlow   = Math.max(0, 1 - gEl / T_GLOW);
+        const fEl = now - fillStart;
+        _fillAlpha = Math.min(1, _easeOut3(fEl / T_FILL));
       }
 
       if (chart && chart.ctx) chart.draw();
 
-      if (_wipeProgress < 1 || _wipeGlow > 0.01) {
-        _wipeRaf = requestAnimationFrame(tick);
+      const done = _drawT >= 1 && _tipGlow <= 0 && _fillAlpha >= 1;
+      if (!done) {
+        _drawRaf = requestAnimationFrame(tick);
       } else {
-        _wipeProgress = 1;
-        _wipeGlow = 0;
-        _wipeShowFill = true;
-        if (chart && chart.ctx) chart.draw();
+        _drawT = 1; _tipGlow = 0; _fillAlpha = 1;
+        chart.draw();
       }
     }
-    _wipeRaf = requestAnimationFrame(tick);
+    _drawRaf = requestAnimationFrame(tick);
   }
 
   if(eqCh) eqCh.destroy();
@@ -6169,13 +6246,11 @@ function renderEq(){
         tension: .38,
       }]
     },
-    plugins: [wipePlugin],
+    plugins: [drawPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: {
-        duration: 0, // disable Chart.js default — we handle it manually
-      },
+      animation: { duration: 0 },
       plugins: { legend: { display: false }, tooltip: { enabled: false } },
       interaction: { mode: 'index', intersect: false },
       scales: {
@@ -6197,8 +6272,8 @@ function renderEq(){
     }
   });
 
-  // Trigger wipe animation after chart renders
-  requestAnimationFrame(() => startWipeAnimation(eqCh));
+  // Kick off animation once chart layout is computed
+  requestAnimationFrame(() => _startDrawAnim(eqCh));
 
   // ── Smooth scrubbing: continuous crosshair + live header update + auto-restore ──
   const area = $('eq-chart-area');
@@ -6309,50 +6384,86 @@ function renderEq(){
   // ── Render last 3 trades ──
   renderEqLastTrades(ft);
 }
-// ── renderEqLastTrades ────────────────────────────────────────────────────
+// ── renderEqBestTrades: top 3 by P&L within the active equity period ────
 function renderEqLastTrades(ft) {
-  const wrap = document.getElementById('eq-last-trades-list');
+  const wrap  = document.getElementById('eq-last-trades-list');
+  const label = document.getElementById('eq-best-trades-label');
   if (!wrap) return;
   wrap.innerHTML = '';
-  const last3 = ft.slice(-3).reverse();
-  if (last3.length === 0) {
-    wrap.innerHTML = '<div style="font-size:11px;color:var(--text3);text-align:center;padding:6px 0;">No trades yet</div>';
+
+  // Update header label to reflect period
+  if (label) {
+    const periodTxt = eqLocalPeriod === 'all' ? 'All Time'
+      : eqLocalPeriod === '7' ? 'Last 7 Days'
+      : eqLocalPeriod === '30' ? 'Last 30 Days'
+      : 'Last 180 Days';
+    label.textContent = 'Best Trades — ' + periodTxt;
+  }
+
+  if (!ft || ft.length === 0) {
+    wrap.innerHTML = '<div style="font-size:11px;color:var(--text3);text-align:center;padding:8px 0;font-family:var(--mono);">No trades in this period</div>';
     return;
   }
-  last3.forEach((t, i) => {
-    const isWin  = t.pnl >= 0;
-    const pnlCol = isWin ? '#00d97e' : '#ef4444';
-    const pnlBg  = isWin ? 'rgba(0,217,126,0.08)' : 'rgba(239,68,68,0.08)';
-    const pnlBorder = isWin ? 'rgba(0,217,126,0.18)' : 'rgba(239,68,68,0.18)';
-    const dirCol = (t.dir||'').toLowerCase() === 'long' ? '#00d97e' : '#ef4444';
+
+  // Sort by P&L descending → top 3 winners
+  const top3 = ft.slice().sort((a, b) => b.pnl - a.pnl).slice(0, 3);
+
+  // Rank medals
+  const medals = ['🥇', '🥈', '🥉'];
+
+  top3.forEach((t, i) => {
+    const isWin    = t.pnl >= 0;
+    const pnlCol   = isWin ? '#00d97e' : '#ef4444';
+    const pnlBg    = isWin ? 'rgba(0,217,126,0.07)' : 'rgba(239,68,68,0.07)';
+    const pnlBord  = isWin ? 'rgba(0,217,126,0.16)' : 'rgba(239,68,68,0.16)';
+    const dirCol   = (t.dir||'').toLowerCase() === 'long' ? '#00d97e' : '#ef4444';
     const pnlSign  = isWin ? '+' : '';
-    const dateStr  = t.date ? t.date.slice(5) : '—';
+    const dateStr  = t.date
+      ? new Date(t.date + 'T00:00:00').toLocaleDateString('id-ID', { day:'2-digit', month:'short' })
+      : '—';
     const pairStr  = t.pair || '—';
-    const rStr     = (t.r != null && t.r !== '') ? (t.r >= 0 ? '+' : '') + parseFloat(t.r).toFixed(1) + 'R' : '';
+    const rStr     = (t.r != null && t.r !== '')
+      ? (t.r >= 0 ? '+' : '') + parseFloat(t.r).toFixed(1) + 'R'
+      : '';
+
     const row = document.createElement('div');
-    row.style.cssText = [
-      'display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:9px;',
-      'background:' + pnlBg + ';border:1px solid ' + pnlBorder + ';',
-      'opacity:0;transform:translateY(6px);',
-      'transition:opacity .28s ease ' + (i*80) + 'ms, transform .28s ease ' + (i*80) + 'ms;'
-    ].join('');
+    row.style.cssText =
+      'display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:10px;' +
+      'background:' + pnlBg + ';border:1px solid ' + pnlBord + ';' +
+      'opacity:0;transform:translateY(8px);' +
+      'transition:opacity .3s cubic-bezier(.4,0,.2,1) ' + (i * 90) + 'ms,' +
+      'transform .3s cubic-bezier(.4,0,.2,1) ' + (i * 90) + 'ms;';
+
     row.innerHTML =
-      '<div style="width:3px;height:28px;border-radius:3px;background:' + pnlCol + ';flex-shrink:0;"></div>' +
+      // Rank medal
+      '<div style="font-size:15px;flex-shrink:0;width:20px;text-align:center;">' + medals[i] + '</div>' +
+      // Left: pair + dir + date
       '<div style="flex:1;min-width:0;">' +
-        '<div style="display:flex;align-items:center;gap:5px;">' +
+        '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">' +
           '<span style="font-size:11px;font-weight:700;font-family:var(--mono);color:var(--text);letter-spacing:.2px;">' + pairStr + '</span>' +
-          (t.dir ? '<span style="font-size:9px;font-weight:700;color:' + dirCol + ';letter-spacing:.4px;text-transform:uppercase;">' + t.dir + '</span>' : '') +
-          (rStr  ? '<span style="font-size:9px;font-weight:600;color:var(--text3);font-family:var(--mono);margin-left:auto;">' + rStr + '</span>' : '') +
+          (t.dir
+            ? '<span style="font-size:9px;font-weight:700;color:' + dirCol + ';letter-spacing:.5px;text-transform:uppercase;padding:1px 5px;border-radius:4px;background:' + (dirCol==='#00d97e'?'rgba(0,217,126,.1)':'rgba(239,68,68,.1)') + ';">' + t.dir.toUpperCase() + '</span>'
+            : '') +
         '</div>' +
-        '<div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:1px;">' + dateStr + (t.session ? ' · ' + t.session : '') + '</div>' +
+        '<div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px;display:flex;gap:6px;">' +
+          '<span>' + dateStr + '</span>' +
+          (rStr ? '<span style="color:var(--accent2);">' + rStr + '</span>' : '') +
+        '</div>' +
       '</div>' +
+      // Right: P&L
       '<div style="text-align:right;flex-shrink:0;">' +
-        '<div style="font-size:12px;font-weight:700;font-family:var(--mono);color:' + pnlCol + ';">' + pnlSign + '$' + Math.abs(t.pnl).toFixed(2) + '</div>' +
-        (t.result ? '<div style="font-size:9px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;">' + t.result + '</div>' : '') +
+        '<div style="font-size:13px;font-weight:800;font-family:var(--mono);color:' + pnlCol + ';letter-spacing:-.3px;">' +
+          pnlSign + '$' + Math.abs(t.pnl).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) +
+        '</div>' +
+        (t.result
+          ? '<div style="font-size:9px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">' + t.result + '</div>'
+          : '') +
       '</div>';
+
     wrap.appendChild(row);
+    // Staggered entrance
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      row.style.opacity = '1';
+      row.style.opacity   = '1';
       row.style.transform = 'translateY(0)';
     }));
   });
