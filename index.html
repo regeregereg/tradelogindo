@@ -760,7 +760,14 @@ select.fi option{background:var(--bg3);}
 .ob-feature-icon{
   width:34px;height:34px;border-radius:10px;
   display:flex;align-items:center;justify-content:center;
-  font-size:17px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+  font-size:18px;flex-shrink:0;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+  line-height:1;
+}
+.ob-feature-icon i{
+  line-height:1;display:flex;
+  filter:drop-shadow(0 0 6px currentColor);
+  opacity:.9;
 }
 .ob-feature-name{font-size:12px;font-weight:700;color:rgba(255,255,255,.88);margin-bottom:3px;letter-spacing:-.1px;}
 .ob-feature-desc{font-size:11px;color:rgba(255,255,255,.32);line-height:1.55;}
@@ -810,7 +817,7 @@ select.fi option{background:var(--bg3);}
 .ob-cta-card:hover{background:rgba(255,255,255,.05);border-color:rgba(139,92,246,.25);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
 .ob-cta-card.primary{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.25);}
 .ob-cta-card.primary:hover{background:rgba(139,92,246,.16);border-color:rgba(139,92,246,.4);box-shadow:0 8px 24px rgba(139,92,246,.2);}
-.ob-cta-icon{font-size:20px;line-height:1;}
+.ob-cta-icon{font-size:22px;line-height:1;display:flex;align-items:center;}.ob-cta-icon i{filter:drop-shadow(0 0 6px currentColor);}
 .ob-cta-label{font-size:12px;font-weight:700;color:rgba(255,255,255,.88);letter-spacing:-.1px;}
 .ob-cta-desc{font-size:10px;color:rgba(255,255,255,.3);line-height:1.5;}
 .ob-cta-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:5px;margin-top:2px;background:rgba(139,92,246,.2);color:var(--accent2);border:1px solid rgba(139,92,246,.25);width:fit-content;}
@@ -1933,21 +1940,21 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
               <div class="ob-subtitle">Platform jurnal trading yang dirancang untuk trader yang ingin bertumbuh dengan data — bukan sekadar feeling.</div>
               <div class="ob-features">
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.1);">📊</div>
+                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.08);color:#00d97e;font-size:18px;"><i class="bi bi-bar-chart-line-fill"></i></div>
                   <div>
                     <div class="ob-feature-name">Catat & Analisis</div>
                     <div class="ob-feature-desc">Log setiap trade secara lengkap — pair, R:R, entry, exit, screenshot, hingga emosi trading kamu.</div>
                   </div>
                 </div>
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.1);">🧬</div>
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:18px;"><i class="bi bi-hexagon-half"></i></div>
                   <div>
                     <div class="ob-feature-name">Trader DNA</div>
                     <div class="ob-feature-desc">Temukan profil tradingmu — consistency, discipline, dan execution score dihitung otomatis.</div>
                   </div>
                 </div>
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(245,158,11,.1);">🏢</div>
+                  <div class="ob-feature-icon" style="background:rgba(245,158,11,.08);color:#f59e0b;font-size:18px;"><i class="bi bi-building-check"></i></div>
                   <div>
                     <div class="ob-feature-name">PropFirm Tracker</div>
                     <div class="ob-feature-desc">Monitor challenge prop firm real-time, dari profit target hingga max drawdown — semua dalam satu layar.</div>
@@ -1963,21 +1970,21 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
               <div class="ob-subtitle">Semua detail trade tersimpan rapi dan langsung terhubung ke dashboard & analytics kamu secara otomatis.</div>
               <div class="ob-features">
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.1);">✍️</div>
+                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.08);color:#00d97e;font-size:18px;"><i class="bi bi-pencil-square"></i></div>
                   <div>
                     <div class="ob-feature-name">Input Cepat & Lengkap</div>
                     <div class="ob-feature-desc">Pair, direction, session, risk %, P&L, R-multiple — semua bisa dilog dalam hitungan detik.</div>
                   </div>
                 </div>
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.1);">📈</div>
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:18px;"><i class="bi bi-graph-up-arrow"></i></div>
                   <div>
                     <div class="ob-feature-name">Equity Curve Real-time</div>
                     <div class="ob-feature-desc">Setiap trade langsung masuk ke grafik equity curve dan semua statistik diperbarui saat itu juga.</div>
                   </div>
                 </div>
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(255,159,64,.1);">🏷️</div>
+                  <div class="ob-feature-icon" style="background:rgba(255,159,64,.08);color:#fb923c;font-size:18px;"><i class="bi bi-tags-fill"></i></div>
                   <div>
                     <div class="ob-feature-name">Tag & Setup Filter</div>
                     <div class="ob-feature-desc">Tambahkan tag custom untuk setiap setup — filter dan bandingkan performa per strategi dengan mudah.</div>
@@ -1993,21 +2000,21 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
               <div class="ob-subtitle">Pahami pola tradingmu dengan data — bukan feeling. Filter waktu fleksibel dari 7 hari hingga all-time.</div>
               <div class="ob-features">
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.1);">🎯</div>
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:18px;"><i class="bi bi-crosshair2"></i></div>
                   <div>
                     <div class="ob-feature-name">Metrik Kunci</div>
                     <div class="ob-feature-desc">Win rate, profit factor, avg R:R, best pair, best session — semua tersaji dalam satu halaman analytics.</div>
                   </div>
                 </div>
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.1);">🧬</div>
+                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.08);color:#00d97e;font-size:18px;"><i class="bi bi-broadcast-pin"></i></div>
                   <div>
                     <div class="ob-feature-name">Trader DNA Radar</div>
                     <div class="ob-feature-desc">6 dimensi performa: Consistency, Discipline, Aggression, Execution, Endurance, Vision — divisualisasi sebagai radar chart.</div>
                   </div>
                 </div>
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(245,158,11,.1);">🗓️</div>
+                  <div class="ob-feature-icon" style="background:rgba(245,158,11,.08);color:#f59e0b;font-size:18px;"><i class="bi bi-calendar2-week-fill"></i></div>
                   <div>
                     <div class="ob-feature-name">Trading Calendar</div>
                     <div class="ob-feature-desc">Lihat pola harian dan bulananmu — hari apa paling profit, dan kapan sebaiknya istirahat dari pasar.</div>
@@ -2023,21 +2030,21 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
               <div class="ob-subtitle">Monitor semua parameter challenge secara visual — tau kapan kamu terlalu agresif sebelum terlambat.</div>
               <div class="ob-features">
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(239,68,68,.1);">⚠️</div>
+                  <div class="ob-feature-icon" style="background:rgba(239,68,68,.08);color:#ef4444;font-size:18px;"><i class="bi bi-shield-exclamation"></i></div>
                   <div>
                     <div class="ob-feature-name">Limit Monitor Real-time</div>
                     <div class="ob-feature-desc">Daily loss limit, max drawdown, profit target — ditampilkan dengan grafik progress yang jelas dan mudah dibaca.</div>
                   </div>
                 </div>
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.1);">📉</div>
+                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.08);color:#00d97e;font-size:18px;"><i class="bi bi-activity"></i></div>
                   <div>
                     <div class="ob-feature-name">Equity vs Limit Chart</div>
                     <div class="ob-feature-desc">Equity curve yang overlay langsung dengan batas-batas challenge prop firmmu — lihat seberapa dekat kamu dengan limit.</div>
                   </div>
                 </div>
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.1);">📋</div>
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:18px;"><i class="bi bi-layers-fill"></i></div>
                   <div>
                     <div class="ob-feature-name">Multi-Challenge</div>
                     <div class="ob-feature-desc">Kelola beberapa akun challenge sekaligus — switch dengan mudah tanpa perlu setup ulang dari awal.</div>
@@ -2054,13 +2061,13 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
               <div class="ob-features" style="flex:none;gap:0;margin-bottom:0;">
                 <div class="ob-cta-row">
                   <div class="ob-cta-card" onclick="closeTour()">
-                    <div class="ob-cta-icon">👀</div>
+                    <div class="ob-cta-icon" style="color:rgba(255,255,255,.6);font-size:22px;"><i class="bi bi-eye-fill"></i></div>
                     <div class="ob-cta-label">Coba Tanpa Daftar</div>
                     <div class="ob-cta-desc">Eksplorasi langsung tanpa login. Bisa catat hingga 10 trade untuk mencoba semua fitur utama.</div>
                     <div class="ob-cta-badge">Guest Mode</div>
                   </div>
                   <div class="ob-cta-card primary" onclick="closeTour()">
-                    <div class="ob-cta-icon">🔓</div>
+                    <div class="ob-cta-icon" style="color:#a78bfa;font-size:22px;"><i class="bi bi-unlock-fill"></i></div>
                     <div class="ob-cta-label">Login &amp; Akses Penuh</div>
                     <div class="ob-cta-desc">Login dengan Google untuk menyimpan semua data ke cloud — tanpa batas, sync di semua device.</div>
                     <div class="ob-cta-badge" style="background:rgba(167,139,250,.25);color:#c4b5fd;border-color:rgba(167,139,250,.35);">Cloud Sync ✓</div>
