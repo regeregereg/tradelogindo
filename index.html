@@ -636,205 +636,198 @@ select.fi option{background:var(--bg3);}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--text3);}
 
-/* ── ONBOARDING TOUR — PREMIUM REDESIGN ── */
+/* ── ONBOARDING TOUR — FIXED & POLISHED ── */
 #onboard-overlay{
   position:fixed;inset:0;
-  background:rgba(0,0,0,.88);
+  background:rgba(0,0,0,.9);
   z-index:2000;display:none;align-items:center;justify-content:center;
-  padding:16px;backdrop-filter:blur(18px);
+  padding:16px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
 }
-#onboard-overlay.open{display:flex;}
+#onboard-overlay.open{display:flex;animation:obFadeIn .25s ease forwards;}
+@keyframes obFadeIn{from{opacity:0}to{opacity:1}}
 
 .ob-card{
-  width:100%;max-width:780px;
-  background:linear-gradient(155deg,rgba(13,13,18,0.98),rgba(10,10,14,0.99));
-  border:1px solid rgba(255,255,255,0.07);
-  border-radius:26px;
-  overflow:hidden;position:relative;
-  box-shadow:0 0 0 1px rgba(139,92,246,0.08),0 40px 100px rgba(0,0,0,.7),0 0 80px rgba(139,92,246,0.05);
+  width:100%;max-width:800px;
+  background:linear-gradient(155deg,rgba(13,13,18,.99),rgba(10,10,14,.99));
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:28px;overflow:hidden;position:relative;
+  box-shadow:0 0 0 1px rgba(139,92,246,.08),0 40px 100px rgba(0,0,0,.8),0 0 120px rgba(139,92,246,.04);
+  max-height:calc(100vh - 32px);display:flex;flex-direction:column;
 }
-/* top glow bar */
 .ob-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent 0%,rgba(0,217,126,0.5) 30%,rgba(139,92,246,0.5) 70%,transparent 100%);
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;z-index:2;
+  background:linear-gradient(90deg,transparent 0%,rgba(0,217,126,.45) 25%,rgba(139,92,246,.5) 60%,rgba(167,139,250,.3) 80%,transparent 100%);
 }
-/* ambient blobs */
 .ob-card::after{
-  content:'';position:absolute;
-  width:300px;height:300px;border-radius:50%;
-  background:radial-gradient(circle,rgba(139,92,246,0.06) 0%,transparent 70%);
-  bottom:-80px;right:-40px;pointer-events:none;
+  content:'';position:absolute;width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,.05) 0%,transparent 70%);
+  bottom:-100px;right:-60px;pointer-events:none;z-index:0;
 }
 
-/* ── 2-col layout ── */
+/* 2-col layout */
 .ob-layout{
-  display:grid;
-  grid-template-columns:200px 1fr;
-  min-height:440px;
-}
-@media(max-width:560px){
-  .ob-layout{grid-template-columns:1fr;min-height:auto;}
-  .ob-nav-col{display:none!important;}
-  .ob-content-col{padding:28px 22px 24px!important;}
+  display:grid;grid-template-columns:208px 1fr;
+  flex:1;min-height:0;position:relative;z-index:1;
 }
 
-/* LEFT — step nav */
+/* LEFT nav */
 .ob-nav-col{
-  padding:32px 0 28px 0;
-  border-right:1px solid rgba(255,255,255,0.05);
+  padding:28px 0 24px;border-right:1px solid rgba(255,255,255,.05);
   display:flex;flex-direction:column;
-  background:rgba(255,255,255,0.015);
-  position:relative;z-index:1;
+  background:rgba(255,255,255,.012);overflow:hidden;
 }
 .ob-nav-header{
-  padding:0 22px 24px;
-  border-bottom:1px solid rgba(255,255,255,0.05);
-  margin-bottom:16px;
+  padding:0 20px 22px;border-bottom:1px solid rgba(255,255,255,.05);
+  margin-bottom:14px;display:flex;align-items:center;gap:9px;
 }
 .ob-brand-dot{
-  width:6px;height:6px;border-radius:50%;
-  background:#00d97e;box-shadow:0 0 8px rgba(0,217,126,.8);
-  display:inline-block;margin-right:7px;
-  animation:obPulse 2.5s ease-in-out infinite;
+  width:7px;height:7px;border-radius:50%;
+  background:#00d97e;box-shadow:0 0 10px rgba(0,217,126,.9),0 0 20px rgba(0,217,126,.4);
+  flex-shrink:0;animation:obPulse 2.5s ease-in-out infinite;
 }
-@keyframes obPulse{0%,100%{opacity:.5;transform:scale(1);}50%{opacity:1;transform:scale(1.3);}}
+@keyframes obPulse{0%,100%{opacity:.5;transform:scale(1);}50%{opacity:1;transform:scale(1.35);}}
 .ob-brand-name{
-  font-size:12px;font-weight:700;
-  background:linear-gradient(135deg,#f4f4f5,rgba(244,244,245,0.55));
+  font-size:12px;font-weight:700;letter-spacing:-.1px;
+  background:linear-gradient(135deg,#f4f4f5,rgba(167,139,250,.7));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  letter-spacing:-.2px;
 }
-.ob-steps-list{display:flex;flex-direction:column;gap:2px;padding:0 10px;flex:1;}
+.ob-steps-list{display:flex;flex-direction:column;gap:2px;padding:0 10px;flex:1;overflow:hidden;}
 .ob-step-item{
   display:flex;align-items:center;gap:10px;
-  padding:9px 12px;border-radius:10px;
-  cursor:pointer;transition:all .2s;
-  position:relative;
+  padding:9px 12px;border-radius:10px;cursor:pointer;
+  transition:all .2s;border:1px solid transparent;user-select:none;
 }
-.ob-step-item:hover .ob-step-label{color:rgba(255,255,255,0.6);}
-.ob-step-item.active{background:rgba(139,92,246,0.1);}
+.ob-step-item:hover{background:rgba(255,255,255,.03);}
+.ob-step-item:hover .ob-step-label{color:rgba(255,255,255,.45);}
+.ob-step-item.active{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.12);}
 .ob-step-item.active .ob-step-label{color:var(--accent2);}
 .ob-step-num{
   width:22px;height:22px;border-radius:7px;
-  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
   display:flex;align-items:center;justify-content:center;
   font-size:9px;font-weight:700;font-family:var(--mono);
-  color:rgba(255,255,255,0.2);flex-shrink:0;
-  transition:all .2s;
+  color:rgba(255,255,255,.2);flex-shrink:0;transition:all .25s;
 }
 .ob-step-item.active .ob-step-num{
-  background:rgba(139,92,246,0.2);border-color:rgba(139,92,246,0.4);
-  color:var(--accent2);box-shadow:0 0 8px rgba(139,92,246,0.2);
+  background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.45);
+  color:var(--accent2);box-shadow:0 0 10px rgba(139,92,246,.25);
 }
 .ob-step-item.done .ob-step-num{
-  background:rgba(0,217,126,0.12);border-color:rgba(0,217,126,0.3);
-  color:#00d97e;
+  background:rgba(0,217,126,.12);border-color:rgba(0,217,126,.3);
+  color:#00d97e;font-size:11px;
 }
-.ob-step-label{
-  font-size:11px;font-weight:600;color:rgba(255,255,255,0.22);
-  letter-spacing:.1px;transition:color .2s;
-}
-.ob-step-item.done .ob-step-label{color:rgba(0,217,126,0.55);}
-.ob-progress-bar-wrap{
-  margin:16px 22px 0;height:2px;
-  background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;
-}
+.ob-step-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.22);letter-spacing:.05px;transition:color .2s;}
+.ob-step-item.done .ob-step-label{color:rgba(0,217,126,.5);}
+.ob-progress-bar-wrap{margin:14px 20px 0;height:2px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;}
 .ob-progress-bar{
   height:100%;border-radius:2px;
-  background:linear-gradient(90deg,#00d97e,#8b5cf6);
-  transition:width .5s cubic-bezier(.4,0,.2,1);
+  background:linear-gradient(90deg,#00d97e 0%,#8b5cf6 100%);
+  transition:width .45s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 8px rgba(0,217,126,.3);
 }
 
-/* RIGHT — content */
+/* RIGHT content */
 .ob-content-col{
-  padding:32px 36px 28px;
-  display:flex;flex-direction:column;
-  position:relative;z-index:1;
+  padding:28px 32px 24px;display:flex;flex-direction:column;
+  overflow:hidden;min-height:0;
 }
+/* FIX: viewport clips slides so they don't bleed out */
+.ob-slides-viewport{flex:1;overflow:hidden;min-height:0;position:relative;}
+.ob-slides{display:flex;height:100%;transition:transform .38s cubic-bezier(.4,0,.2,1);will-change:transform;}
+.ob-slide{min-width:100%;width:100%;display:flex;flex-direction:column;overflow:hidden;}
 
-/* slide transition */
-.ob-slides{display:flex;transition:transform .38s cubic-bezier(.4,0,.2,1);}
-.ob-slide{
-  min-width:100%;
-  display:flex;flex-direction:column;
-  flex:1;
-}
-
-/* slide header */
 .ob-slide-tag{
-  display:inline-flex;align-items:center;gap:5px;
-  font-size:9px;font-weight:700;letter-spacing:1.5px;
-  text-transform:uppercase;color:rgba(255,255,255,0.2);
-  margin-bottom:10px;
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:9px;font-weight:700;letter-spacing:1.8px;
+  text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:10px;
 }
-.ob-slide-tag-dot{
-  width:4px;height:4px;border-radius:50%;flex-shrink:0;
-}
+.ob-slide-tag-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;}
 .ob-title{
-  font-size:22px;font-weight:700;letter-spacing:-.6px;
-  background:linear-gradient(135deg,#f4f4f5 0%,rgba(244,244,245,0.7) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;margin-bottom:6px;line-height:1.2;
+  font-size:20px;font-weight:800;letter-spacing:-.6px;
+  background:linear-gradient(130deg,#f4f4f5 0%,rgba(244,244,245,.68) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:5px;line-height:1.2;
 }
-.ob-subtitle{
-  font-size:12px;color:rgba(255,255,255,0.35);
-  margin-bottom:24px;line-height:1.5;letter-spacing:.1px;
-}
-
-/* feature items */
-.ob-features{display:flex;flex-direction:column;gap:10px;flex:1;}
+.ob-subtitle{font-size:12px;color:rgba(255,255,255,.32);margin-bottom:18px;line-height:1.6;letter-spacing:.05px;}
+.ob-features{display:flex;flex-direction:column;gap:8px;flex:1;overflow:hidden;}
 .ob-feature{
   display:flex;align-items:flex-start;gap:12px;
-  padding:12px 14px;border-radius:12px;
-  background:rgba(255,255,255,0.025);
-  border:1px solid rgba(255,255,255,0.05);
-  transition:border-color .2s,background .2s;
+  padding:11px 13px;border-radius:12px;
+  background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.045);
+  transition:background .2s,border-color .2s,transform .15s;cursor:default;
 }
-.ob-feature:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.08);}
+.ob-feature:hover{background:rgba(255,255,255,.042);border-color:rgba(255,255,255,.08);transform:translateX(2px);}
 .ob-feature-icon{
-  width:32px;height:32px;border-radius:9px;
+  width:34px;height:34px;border-radius:10px;
   display:flex;align-items:center;justify-content:center;
-  font-size:16px;flex-shrink:0;
+  font-size:17px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
 }
-.ob-feature-text{}
-.ob-feature-name{
-  font-size:12px;font-weight:700;color:rgba(255,255,255,0.85);
-  margin-bottom:2px;letter-spacing:-.1px;
-}
-.ob-feature-desc{
-  font-size:11px;color:rgba(255,255,255,0.3);line-height:1.55;
-}
+.ob-feature-name{font-size:12px;font-weight:700;color:rgba(255,255,255,.88);margin-bottom:3px;letter-spacing:-.1px;}
+.ob-feature-desc{font-size:11px;color:rgba(255,255,255,.32);line-height:1.55;}
 
-/* bottom actions */
+/* Footer */
 .ob-footer{
   display:flex;align-items:center;justify-content:space-between;
-  margin-top:20px;padding-top:16px;
-  border-top:1px solid rgba(255,255,255,0.05);
+  margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05);flex-shrink:0;
 }
-.ob-footer-left{font-size:10px;color:rgba(255,255,255,0.15);font-family:var(--mono);}
-.ob-footer-btns{display:flex;gap:8px;}
+.ob-footer-left{font-size:10px;color:rgba(255,255,255,.15);font-family:var(--mono);letter-spacing:.5px;}
+.ob-footer-btns{display:flex;gap:8px;align-items:center;}
 
-/* close btn */
+/* FIX: prev button uses opacity+transform instead of display:none to avoid layout shift */
+.ob-btn-prev{
+  background:rgba(255,255,255,.04);color:rgba(255,255,255,.4);
+  border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 16px;
+  font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);letter-spacing:.2px;
+  transition:all .2s;opacity:0;pointer-events:none;transform:translateX(-4px);
+}
+.ob-btn-prev.visible{opacity:1;pointer-events:auto;transform:translateX(0);}
+.ob-btn-prev:hover{color:var(--text);border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.07);}
+.ob-btn-next{
+  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  color:#fff;border:none;border-radius:10px;padding:8px 18px;
+  font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);letter-spacing:.3px;
+  transition:all .2s;box-shadow:0 4px 14px rgba(139,92,246,.35),inset 0 1px 0 rgba(255,255,255,.12);
+}
+.ob-btn-next:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 20px rgba(139,92,246,.45);}
+
+/* Close btn */
 .ob-close{
-  position:absolute;top:14px;right:16px;
-  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);
-  border-radius:7px;color:rgba(255,255,255,0.25);
-  font-size:13px;cursor:pointer;
-  width:26px;height:26px;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .15s;z-index:10;
+  position:absolute;top:14px;right:16px;z-index:10;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+  border-radius:8px;color:rgba(255,255,255,.25);
+  font-size:12px;cursor:pointer;width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
 }
-.ob-close:hover{background:rgba(255,77,77,0.1);border-color:rgba(255,77,77,0.2);color:rgba(255,77,77,0.7);}
+.ob-close:hover{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.2);color:rgba(239,68,68,.7);}
 
-/* legacy dot — hidden in new design, kept for JS compat */
-.ob-dot{display:none;}
-.ob-dots{display:none;}
-.ob-actions{display:none;}
+/* Slide 5 CTA */
+.ob-cta-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.ob-cta-card{
+  padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.025);display:flex;flex-direction:column;gap:6px;
+  cursor:pointer;transition:all .2s;
+}
+.ob-cta-card:hover{background:rgba(255,255,255,.05);border-color:rgba(139,92,246,.25);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.ob-cta-card.primary{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.25);}
+.ob-cta-card.primary:hover{background:rgba(139,92,246,.16);border-color:rgba(139,92,246,.4);box-shadow:0 8px 24px rgba(139,92,246,.2);}
+.ob-cta-icon{font-size:20px;line-height:1;}
+.ob-cta-label{font-size:12px;font-weight:700;color:rgba(255,255,255,.88);letter-spacing:-.1px;}
+.ob-cta-desc{font-size:10px;color:rgba(255,255,255,.3);line-height:1.5;}
+.ob-cta-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:2px 7px;border-radius:5px;margin-top:2px;background:rgba(139,92,246,.2);color:var(--accent2);border:1px solid rgba(139,92,246,.25);width:fit-content;}
+
+/* Legacy — hidden, kept for JS compat */
+.ob-dot{display:none;}.ob-dots{display:none;}.ob-actions{display:none;}
 .ob-icon,.ob-body,.ob-tag{display:none;}
+/* Legacy button IDs — keep hidden, replaced by .ob-btn-prev/.ob-btn-next */
+#ob-prev,#ob-next{display:none!important;}
 
-@media(max-width:480px){
-  .ob-card{border-radius:20px;}
+@media(max-width:600px){
+  .ob-card{border-radius:22px;max-height:calc(100vh - 24px);}
+  .ob-layout{grid-template-columns:1fr;}
+  .ob-nav-col{display:none!important;}
+  .ob-content-col{padding:24px 20px 20px;}
   .ob-title{font-size:18px;}
+  .ob-cta-row{grid-template-columns:1fr;}
 }
 
 /* ══ 11. RESPONSIVE / MOBILE ══════════════════════════════ */
@@ -1888,21 +1881,21 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 </head>
 <body>
 
-<!-- ══ ONBOARDING TOUR — PREMIUM REDESIGN ══ -->
+<!-- ══ ONBOARDING TOUR — FIXED & POLISHED ══ -->
 <div id="onboard-overlay">
   <div class="ob-card">
-    <button class="ob-close" id="ob-close">✕</button>
+    <button class="ob-close" id="ob-close" aria-label="Tutup">✕</button>
 
     <div class="ob-layout">
 
       <!-- LEFT: Step navigator -->
       <div class="ob-nav-col">
         <div class="ob-nav-header">
-          <div><span class="ob-brand-dot"></span><span class="ob-brand-name">RiskPerTrade</span></div>
+          <span class="ob-brand-dot"></span>
+          <span class="ob-brand-name">RiskPerTrade</span>
         </div>
-
         <div class="ob-steps-list" id="ob-steps-list">
-          <div class="ob-step-item active" data-slide="0">
+          <div class="ob-step-item" data-slide="0">
             <div class="ob-step-num" id="sn-0">01</div>
             <span class="ob-step-label">Selamat Datang</span>
           </div>
@@ -1923,182 +1916,181 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             <span class="ob-step-label">Mulai Sekarang</span>
           </div>
         </div>
-
         <div class="ob-progress-bar-wrap">
-          <div class="ob-progress-bar" id="ob-progress-bar" style="width:20%"></div>
+          <div class="ob-progress-bar" id="ob-progress-bar"></div>
         </div>
       </div>
 
       <!-- RIGHT: Content area -->
       <div class="ob-content-col">
+        <div class="ob-slides-viewport">
+          <div class="ob-slides" id="ob-slides">
 
-        <!-- Slides wrapper -->
-        <div class="ob-slides" id="ob-slides" style="flex:1;overflow:hidden;">
-
-          <!-- Slide 1: Welcome -->
-          <div class="ob-slide">
-            <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.8);"></div>Trading Journal Platform</div>
-            <div class="ob-title">Selamat Datang 👋</div>
-            <div class="ob-subtitle">Platform jurnal trading yang dirancang untuk trader yang ingin berkembang serius.</div>
-            <div class="ob-features">
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(0,217,126,0.1);">📊</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Catat & Analisis</div>
-                  <div class="ob-feature-desc">Log setiap trade dengan lengkap — pair, R:R, entry, exit, screenshot, hingga emosi trading.</div>
+            <!-- Slide 1: Welcome -->
+            <div class="ob-slide">
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.9);"></div>Trading Journal Platform</div>
+              <div class="ob-title">Selamat Datang 👋</div>
+              <div class="ob-subtitle">Platform jurnal trading yang dirancang untuk trader yang ingin bertumbuh dengan data — bukan sekadar feeling.</div>
+              <div class="ob-features">
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.1);">📊</div>
+                  <div>
+                    <div class="ob-feature-name">Catat & Analisis</div>
+                    <div class="ob-feature-desc">Log setiap trade secara lengkap — pair, R:R, entry, exit, screenshot, hingga emosi trading kamu.</div>
+                  </div>
                 </div>
-              </div>
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(139,92,246,0.1);">🧬</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Trader DNA</div>
-                  <div class="ob-feature-desc">Temukan profil tradingmu — consistency, discipline, dan execution score secara otomatis.</div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.1);">🧬</div>
+                  <div>
+                    <div class="ob-feature-name">Trader DNA</div>
+                    <div class="ob-feature-desc">Temukan profil tradingmu — consistency, discipline, dan execution score dihitung otomatis.</div>
+                  </div>
                 </div>
-              </div>
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(245,158,11,0.1);">🏢</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">PropFirm Tracker</div>
-                  <div class="ob-feature-desc">Monitor challenge prop firm secara real-time, dari profit target hingga max drawdown.</div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(245,158,11,.1);">🏢</div>
+                  <div>
+                    <div class="ob-feature-name">PropFirm Tracker</div>
+                    <div class="ob-feature-desc">Monitor challenge prop firm real-time, dari profit target hingga max drawdown — semua dalam satu layar.</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Slide 2: Journal -->
-          <div class="ob-slide">
-            <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.8);"></div>Fitur Journal</div>
-            <div class="ob-title">Catat Setiap Trade</div>
-            <div class="ob-subtitle">Semua detail trade tersimpan rapi dan otomatis terhubung ke dashboard & analytics kamu.</div>
-            <div class="ob-features">
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(0,217,126,0.1);">✍️</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Detail Lengkap</div>
-                  <div class="ob-feature-desc">Pair, direction, session, risk %, P&L, R-multiple — semua bisa dilog dalam hitungan detik.</div>
+            <!-- Slide 2: Journal -->
+            <div class="ob-slide">
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.9);"></div>Fitur Utama</div>
+              <div class="ob-title">Catat Setiap Trade</div>
+              <div class="ob-subtitle">Semua detail trade tersimpan rapi dan langsung terhubung ke dashboard & analytics kamu secara otomatis.</div>
+              <div class="ob-features">
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.1);">✍️</div>
+                  <div>
+                    <div class="ob-feature-name">Input Cepat & Lengkap</div>
+                    <div class="ob-feature-desc">Pair, direction, session, risk %, P&L, R-multiple — semua bisa dilog dalam hitungan detik.</div>
+                  </div>
                 </div>
-              </div>
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(139,92,246,0.1);">📈</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Equity Curve Otomatis</div>
-                  <div class="ob-feature-desc">Setiap trade langsung masuk ke grafik equity curve dan semua statistik diperbarui secara real-time.</div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.1);">📈</div>
+                  <div>
+                    <div class="ob-feature-name">Equity Curve Real-time</div>
+                    <div class="ob-feature-desc">Setiap trade langsung masuk ke grafik equity curve dan semua statistik diperbarui saat itu juga.</div>
+                  </div>
                 </div>
-              </div>
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(255,159,64,0.1);">🏷️</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Tag & Setup</div>
-                  <div class="ob-feature-desc">Tambahkan tag custom untuk setiap setup trading — filter dan bandingkan performa per strategi.</div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(255,159,64,.1);">🏷️</div>
+                  <div>
+                    <div class="ob-feature-name">Tag & Setup Filter</div>
+                    <div class="ob-feature-desc">Tambahkan tag custom untuk setiap setup — filter dan bandingkan performa per strategi dengan mudah.</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Slide 3: Analytics -->
-          <div class="ob-slide">
-            <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#8b5cf6;box-shadow:0 0 6px rgba(139,92,246,.8);"></div>Fitur Analytics</div>
-            <div class="ob-title">Analisis Mendalam</div>
-            <div class="ob-subtitle">Pahami pola tradingmu dengan data — bukan feeling. Filter waktu fleksibel: 7 hari hingga all-time.</div>
-            <div class="ob-features">
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(139,92,246,0.1);">🎯</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Metrik Kunci</div>
-                  <div class="ob-feature-desc">Win rate, profit factor, avg R:R, best pair, best session — semua tersaji dalam satu halaman.</div>
+            <!-- Slide 3: Analytics -->
+            <div class="ob-slide">
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#8b5cf6;box-shadow:0 0 6px rgba(139,92,246,.9);"></div>Analitik</div>
+              <div class="ob-title">Analisis Mendalam</div>
+              <div class="ob-subtitle">Pahami pola tradingmu dengan data — bukan feeling. Filter waktu fleksibel dari 7 hari hingga all-time.</div>
+              <div class="ob-features">
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.1);">🎯</div>
+                  <div>
+                    <div class="ob-feature-name">Metrik Kunci</div>
+                    <div class="ob-feature-desc">Win rate, profit factor, avg R:R, best pair, best session — semua tersaji dalam satu halaman analytics.</div>
+                  </div>
                 </div>
-              </div>
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(0,217,126,0.1);">🧬</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Trader DNA Radar</div>
-                  <div class="ob-feature-desc">6 dimensi performa: Consistency, Discipline, Aggression, Execution, Endurance, Vision.</div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.1);">🧬</div>
+                  <div>
+                    <div class="ob-feature-name">Trader DNA Radar</div>
+                    <div class="ob-feature-desc">6 dimensi performa: Consistency, Discipline, Aggression, Execution, Endurance, Vision — divisualisasi sebagai radar chart.</div>
+                  </div>
                 </div>
-              </div>
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(245,158,11,0.1);">🗓️</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Trading Calendar</div>
-                  <div class="ob-feature-desc">Lihat pola harian dan bulananmu — hari apa kamu paling profit, dan kapan harus istirahat.</div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(245,158,11,.1);">🗓️</div>
+                  <div>
+                    <div class="ob-feature-name">Trading Calendar</div>
+                    <div class="ob-feature-desc">Lihat pola harian dan bulananmu — hari apa paling profit, dan kapan sebaiknya istirahat dari pasar.</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Slide 4: PropFirm -->
-          <div class="ob-slide">
-            <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#ef4444;box-shadow:0 0 6px rgba(239,68,68,.7);"></div>Fitur PropFirm</div>
-            <div class="ob-title">Track PropFirm Challenge</div>
-            <div class="ob-subtitle">Monitor semua parameter challenge secara visual — tau kapan kamu terlalu agresif sebelum terlambat.</div>
-            <div class="ob-features">
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(239,68,68,0.1);">⚠️</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Limit Monitor Real-time</div>
-                  <div class="ob-feature-desc">Daily loss limit, max drawdown, profit target — ditampilkan dengan grafik progress yang jelas.</div>
+            <!-- Slide 4: PropFirm -->
+            <div class="ob-slide">
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#ef4444;box-shadow:0 0 6px rgba(239,68,68,.7);"></div>PropFirm Tracker</div>
+              <div class="ob-title">Track Challenge-mu</div>
+              <div class="ob-subtitle">Monitor semua parameter challenge secara visual — tau kapan kamu terlalu agresif sebelum terlambat.</div>
+              <div class="ob-features">
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(239,68,68,.1);">⚠️</div>
+                  <div>
+                    <div class="ob-feature-name">Limit Monitor Real-time</div>
+                    <div class="ob-feature-desc">Daily loss limit, max drawdown, profit target — ditampilkan dengan grafik progress yang jelas dan mudah dibaca.</div>
+                  </div>
                 </div>
-              </div>
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(0,217,126,0.1);">📉</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Equity vs Limit Chart</div>
-                  <div class="ob-feature-desc">Grafik equity curve yang overlay langsung dengan batas-batas challenge prop firmmu.</div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(0,217,126,.1);">📉</div>
+                  <div>
+                    <div class="ob-feature-name">Equity vs Limit Chart</div>
+                    <div class="ob-feature-desc">Equity curve yang overlay langsung dengan batas-batas challenge prop firmmu — lihat seberapa dekat kamu dengan limit.</div>
+                  </div>
                 </div>
-              </div>
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(139,92,246,0.1);">📋</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Multi-Challenge</div>
-                  <div class="ob-feature-desc">Kelola beberapa akun challenge sekaligus — switch dengan mudah tanpa perlu setup ulang.</div>
+                <div class="ob-feature">
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.1);">📋</div>
+                  <div>
+                    <div class="ob-feature-name">Multi-Challenge</div>
+                    <div class="ob-feature-desc">Kelola beberapa akun challenge sekaligus — switch dengan mudah tanpa perlu setup ulang dari awal.</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Slide 5: Get Started -->
-          <div class="ob-slide">
-            <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.8);"></div>Siap Memulai</div>
-            <div class="ob-title">Mulai Trading Lebih Cerdas</div>
-            <div class="ob-subtitle">Dua cara untuk akses — pilih yang sesuai dengan kebutuhanmu.</div>
-            <div class="ob-features">
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(0,217,126,0.1);">👀</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Coba Tanpa Daftar</div>
-                  <div class="ob-feature-desc">Eksplorasi langsung tanpa login — bisa mencatat hingga 10 trade untuk mencoba semua fitur utama.</div>
+            <!-- Slide 5: Get Started -->
+            <div class="ob-slide">
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.9);"></div>Siap Memulai</div>
+              <div class="ob-title">Mulai Trading Lebih Cerdas</div>
+              <div class="ob-subtitle">Pilih cara aksesmu — bebas coba dulu atau langsung simpan ke cloud.</div>
+              <div class="ob-features" style="flex:none;gap:0;margin-bottom:0;">
+                <div class="ob-cta-row">
+                  <div class="ob-cta-card" onclick="closeTour()">
+                    <div class="ob-cta-icon">👀</div>
+                    <div class="ob-cta-label">Coba Tanpa Daftar</div>
+                    <div class="ob-cta-desc">Eksplorasi langsung tanpa login. Bisa catat hingga 10 trade untuk mencoba semua fitur utama.</div>
+                    <div class="ob-cta-badge">Guest Mode</div>
+                  </div>
+                  <div class="ob-cta-card primary" onclick="closeTour()">
+                    <div class="ob-cta-icon">🔓</div>
+                    <div class="ob-cta-label">Login &amp; Akses Penuh</div>
+                    <div class="ob-cta-desc">Login dengan Google untuk menyimpan semua data ke cloud — tanpa batas, sync di semua device.</div>
+                    <div class="ob-cta-badge" style="background:rgba(167,139,250,.25);color:#c4b5fd;border-color:rgba(167,139,250,.35);">Cloud Sync ✓</div>
+                  </div>
                 </div>
-              </div>
-              <div class="ob-feature">
-                <div class="ob-feature-icon" style="background:rgba(139,92,246,0.1);">🔓</div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name">Akses Penuh</div>
-                  <div class="ob-feature-desc">Login dengan Google untuk menyimpan semua data ke cloud — tanpa batas, sync di semua device.</div>
-                </div>
-              </div>
-              <div class="ob-feature" style="border-color:rgba(139,92,246,0.15);background:rgba(139,92,246,0.05);">
-                <div class="ob-feature-icon" style="background:rgba(139,92,246,0.15);">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#a78bfa" stroke="none"/></svg>
-                </div>
-                <div class="ob-feature-text">
-                  <div class="ob-feature-name" style="color:#a78bfa;">Butuh Akses Penuh?</div>
-                  <div class="ob-feature-desc">Hubungi <a href="https://www.instagram.com/journalingtoolsid/" target="_blank" style="color:#a78bfa;text-decoration:none;font-weight:600;">@journalingtoolsid</a> di Instagram untuk mendapatkan undangan akses.</div>
+                <div class="ob-feature" style="margin-top:8px;border-color:rgba(139,92,246,.12);background:rgba(139,92,246,.04);">
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.12);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#a78bfa" stroke="none"/></svg>
+                  </div>
+                  <div>
+                    <div class="ob-feature-name" style="color:#a78bfa;">Butuh Akses Penuh?</div>
+                    <div class="ob-feature-desc">Hubungi <a href="https://www.instagram.com/journalingtoolsid/" target="_blank" style="color:#a78bfa;font-weight:600;text-decoration:none;">@journalingtoolsid</a> di Instagram untuk mendapatkan undangan akses.</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-        </div><!-- /ob-slides -->
+          </div><!-- /ob-slides -->
+        </div><!-- /ob-slides-viewport -->
 
         <!-- Footer actions -->
         <div class="ob-footer">
           <span class="ob-footer-left" id="ob-step-counter">1 / 5</span>
           <div class="ob-footer-btns">
-            <button class="btng bsm" id="ob-prev" style="display:none">← Kembali</button>
-            <button class="btn bsm" id="ob-next">Selanjutnya →</button>
+            <button class="ob-btn-prev" id="ob-btn-prev">← Kembali</button>
+            <button class="ob-btn-next" id="ob-btn-next">Selanjutnya →</button>
           </div>
         </div>
 
-        <!-- Hidden dots for JS compat -->
+        <!-- Hidden legacy elements for JS compat -->
         <div class="ob-dots" id="ob-dots" style="display:none">
           <div class="ob-dot active" data-slide="0"></div>
           <div class="ob-dot" data-slide="1"></div>
@@ -2107,12 +2099,14 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <div class="ob-dot" data-slide="4"></div>
         </div>
         <div class="ob-actions" style="display:none"></div>
+        <!-- Legacy button stubs (hidden by CSS, kept for any external references) -->
+        <button id="ob-prev" style="display:none" aria-hidden="true"></button>
+        <button id="ob-next" style="display:none" aria-hidden="true"></button>
 
       </div><!-- /ob-content-col -->
     </div><!-- /ob-layout -->
-
-  </div>
-</div>
+  </div><!-- /ob-card -->
+</div><!-- /onboard-overlay -->
 
 <!-- ══ LOGIN SCREEN ══ -->
 <div id="login-screen">
@@ -8228,46 +8222,71 @@ function downloadFile(filename, content, mimeType) {
 // (added to onAuthStateChanged flow via updateAll)
 
 // ══════════════════════════════════════════════════════
-// ── ONBOARDING TOUR ────────────────────────────────────
+// ── ONBOARDING TOUR — FIXED ───────────────────────────
 // ══════════════════════════════════════════════════════
-const OB_KEY    = 'rpt_tour_seen';
-const OB_TOTAL  = 5;
+const OB_KEY   = 'rpt_tour_seen';
+const OB_TOTAL = 5;
 let   obCurrent = 0;
+let   obLocked  = false; // prevent rapid-click animation jank
 
 function obGoTo(idx) {
-  obCurrent = Math.max(0, Math.min(OB_TOTAL - 1, idx));
-  // Slide
+  if (obLocked) return;
+  // FIX: clamp — never go out-of-bounds
+  idx = Math.max(0, Math.min(OB_TOTAL - 1, idx));
+  obCurrent = idx;
+
+  // Animate slides
   $('ob-slides').style.transform = `translateX(-${obCurrent * 100}%)`;
-  // Dots (legacy)
-  document.querySelectorAll('.ob-dot').forEach((d, i) => {
-    d.classList.toggle('active', i === obCurrent);
-  });
-  // Buttons
-  $('ob-prev').style.display = obCurrent === 0 ? 'none' : 'block';
-  $('ob-next').textContent   = obCurrent === OB_TOTAL - 1 ? '✓ Mulai Sekarang' : 'Selanjutnya →';
+
+  // Progress bar
+  const bar = document.getElementById('ob-progress-bar');
+  if (bar) bar.style.width = ((obCurrent + 1) / OB_TOTAL * 100).toFixed(1) + '%';
+
   // Step counter
   const counter = document.getElementById('ob-step-counter');
   if (counter) counter.textContent = (obCurrent + 1) + ' / ' + OB_TOTAL;
+
   // Left nav steps
   document.querySelectorAll('.ob-step-item').forEach((el, i) => {
     el.classList.remove('active', 'done');
     if (i === obCurrent) el.classList.add('active');
     else if (i < obCurrent) el.classList.add('done');
-    // Update step num icon
     const num = el.querySelector('.ob-step-num');
-    if (num) {
-      if (i < obCurrent) num.textContent = '✓';
-      else num.textContent = String(i + 1).padStart(2, '0');
-    }
+    if (!num) return;
+    num.textContent = i < obCurrent ? '✓' : String(i + 1).padStart(2, '0');
   });
-  // Progress bar
-  const bar = document.getElementById('ob-progress-bar');
-  if (bar) bar.style.width = ((obCurrent + 1) / OB_TOTAL * 100) + '%';
+
+  // FIX: prev uses visibility class — no layout shift
+  const prevBtn = document.getElementById('ob-btn-prev');
+  if (prevBtn) {
+    if (obCurrent === 0) prevBtn.classList.remove('visible');
+    else prevBtn.classList.add('visible');
+  }
+
+  // Next button: green on last slide
+  const nextBtn = document.getElementById('ob-btn-next');
+  if (nextBtn) {
+    if (obCurrent === OB_TOTAL - 1) {
+      nextBtn.textContent = '✓ Mulai Sekarang';
+      nextBtn.style.background = 'linear-gradient(135deg,#00d97e,#059669)';
+      nextBtn.style.boxShadow = '0 4px 14px rgba(0,217,126,.35),inset 0 1px 0 rgba(255,255,255,.12)';
+    } else {
+      nextBtn.textContent = 'Selanjutnya →';
+      nextBtn.style.background = 'linear-gradient(135deg,var(--accent),#7c3aed)';
+      nextBtn.style.boxShadow = '0 4px 14px rgba(139,92,246,.35),inset 0 1px 0 rgba(255,255,255,.12)';
+    }
+  }
+
+  // Brief lock to prevent animation jank
+  obLocked = true;
+  setTimeout(() => { obLocked = false; }, 400);
 }
 
 function openTour(fromStart = true) {
-  if (fromStart) obGoTo(0);
+  if (fromStart) { obCurrent = -1; } // force re-render
+  obGoTo(fromStart ? 0 : obCurrent);
   $('onboard-overlay').classList.add('open');
+  setTimeout(() => { const b = document.getElementById('ob-btn-next'); if(b) b.focus(); }, 100);
 }
 
 function closeTour() {
@@ -8278,34 +8297,30 @@ function closeTour() {
 // Auto-show on first visit
 try {
   if (!localStorage.getItem(OB_KEY)) {
-    // Slight delay so app renders first
     setTimeout(() => openTour(true), 600);
   }
 } catch(e) {}
 
-// Dot clicks
-document.querySelectorAll('.ob-dot').forEach(d => {
-  d.addEventListener('click', () => obGoTo(parseInt(d.dataset.slide)));
-});
 // Left nav step clicks
 document.querySelectorAll('.ob-step-item').forEach(el => {
   el.addEventListener('click', () => obGoTo(parseInt(el.dataset.slide)));
 });
 
-// Prev / Next
-$('ob-prev').addEventListener('click', () => obGoTo(obCurrent - 1));
-$('ob-next').addEventListener('click', () => {
-  if (obCurrent === OB_TOTAL - 1) {
-    closeTour();
-  } else {
-    obGoTo(obCurrent + 1);
-  }
-});
+// Prev / Next — new buttons
+(function() {
+  const prevBtn = document.getElementById('ob-btn-prev');
+  const nextBtn = document.getElementById('ob-btn-next');
+  if (prevBtn) prevBtn.addEventListener('click', () => obGoTo(obCurrent - 1));
+  if (nextBtn) nextBtn.addEventListener('click', () => {
+    if (obCurrent === OB_TOTAL - 1) closeTour();
+    else obGoTo(obCurrent + 1);
+  });
+})();
 
 // Close button
 $('ob-close').addEventListener('click', closeTour);
 
-// Close on overlay click
+// Close on backdrop click
 $('onboard-overlay').addEventListener('click', e => {
   if (e.target === $('onboard-overlay')) closeTour();
 });
@@ -8316,13 +8331,32 @@ $('sb-tour-btn').addEventListener('click', () => {
   if (typeof isMob === 'function' && isMob()) closeSB();
 });
 
-// Keyboard nav
+// Keyboard nav — FIX: prevent default & proper clamping
 document.addEventListener('keydown', e => {
   if (!$('onboard-overlay').classList.contains('open')) return;
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') obGoTo(obCurrent + 1);
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   obGoTo(obCurrent - 1);
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); obGoTo(obCurrent + 1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); obGoTo(obCurrent - 1); }
   if (e.key === 'Escape') closeTour();
 });
+
+// Touch swipe support
+(function() {
+  let startX = 0, startY = 0;
+  const card = document.querySelector('.ob-card');
+  if (!card) return;
+  card.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  card.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+      if (dx < 0) obGoTo(obCurrent + 1);
+      else         obGoTo(obCurrent - 1);
+    }
+  }, { passive: true });
+})();
 
 // ══════════════════════════════════════════════════════
 // ── 📸 SCREENSHOT ATTACH ─────────────────────────────
