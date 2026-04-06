@@ -6035,52 +6035,98 @@ function renderEq(){
   g.addColorStop(0.65, `rgba(${colRgb},.04)`);
   g.addColorStop(1, 'rgba(0,0,0,0)');
 
-  // ── Scrub plugin ──
+  // ── Scrub state ──
   let _scrubIdx = null;
 
-  // ── Premium draw-on animation: renders line point-by-point with glowing tip ──
-  let _drawRaf = null;
-  let _drawT    = 0;   // 0..1 progress through data points
-  let _tipGlow  = 1;   // glow at leading tip, fades after line done
-  let _fillAlpha = 0;  // gradient fill fades in after line finishes
+  // ── Animation state ──
+  let _drawRaf   = null;
+  let _drawT     = 0;   // 0..1: line reveal progress
+  let _tipGlow   = 1;   // glow intensity at leading dot
+  let _fillAlpha = 0;   // gradient fill fade-in
+  let _animDone  = false;
 
-  // Cubic ease-out: fast start, smooth landing
-  function _easeOut3(t){ return 1 - Math.pow(1 - t, 3); }
+  function _easeOut3(t) { return 1 - Math.pow(1 - t, 3); }
 
-  // Pre-compute pixel coordinates of the bezier path at any t ∈ [0,1]
-  // We'll interpolate over the dataset points
-  function _lerpPath(meta, t) {
-    if (!meta || !meta.data.length) return null;
-    const pts = meta.data;
-    const n   = pts.length - 1;
-    if (n <= 0) return { x: pts[0].x, y: pts[0].y };
-    const fi  = t * n;
-    const i   = Math.min(Math.floor(fi), n - 1);
-    const frac = fi - i;
-    // Cubic hermite blend between adjacent points
-    const p0 = pts[Math.max(0, i - 1)];
-    const p1 = pts[i];
-    const p2 = pts[Math.min(n, i + 1)];
-    const p3 = pts[Math.min(n, i + 2)];
-    const t2 = frac * frac, t3 = t2 * frac;
-    const cx = 0.5*((p2.x-p0.x)*frac + (2*p0.x-5*p1.x+4*p2.x-p3.x)*t2 + (3*p1.x-p0.x-3*p2.x+p3.x)*t3) + p1.x;
-    const cy = 0.5*((p2.y-p0.y)*frac + (2*p0.y-5*p1.y+4*p2.y-p3.y)*t2 + (3*p1.y-p0.y-3*p2.y+p3.y)*t3) + p1.y;
-    return { x: cx, y: cy };
+  // ── Draw a bezier segment using Chart.js's own control points ──
+  // Each point in meta.data has cp1 (incoming) and cp2 (outgoing) control points
+  function _drawSegments(c, pts, fromIdx, toIdx, tip) {
+    if (!pts.length) return;
+    c.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i <= toIdx; i++) {
+      const prev = pts[i - 1];
+      const cur  = pts[i];
+      // Use Chart.js's computed bezier control points for exact match
+      const cp1x = prev.cp2 ? prev.cp2.x : (prev.x + cur.x) / 2;
+      const cp1y = prev.cp2 ? prev.cp2.y : prev.y;
+      const cp2x = cur.cp1  ? cur.cp1.x  : (prev.x + cur.x) / 2;
+      const cp2y = cur.cp1  ? cur.cp1.y  : cur.y;
+      c.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, cur.x, cur.y);
+    }
+    // Partial segment to tip position
+    if (tip && toIdx < pts.length - 1) {
+      const prev = pts[toIdx];
+      const next = pts[toIdx + 1];
+      // Lerp between toIdx and toIdx+1 based on fractional t
+      const cp1x = prev.cp2 ? prev.cp2.x : (prev.x + next.x) / 2;
+      const cp1y = prev.cp2 ? prev.cp2.y : prev.y;
+      const cp2x = next.cp1 ? next.cp1.x : (prev.x + next.x) / 2;
+      const cp2y = next.cp1 ? next.cp1.y : next.y;
+      // Draw partial cubic via de Casteljau
+      const frac = (_drawT * (pts.length - 1)) - toIdx;
+      const t = frac;
+      const q0x = prev.x + (cp1x - prev.x) * t,  q0y = prev.y + (cp1y - prev.y) * t;
+      const q1x = cp1x  + (cp2x - cp1x) * t,      q1y = cp1y  + (cp2y - cp1y) * t;
+      const q2x = cp2x  + (next.x - cp2x) * t,    q2y = cp2y  + (next.y - cp2y) * t;
+      const r0x = q0x + (q1x - q0x) * t,           r0y = q0y + (q1y - q0y) * t;
+      const r1x = q1x + (q2x - q1x) * t,           r1y = q1y + (q2y - q1y) * t;
+      const ex  = r0x + (r1x - r0x) * t,            ey  = r0y + (r1y - r0y) * t;
+      c.bezierCurveTo(q0x, q0y, r0x, r0y, ex, ey);
+    }
   }
 
-  // ─ Draw plugin: renders partial path + glowing tip + fill fade-in ──
+  // ── Get tip pixel position using de Casteljau ──
+  function _getTip(pts) {
+    const n = pts.length;
+    if (n === 0) return null;
+    if (n === 1 || _drawT <= 0) return { x: pts[0].x, y: pts[0].y };
+    const fi     = _drawT * (n - 1);
+    const toIdx  = Math.min(Math.floor(fi), n - 2);
+    if (_drawT >= 1) return { x: pts[n-1].x, y: pts[n-1].y };
+    const frac   = fi - toIdx;
+    const prev   = pts[toIdx];
+    const next   = pts[toIdx + 1];
+    const cp1x   = prev.cp2 ? prev.cp2.x : (prev.x + next.x) / 2;
+    const cp1y   = prev.cp2 ? prev.cp2.y : prev.y;
+    const cp2x   = next.cp1 ? next.cp1.x : (prev.x + next.x) / 2;
+    const cp2y   = next.cp1 ? next.cp1.y : next.y;
+    const t = frac;
+    const q0x = prev.x + (cp1x - prev.x)*t, q0y = prev.y + (cp1y - prev.y)*t;
+    const q1x = cp1x  + (cp2x - cp1x)*t,    q1y = cp1y  + (cp2y - cp1y)*t;
+    const q2x = cp2x  + (next.x - cp2x)*t,  q2y = cp2y  + (next.y - cp2y)*t;
+    const r0x = q0x + (q1x - q0x)*t,         r0y = q0y + (q1y - q0y)*t;
+    const r1x = q1x + (q2x - q1x)*t,         r1y = q1y + (q2y - q1y)*t;
+    return { x: r0x + (r1x - r0x)*t,          y: r0y + (r1y - r0y)*t };
+  }
+
   const drawPlugin = {
     id: 'eqDraw',
-    // Hide the dataset's own draw until we take over
+
+    // ── Suppress Chart.js native line+fill during animation ──
     beforeDatasetsDraw(chart) {
+      if (_animDone) return; // animation done — let Chart.js render normally
+      // Returning false from this hook cancels the dataset draw entirely
+      return false;
+    },
+
+    afterDraw(chart) {
       const { ctx: c, chartArea: ca } = chart;
       if (!ca) return;
 
-      // Scrub overlay
+      // ── Scrub overlay (always active) ──
       if (_scrubIdx !== null && _scrubIdx < D.length - 1) {
-        const meta = chart.getDatasetMeta(0);
-        if (meta && meta.data[_scrubIdx]) {
-          const ptX = meta.data[_scrubIdx].x;
+        const meta2 = chart.getDatasetMeta(0);
+        if (meta2 && meta2.data[_scrubIdx]) {
+          const ptX = meta2.data[_scrubIdx].x;
           if (ptX < ca.right) {
             c.save();
             c.fillStyle = 'rgba(20,20,26,0.72)';
@@ -6094,137 +6140,123 @@ function renderEq(){
           }
         }
       }
-    },
-    afterDatasetsDraw(chart) {
-      if (_drawT >= 1 && _tipGlow <= 0 && _fillAlpha >= 1) return; // fully done — Chart.js handles it
-      const { ctx: c, chartArea: ca } = chart;
-      if (!ca) return;
+
+      if (_animDone) return; // only manual draw during animation
+
       const meta = chart.getDatasetMeta(0);
       if (!meta || !meta.data.length) return;
       const pts = meta.data;
       const n   = pts.length;
-      if (n < 2) return;
+      if (n < 1) return;
 
-      const endIdx = Math.min(n - 1, Math.floor(_drawT * (n - 1)));
-      const tip    = _lerpPath(meta, _drawT);
+      const toIdx = Math.min(n - 2, Math.floor(_drawT * (n - 1)));
+      const tip   = _getTip(pts);
 
       c.save();
 
-      // ── 1. Clip: only draw left of tip ──
+      // ── Clip to revealed area (left of tip) ──
       c.beginPath();
-      c.rect(ca.left - 2, ca.top - 2, (tip ? tip.x : ca.right) - ca.left + 4, ca.bottom - ca.top + 4);
+      c.rect(ca.left - 2, ca.top - 4, (tip ? tip.x + 4 : ca.right + 4) - ca.left, ca.bottom - ca.top + 8);
       c.clip();
 
-      // ── 2. Fill area under revealed line (fade in) ──
-      if (_fillAlpha > 0) {
+      // ── Fill: fade in after line finishes ──
+      if (_fillAlpha > 0 && n >= 2) {
         c.save();
         c.globalAlpha = Math.min(1, _fillAlpha);
         c.fillStyle   = g;
         c.beginPath();
         c.moveTo(pts[0].x, ca.bottom);
-        for (let i = 0; i <= endIdx; i++) {
-          if (i === 0) c.lineTo(pts[0].x, pts[0].y);
-          else {
-            const prev = pts[i - 1];
-            const cur  = pts[i];
-            const cpx  = (prev.x + cur.x) / 2;
-            c.bezierCurveTo(cpx, prev.y, cpx, cur.y, cur.x, cur.y);
-          }
-        }
-        if (tip && endIdx < n - 1) {
-          c.lineTo(tip.x, tip.y);
-          c.lineTo(tip.x, ca.bottom);
-        } else {
-          c.lineTo(pts[endIdx].x, ca.bottom);
-        }
+        c.lineTo(pts[0].x, pts[0].y);
+        _drawSegments(c, pts, 0, toIdx, tip);
+        if (tip) { c.lineTo(tip.x, ca.bottom); }
+        else     { c.lineTo(pts[Math.min(toIdx, n-1)].x, ca.bottom); }
         c.closePath();
         c.fill();
         c.restore();
       }
 
-      // ── 3. Draw the line up to tip ──
-      c.beginPath();
-      c.strokeStyle = col;
-      c.lineWidth   = 2.5;
-      c.lineJoin    = 'round';
-      c.lineCap     = 'round';
-      for (let i = 0; i <= endIdx; i++) {
-        if (i === 0) c.moveTo(pts[0].x, pts[0].y);
-        else {
-          const prev = pts[i - 1];
-          const cur  = pts[i];
-          const cpx  = (prev.x + cur.x) / 2;
-          c.bezierCurveTo(cpx, prev.y, cpx, cur.y, cur.x, cur.y);
-        }
+      // ── Line: exact same bezier as Chart.js ──
+      if (n >= 2) {
+        c.save();
+        c.beginPath();
+        c.strokeStyle = col;
+        c.lineWidth   = 2.5;
+        c.lineJoin    = 'round';
+        c.lineCap     = 'round';
+        _drawSegments(c, pts, 0, toIdx, tip);
+        c.stroke();
+        c.restore();
       }
-      if (tip && endIdx < n - 1) c.lineTo(tip.x, tip.y);
-      c.stroke();
 
-      // ── 4. Glowing tip dot ──
-      if (tip && _tipGlow > 0) {
-        const gl = _tipGlow;
+      // ── Glowing tip dot ──
+      if (tip && _tipGlow > 0.01) {
+        const gl   = _tipGlow;
+        const r    = 20 * gl;
+        c.save();
         // Outer halo
-        const halo = c.createRadialGradient(tip.x, tip.y, 0, tip.x, tip.y, 22 * gl);
-        halo.addColorStop(0, `rgba(${colRgb},${(0.35 * gl).toFixed(3)})`);
-        halo.addColorStop(1, `rgba(${colRgb},0)`);
+        const halo = c.createRadialGradient(tip.x, tip.y, 0, tip.x, tip.y, r);
+        halo.addColorStop(0,   `rgba(${colRgb},${(0.4 * gl).toFixed(3)})`);
+        halo.addColorStop(0.5, `rgba(${colRgb},${(0.15 * gl).toFixed(3)})`);
+        halo.addColorStop(1,   `rgba(${colRgb},0)`);
         c.fillStyle = halo;
         c.beginPath();
-        c.arc(tip.x, tip.y, 22 * gl, 0, Math.PI * 2);
+        c.arc(tip.x, tip.y, r, 0, Math.PI * 2);
         c.fill();
-        // Core dot
+        // Core bright dot
         c.shadowColor = col;
-        c.shadowBlur  = 14 * gl;
-        c.fillStyle   = `rgba(${colRgb},${(0.9 * gl + 0.1).toFixed(3)})`;
+        c.shadowBlur  = 16 * gl;
+        c.fillStyle   = `rgba(${colRgb},${Math.min(1, 0.85 * gl + 0.15).toFixed(3)})`;
         c.beginPath();
         c.arc(tip.x, tip.y, 3.5, 0, Math.PI * 2);
         c.fill();
+        // Inner white core
         c.shadowBlur = 0;
+        c.fillStyle  = `rgba(255,255,255,${(gl * 0.7).toFixed(3)})`;
+        c.beginPath();
+        c.arc(tip.x, tip.y, 1.5, 0, Math.PI * 2);
+        c.fill();
+        c.restore();
       }
 
       c.restore();
     }
   };
 
-  // ── Animation loop ──
+  // ── Animation tick ──
   function _startDrawAnim(chart) {
     if (_drawRaf) cancelAnimationFrame(_drawRaf);
+    _animDone  = false;
     _drawT     = 0;
     _tipGlow   = 1;
     _fillAlpha = 0;
-    const T_LINE  = 900;   // ms: line draw duration
-    const T_GLOW  = 500;   // ms: tip glow fade after line done
-    const T_FILL  = 480;   // ms: fill fade-in after line done
-    let lineStart = null;
-    let glowStart = null;
-    let fillStart = null;
-    let lineDone  = false;
+    const T_LINE = 900;
+    const T_GLOW = 520;
+    const T_FILL = 460;
+    let t0 = null, glowT0 = null, fillT0 = null, lineDone = false;
 
     function tick(now) {
-      if (!lineStart) lineStart = now;
-      const lineEl = now - lineStart;
-      _drawT = Math.min(1, _easeOut3(lineEl / T_LINE));
+      if (!t0) t0 = now;
+      const el = now - t0;
+      _drawT = Math.min(1, _easeOut3(el / T_LINE));
 
       if (_drawT >= 1 && !lineDone) {
-        lineDone  = true;
-        glowStart = now;
-        fillStart = now;
+        lineDone = true;
+        glowT0   = now;
+        fillT0   = now;
       }
-
       if (lineDone) {
-        const gEl = now - glowStart;
-        _tipGlow   = Math.max(0, 1 - gEl / T_GLOW);
-        const fEl = now - fillStart;
-        _fillAlpha = Math.min(1, _easeOut3(fEl / T_FILL));
+        _tipGlow   = Math.max(0, 1 - (now - glowT0) / T_GLOW);
+        _fillAlpha = Math.min(1, _easeOut3((now - fillT0) / T_FILL));
       }
 
       if (chart && chart.ctx) chart.draw();
 
-      const done = _drawT >= 1 && _tipGlow <= 0 && _fillAlpha >= 1;
-      if (!done) {
+      if (_drawT < 1 || _tipGlow > 0 || _fillAlpha < 1) {
         _drawRaf = requestAnimationFrame(tick);
       } else {
-        _drawT = 1; _tipGlow = 0; _fillAlpha = 1;
-        chart.draw();
+        // Animation complete — hand back to Chart.js
+        _animDone = true;
+        if (chart && chart.ctx) chart.draw();
       }
     }
     _drawRaf = requestAnimationFrame(tick);
