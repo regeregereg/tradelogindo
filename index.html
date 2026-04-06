@@ -6043,8 +6043,6 @@ function renderEq(){
   let _drawT     = 0;   // 0..1: line reveal progress
   let _tipGlow   = 1;   // glow intensity at leading dot
   let _fillAlpha = 0;   // gradient fill fade-in
-  let _animDone  = false;
-
   function _easeOut3(t) { return 1 - Math.pow(1 - t, 3); }
 
   // ── Draw a bezier segment using Chart.js's own control points ──
@@ -6111,22 +6109,20 @@ function renderEq(){
   const drawPlugin = {
     id: 'eqDraw',
 
-    // ── Suppress Chart.js native line+fill during animation ──
-    beforeDatasetsDraw(chart) {
-      if (_animDone) return; // animation done — let Chart.js render normally
-      // Returning false from this hook cancels the dataset draw entirely
-      return false;
+    // ── ALWAYS suppress Chart.js native line+fill — we own all drawing ──
+    beforeDatasetsDraw() {
+      return false; // cancel Chart.js dataset render permanently
     },
 
     afterDraw(chart) {
       const { ctx: c, chartArea: ca } = chart;
       if (!ca) return;
 
-      // ── Scrub overlay (always active) ──
+      // ── Scrub overlay (always active, sits on top of everything) ──
       if (_scrubIdx !== null && _scrubIdx < D.length - 1) {
-        const meta2 = chart.getDatasetMeta(0);
-        if (meta2 && meta2.data[_scrubIdx]) {
-          const ptX = meta2.data[_scrubIdx].x;
+        const m2 = chart.getDatasetMeta(0);
+        if (m2 && m2.data[_scrubIdx]) {
+          const ptX = m2.data[_scrubIdx].x;
           if (ptX < ca.right) {
             c.save();
             c.fillStyle = 'rgba(20,20,26,0.72)';
@@ -6141,25 +6137,25 @@ function renderEq(){
         }
       }
 
-      if (_animDone) return; // only manual draw during animation
-
       const meta = chart.getDatasetMeta(0);
       if (!meta || !meta.data.length) return;
       const pts = meta.data;
       const n   = pts.length;
       if (n < 1) return;
 
+      // At _drawT=1, toIdx covers all segments → full line drawn
       const toIdx = Math.min(n - 2, Math.floor(_drawT * (n - 1)));
-      const tip   = _getTip(pts);
+      const tip   = _drawT >= 1 ? null : _getTip(pts); // no tip when fully drawn
 
       c.save();
 
-      // ── Clip to revealed area (left of tip) ──
+      // ── Clip to revealed area ──
+      const clipRight = _drawT >= 1 ? ca.right + 4 : (tip ? tip.x + 4 : ca.right + 4);
       c.beginPath();
-      c.rect(ca.left - 2, ca.top - 4, (tip ? tip.x + 4 : ca.right + 4) - ca.left, ca.bottom - ca.top + 8);
+      c.rect(ca.left - 2, ca.top - 4, clipRight - ca.left, ca.bottom - ca.top + 8);
       c.clip();
 
-      // ── Fill: fade in after line finishes ──
+      // ── Fill (fades in, then stays at full alpha forever) ──
       if (_fillAlpha > 0 && n >= 2) {
         c.save();
         c.globalAlpha = Math.min(1, _fillAlpha);
@@ -6167,15 +6163,15 @@ function renderEq(){
         c.beginPath();
         c.moveTo(pts[0].x, ca.bottom);
         c.lineTo(pts[0].x, pts[0].y);
-        _drawSegments(c, pts, 0, toIdx, tip);
-        if (tip) { c.lineTo(tip.x, ca.bottom); }
-        else     { c.lineTo(pts[Math.min(toIdx, n-1)].x, ca.bottom); }
+        _drawSegments(c, pts, 0, _drawT >= 1 ? n - 1 : toIdx, tip);
+        const lastX = _drawT >= 1 ? pts[n-1].x : (tip ? tip.x : pts[Math.min(toIdx,n-1)].x);
+        c.lineTo(lastX, ca.bottom);
         c.closePath();
         c.fill();
         c.restore();
       }
 
-      // ── Line: exact same bezier as Chart.js ──
+      // ── Line (same bezier as Chart.js via cp1/cp2) ──
       if (n >= 2) {
         c.save();
         c.beginPath();
@@ -6183,38 +6179,28 @@ function renderEq(){
         c.lineWidth   = 2.5;
         c.lineJoin    = 'round';
         c.lineCap     = 'round';
-        _drawSegments(c, pts, 0, toIdx, tip);
+        _drawSegments(c, pts, 0, _drawT >= 1 ? n - 1 : toIdx, tip);
         c.stroke();
         c.restore();
       }
 
-      // ── Glowing tip dot ──
+      // ── Glowing tip dot (only during animation) ──
       if (tip && _tipGlow > 0.01) {
-        const gl   = _tipGlow;
-        const r    = 20 * gl;
+        const gl = _tipGlow;
+        const r  = 20 * gl;
         c.save();
-        // Outer halo
         const halo = c.createRadialGradient(tip.x, tip.y, 0, tip.x, tip.y, r);
-        halo.addColorStop(0,   `rgba(${colRgb},${(0.4 * gl).toFixed(3)})`);
-        halo.addColorStop(0.5, `rgba(${colRgb},${(0.15 * gl).toFixed(3)})`);
+        halo.addColorStop(0,   `rgba(${colRgb},${(0.4*gl).toFixed(3)})`);
+        halo.addColorStop(0.5, `rgba(${colRgb},${(0.15*gl).toFixed(3)})`);
         halo.addColorStop(1,   `rgba(${colRgb},0)`);
         c.fillStyle = halo;
-        c.beginPath();
-        c.arc(tip.x, tip.y, r, 0, Math.PI * 2);
-        c.fill();
-        // Core bright dot
-        c.shadowColor = col;
-        c.shadowBlur  = 16 * gl;
-        c.fillStyle   = `rgba(${colRgb},${Math.min(1, 0.85 * gl + 0.15).toFixed(3)})`;
-        c.beginPath();
-        c.arc(tip.x, tip.y, 3.5, 0, Math.PI * 2);
-        c.fill();
-        // Inner white core
+        c.beginPath(); c.arc(tip.x, tip.y, r, 0, Math.PI*2); c.fill();
+        c.shadowColor = col; c.shadowBlur = 16*gl;
+        c.fillStyle = `rgba(${colRgb},${Math.min(1,0.85*gl+0.15).toFixed(3)})`;
+        c.beginPath(); c.arc(tip.x, tip.y, 3.5, 0, Math.PI*2); c.fill();
         c.shadowBlur = 0;
-        c.fillStyle  = `rgba(255,255,255,${(gl * 0.7).toFixed(3)})`;
-        c.beginPath();
-        c.arc(tip.x, tip.y, 1.5, 0, Math.PI * 2);
-        c.fill();
+        c.fillStyle = `rgba(255,255,255,${(gl*0.7).toFixed(3)})`;
+        c.beginPath(); c.arc(tip.x, tip.y, 1.5, 0, Math.PI*2); c.fill();
         c.restore();
       }
 
@@ -6225,7 +6211,6 @@ function renderEq(){
   // ── Animation tick ──
   function _startDrawAnim(chart) {
     if (_drawRaf) cancelAnimationFrame(_drawRaf);
-    _animDone  = false;
     _drawT     = 0;
     _tipGlow   = 1;
     _fillAlpha = 0;
@@ -6240,9 +6225,7 @@ function renderEq(){
       _drawT = Math.min(1, _easeOut3(el / T_LINE));
 
       if (_drawT >= 1 && !lineDone) {
-        lineDone = true;
-        glowT0   = now;
-        fillT0   = now;
+        lineDone = true; glowT0 = now; fillT0 = now;
       }
       if (lineDone) {
         _tipGlow   = Math.max(0, 1 - (now - glowT0) / T_GLOW);
@@ -6251,13 +6234,14 @@ function renderEq(){
 
       if (chart && chart.ctx) chart.draw();
 
-      if (_drawT < 1 || _tipGlow > 0 || _fillAlpha < 1) {
+      // Keep ticking until glow+fill are done; after that chart.draw()
+      // is only triggered by user interaction (scrub/resize) — our plugin
+      // keeps drawing at _drawT=1 with full fill on each redraw.
+      if (_drawT < 1 || _tipGlow > 0.005 || _fillAlpha < 0.999) {
         _drawRaf = requestAnimationFrame(tick);
-      } else {
-        // Animation complete — hand back to Chart.js
-        _animDone = true;
-        if (chart && chart.ctx) chart.draw();
       }
+      // No else: animation stops, state (_drawT=1, _fillAlpha=1) remains
+      // and afterDraw will correctly render the complete chart on any future draw()
     }
     _drawRaf = requestAnimationFrame(tick);
   }
@@ -6440,63 +6424,52 @@ function renderEqLastTrades(ft) {
   // Sort by P&L descending → top 3 winners
   const top3 = ft.slice().sort((a, b) => b.pnl - a.pnl).slice(0, 3);
 
-  // Rank medals
-  const medals = ['🥇', '🥈', '🥉'];
-
   top3.forEach((t, i) => {
-    const isWin    = t.pnl >= 0;
-    const pnlCol   = isWin ? '#00d97e' : '#ef4444';
-    const pnlBg    = isWin ? 'rgba(0,217,126,0.07)' : 'rgba(239,68,68,0.07)';
-    const pnlBord  = isWin ? 'rgba(0,217,126,0.16)' : 'rgba(239,68,68,0.16)';
-    const dirCol   = (t.dir||'').toLowerCase() === 'long' ? '#00d97e' : '#ef4444';
-    const pnlSign  = isWin ? '+' : '';
-    const dateStr  = t.date
+    const isWin   = t.pnl >= 0;
+    const pnlCol  = isWin ? '#00d97e' : '#ef4444';
+    const dirCol  = (t.dir||'').toLowerCase() === 'long' ? '#00d97e' : '#ef4444';
+    const pnlSign = isWin ? '+' : '';
+    const dateStr = t.date
       ? new Date(t.date + 'T00:00:00').toLocaleDateString('id-ID', { day:'2-digit', month:'short' })
       : '—';
-    const pairStr  = t.pair || '—';
-    const rStr     = (t.r != null && t.r !== '')
+    const pairStr = t.pair || '—';
+    const rStr    = (t.r != null && t.r !== '')
       ? (t.r >= 0 ? '+' : '') + parseFloat(t.r).toFixed(1) + 'R'
       : '';
+    const rankNum = ['01','02','03'][i];
 
     const row = document.createElement('div');
     row.style.cssText =
-      'display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:10px;' +
-      'background:' + pnlBg + ';border:1px solid ' + pnlBord + ';' +
-      'opacity:0;transform:translateY(8px);' +
-      'transition:opacity .3s cubic-bezier(.4,0,.2,1) ' + (i * 90) + 'ms,' +
-      'transform .3s cubic-bezier(.4,0,.2,1) ' + (i * 90) + 'ms;';
+      'display:flex;align-items:center;gap:12px;padding:9px 0;' +
+      'border-bottom:1px solid var(--border);' +
+      'opacity:0;transform:translateX(-6px);' +
+      'transition:opacity .32s cubic-bezier(.4,0,.2,1) ' + (i*80) + 'ms,' +
+      'transform .32s cubic-bezier(.4,0,.2,1) ' + (i*80) + 'ms;';
+    if (i === top3.length - 1) row.style.borderBottom = 'none';
 
     row.innerHTML =
-      // Rank medal
-      '<div style="font-size:15px;flex-shrink:0;width:20px;text-align:center;">' + medals[i] + '</div>' +
-      // Left: pair + dir + date
+      // Rank number — subtle, monospace
+      '<div style="font-size:10px;font-family:var(--mono);color:var(--text3);width:16px;flex-shrink:0;letter-spacing:.5px;">' + rankNum + '</div>' +
+      // Color bar
+      '<div style="width:2px;height:32px;border-radius:2px;background:' + pnlCol + ';opacity:.7;flex-shrink:0;"></div>' +
+      // Middle: pair + date
       '<div style="flex:1;min-width:0;">' +
-        '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">' +
-          '<span style="font-size:11px;font-weight:700;font-family:var(--mono);color:var(--text);letter-spacing:.2px;">' + pairStr + '</span>' +
-          (t.dir
-            ? '<span style="font-size:9px;font-weight:700;color:' + dirCol + ';letter-spacing:.5px;text-transform:uppercase;padding:1px 5px;border-radius:4px;background:' + (dirCol==='#00d97e'?'rgba(0,217,126,.1)':'rgba(239,68,68,.1)') + ';">' + t.dir.toUpperCase() + '</span>'
-            : '') +
-        '</div>' +
-        '<div style="font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:2px;display:flex;gap:6px;">' +
-          '<span>' + dateStr + '</span>' +
-          (rStr ? '<span style="color:var(--accent2);">' + rStr + '</span>' : '') +
+        '<div style="font-size:11px;font-weight:700;font-family:var(--mono);color:var(--text);letter-spacing:.3px;margin-bottom:2px;">' + pairStr + '</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<span style="font-size:9px;color:var(--text3);font-family:var(--mono);">' + dateStr + '</span>' +
+          (t.dir ? '<span style="font-size:9px;font-weight:600;color:' + dirCol + ';letter-spacing:.4px;text-transform:uppercase;font-family:var(--mono);">' + t.dir + '</span>' : '') +
+          (rStr  ? '<span style="font-size:9px;color:var(--text3);font-family:var(--mono);">' + rStr + '</span>' : '') +
         '</div>' +
       '</div>' +
-      // Right: P&L
-      '<div style="text-align:right;flex-shrink:0;">' +
-        '<div style="font-size:13px;font-weight:800;font-family:var(--mono);color:' + pnlCol + ';letter-spacing:-.3px;">' +
-          pnlSign + '$' + Math.abs(t.pnl).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) +
-        '</div>' +
-        (t.result
-          ? '<div style="font-size:9px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;">' + t.result + '</div>'
-          : '') +
+      // P&L — right aligned
+      '<div style="font-size:12px;font-weight:700;font-family:var(--mono);color:' + pnlCol + ';letter-spacing:-.2px;flex-shrink:0;">' +
+        pnlSign + '$' + Math.abs(t.pnl).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) +
       '</div>';
 
     wrap.appendChild(row);
-    // Staggered entrance
     requestAnimationFrame(() => requestAnimationFrame(() => {
       row.style.opacity   = '1';
-      row.style.transform = 'translateY(0)';
+      row.style.transform = 'translateX(0)';
     }));
   });
 }
