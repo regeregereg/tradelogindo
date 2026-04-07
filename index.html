@@ -5097,6 +5097,19 @@ function getPeriodLabel() {
 }
 
 // ── SYNC INDICATOR ────────────────────────────────────
+// Safety timeout: always dismiss splash after 4s no matter what
+(function() {
+  var _splashTimer = setTimeout(function() {
+    var s = document.getElementById('rpt-splash');
+    if (s) s.classList.add('hidden');
+  }, 4000);
+  window._splashDismiss = function() {
+    clearTimeout(_splashTimer);
+    var s = document.getElementById('rpt-splash');
+    if (s) s.classList.add('hidden');
+  };
+})();
+
 function setSyncState(state) {
   const dot = $('sync-dot');
   dot.className = 'sync-dot' + (state === 'syncing' ? ' syncing' : state === 'error' ? ' error' : '');
@@ -5105,10 +5118,7 @@ function setSyncState(state) {
   if (bar) bar.classList.toggle('active', state === 'syncing');
   // Dismiss splash on first successful load
   if (state === 'ok' || state === 'error') {
-    const splash = document.getElementById('rpt-splash');
-    if (splash && !splash.classList.contains('hidden')) {
-      setTimeout(() => splash.classList.add('hidden'), 300);
-    }
+    if (window._splashDismiss) window._splashDismiss();
   }
 }
 
@@ -5634,6 +5644,11 @@ onAuthStateChanged(auth, async user => {
     const wasLoggedIn = currentUser !== null;
     currentUser = null;
     $('login-loading').style.display = 'none';
+    // Dismiss splash for guest/unauthenticated users
+    const splash = document.getElementById('rpt-splash');
+    if (splash && !splash.classList.contains('hidden')) {
+      setTimeout(() => splash.classList.add('hidden'), 300);
+    }
     if (unsubTrades) { unsubTrades(); unsubTrades = null; }
     setAuthUI(false);
     setFloatCTA(true); // Guest mode: show upgrade CTA
