@@ -11160,7 +11160,15 @@ async function loadPlaybooks() {
 }
 
 async function savePlaybook(data) {
-  if(!window._db || !window._currentUser) return;
+  // Wait up to 10s for db and auth to be ready (handles race condition on first load)
+  let waited = 0;
+  while ((!window._db || !window._currentUser) && waited < 100) {
+    await new Promise(r => setTimeout(r, 100));
+    waited++;
+  }
+  if(!window._db || !window._currentUser) {
+    throw new Error('Tidak terkoneksi ke cloud. Pastikan kamu sudah login dan coba lagi.');
+  }
   const { collection, doc, addDoc, updateDoc } = await pbCollection();
   const col = collection(window._db, 'users', window._currentUser.uid, 'playbooks');
   if(data.id) {
@@ -11418,8 +11426,15 @@ document.getElementById('playbook-save-btn').addEventListener('click', async () 
   const name = document.getElementById('pb-name').value.trim();
   if(!name) { document.getElementById('pb-name').style.borderColor='#ff4d4d'; document.getElementById('pb-name').focus(); return; }
   document.getElementById('pb-name').style.borderColor='';
+
+  // Guard: must be logged in
+  if(!window._currentUser) {
+    alert('Kamu harus login dulu sebelum menyimpan strategi.');
+    return;
+  }
+
   const btn = document.getElementById('playbook-save-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="bi bi-arrow-repeat" style="font-size:14px"></i> Menyimpan...';
+  btn.disabled = true; btn.innerHTML = '<i class="bi bi-arrow-repeat" style="font-size:14px;animation:spin 1s linear infinite"></i> Menyimpan...';
   const data = {
     name,
     desc: document.getElementById('pb-desc').value.trim(),
@@ -11434,7 +11449,14 @@ document.getElementById('playbook-save-btn').addEventListener('click', async () 
   try {
     await savePlaybook(data);
     document.getElementById('md-playbook').classList.remove('open');
-  } catch(e) { console.error(e); alert('Gagal menyimpan playbook'); }
+    // Show success toast if available
+    if(typeof window.showToast === 'function') {
+      window.showToast('Strategi berhasil disimpan ✓', 'success');
+    }
+  } catch(e) {
+    console.error('savePlaybook error:', e);
+    alert('Gagal menyimpan strategi: ' + (e.message || 'Coba lagi atau periksa koneksi internet kamu.'));
+  }
   btn.disabled = false; btn.innerHTML = '<i class="bi bi-cloud-check" style="font-size:14px"></i> Simpan Playbook';
 });
 
@@ -11447,6 +11469,18 @@ function initPlaybookModule() {
 
 // Hook after auth: wait for _currentUser to be set
 waitFor(() => window._db && window._currentUser, initPlaybookModule);
+
+// Re-load playbooks if user navigates to playbook page after auth (belt-and-suspenders)
+document.addEventListener('DOMContentLoaded', () => {
+  const pbPage = document.getElementById('page-playbook');
+  if(pbPage && typeof MutationObserver !== 'undefined') {
+    new MutationObserver(() => {
+      if(pbPage.classList.contains('active') && window._db && window._currentUser && playbooks.length === 0 && window._pbLoaded) {
+        loadPlaybooks();
+      }
+    }).observe(pbPage, { attributes: true, attributeFilter: ['class'] });
+  }
+});
 
 // Also reload playbooks when trades update (for stats)
 const _origUpdateAll = window.updateAll;
