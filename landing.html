@@ -625,6 +625,220 @@ footer{
   .badge-item{border-right:none;border-bottom:1px solid var(--border);width:50%;}
   .badge-item:nth-child(even){border-right:none;}
 }
+
+/* ══════════════════════════════════════════════
+   §ONBOARDING PREVIEW SECTION
+   ══════════════════════════════════════════════ */
+#onboarding-preview{
+  padding:100px 0;
+  border-top:1px solid var(--border);
+  position:relative;
+  overflow:hidden;
+}
+#onboarding-preview::before{
+  content:'';position:absolute;
+  top:0;left:50%;transform:translateX(-50%);
+  width:800px;height:600px;
+  background:radial-gradient(ellipse,rgba(139,92,246,0.07) 0%,transparent 65%);
+  pointer-events:none;
+}
+.ob-preview-header{text-align:center;margin-bottom:56px;}
+.ob-preview-label{
+  font-family:var(--mono);font-size:11px;color:var(--accent2);
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;
+}
+.ob-preview-title{
+  font-family:var(--font);font-size:clamp(28px,4vw,44px);
+  font-weight:800;letter-spacing:-1px;color:var(--text);
+  line-height:1.1;margin-bottom:14px;
+}
+.ob-preview-sub{
+  font-size:16px;color:var(--text2);font-weight:300;
+  max-width:480px;margin:0 auto;line-height:1.7;
+}
+
+/* ── Tab strip ── */
+.ob-tabs{
+  display:flex;gap:0;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:32px;
+  flex-wrap:wrap;
+}
+.ob-tab{
+  flex:1;min-width:120px;
+  padding:14px 12px;
+  text-align:center;
+  cursor:pointer;
+  font-family:var(--body);font-size:12px;font-weight:500;
+  color:var(--text2);
+  border-right:1px solid var(--border);
+  transition:all .2s;
+  position:relative;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  user-select:none;
+}
+.ob-tab:last-child{border-right:none;}
+.ob-tab-icon{font-size:18px;line-height:1;}
+.ob-tab.active{
+  background:var(--accent-dim);
+  color:var(--accent2);
+}
+.ob-tab.active::after{
+  content:'';position:absolute;
+  bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+}
+.ob-tab:hover:not(.active){
+  background:var(--bg3);color:var(--text);
+}
+
+/* ── Panel area ── */
+.ob-panels{position:relative;min-height:380px;}
+.ob-panel{
+  display:none;
+  grid-template-columns:1fr 1fr;
+  gap:40px;align-items:center;
+}
+.ob-panel.active{display:grid;animation:obPanelIn .35s ease both;}
+@media(max-width:768px){
+  .ob-panel{grid-template-columns:1fr;}
+  .ob-panel-visual{order:-1;}
+}
+@keyframes obPanelIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+.ob-panel-text{}
+.ob-panel-step{
+  font-family:var(--mono);font-size:10px;color:var(--accent2);
+  letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;
+}
+.ob-panel-title{
+  font-family:var(--font);font-size:clamp(22px,3vw,30px);
+  font-weight:800;letter-spacing:-.5px;color:var(--text);
+  line-height:1.15;margin-bottom:12px;
+}
+.ob-panel-desc{
+  font-size:14px;color:var(--text2);line-height:1.75;
+  font-weight:300;margin-bottom:24px;
+}
+.ob-panel-points{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.ob-panel-point{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:13px;color:var(--text2);
+}
+.ob-pp-dot{
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;
+  margin-top:6px;
+  background:var(--accent);box-shadow:0 0 5px var(--accent-glow);
+}
+.ob-panel-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 22px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  color:#fff;font-family:var(--body);font-size:13px;font-weight:600;
+  text-decoration:none;
+  transition:all .25s;
+  box-shadow:0 4px 16px rgba(139,92,246,0.35);
+}
+.ob-panel-cta:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(139,92,246,0.5);}
+
+/* ── Panel visual cards ── */
+.ob-panel-visual{
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:18px;padding:20px;
+  box-shadow:0 24px 60px rgba(0,0,0,0.4),0 0 40px rgba(139,92,246,0.05);
+  position:relative;
+}
+.ob-vis-label{
+  font-family:var(--mono);font-size:9px;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;
+}
+
+/* ── Mini UI snippets per panel ── */
+/* Journal */
+.mini-form{display:flex;flex-direction:column;gap:8px;}
+.mini-row{display:flex;gap:8px;}
+.mini-field{
+  flex:1;padding:9px 12px;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;font-family:var(--mono);font-size:11px;color:var(--text2);
+}
+.mini-field.accent-border{border-color:rgba(139,92,246,0.35);color:var(--accent2);}
+.mini-badge-long{
+  padding:5px 12px;border-radius:6px;
+  background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);
+  font-size:10px;font-weight:600;color:var(--green);font-family:var(--mono);
+  display:flex;align-items:center;justify-content:center;
+}
+.mini-badge-short{
+  padding:5px 12px;border-radius:6px;
+  background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);
+  font-size:10px;font-weight:600;color:var(--red);font-family:var(--mono);
+  display:flex;align-items:center;justify-content:center;
+}
+.mini-submit{
+  padding:10px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  color:#fff;font-size:12px;font-weight:600;
+  border:none;cursor:pointer;font-family:var(--body);
+  transition:opacity .2s;
+}
+/* Analytics */
+.mini-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.mini-stat{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:9px;padding:10px 12px;text-align:center;
+}
+.mini-stat-lbl{font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px;}
+.mini-stat-v{font-family:var(--mono);font-size:16px;font-weight:500;}
+.mini-equity-wrap{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:9px;padding:12px;
+}
+/* Calendar */
+.mini-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.mini-cal-day{
+  aspect-ratio:1;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-family:var(--mono);color:var(--text3);
+}
+/* PropFirm */
+.mini-pf-row{display:flex;justify-content:space-between;margin-bottom:6px;font-size:11px;}
+.mini-pf-bar-wrap{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-bottom:10px;}
+.mini-pf-bar{height:100%;border-radius:2px;}
+/* Daily */
+.mini-mood-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.mini-mood-chip{
+  padding:5px 10px;border-radius:20px;
+  font-size:10px;font-family:var(--mono);
+  border:1px solid var(--border);color:var(--text3);cursor:pointer;
+  transition:all .15s;
+}
+.mini-mood-chip.sel{background:var(--accent-dim);border-color:rgba(139,92,246,.3);color:var(--accent2);}
+/* Risk Calc */
+.mini-calc-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.mini-calc-result{
+  background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);
+  border-radius:9px;padding:12px 14px;margin-top:10px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+
+/* ── Bottom CTA strip ── */
+.ob-bottom-strip{
+  margin-top:48px;
+  padding:28px 32px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:18px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:24px;flex-wrap:wrap;
+}
+.ob-bottom-text{}
+.ob-bottom-title{font-family:var(--font);font-size:18px;font-weight:700;margin-bottom:4px;}
+.ob-bottom-sub{font-size:13px;color:var(--text2);}
+.ob-bottom-actions{display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -637,10 +851,11 @@ footer{
   </a>
   <div class="nav-links">
     <a href="#features" class="nav-link">Fitur</a>
+    <a href="#onboarding-preview" class="nav-link">Preview</a>
     <a href="#how" class="nav-link">Cara Kerja</a>
     <a href="#pricing" class="nav-link">Harga</a>
     <a href="#faq" class="nav-link">FAQ</a>
-    <a href="https://riskpertrade.me" class="nav-cta" target="_blank">Buka App →</a>
+    <a href="https://riskpertrade.me?tour=true" class="nav-cta" target="_blank">Coba App →</a>
   </div>
 </nav>
 
@@ -662,11 +877,11 @@ footer{
   </p>
 
   <div class="hero-actions">
-    <a href="https://riskpertrade.me" class="btn-primary" target="_blank">
+    <a href="https://riskpertrade.me?tour=true" class="btn-primary" target="_blank">
       🔓 Coba Gratis Sekarang
     </a>
-    <a href="#features" class="btn-secondary">
-      Lihat Semua Fitur ↓
+    <a href="#onboarding-preview" class="btn-secondary">
+      Lihat Preview Fitur ↓
     </a>
   </div>
 
@@ -976,6 +1191,295 @@ footer{
   </div>
 </section>
 
+<!-- ══════════════════════════════════════════════
+     §ONBOARDING PREVIEW — Interactive feature tour
+     ══════════════════════════════════════════════ -->
+<section id="onboarding-preview">
+  <div class="container">
+
+    <div class="ob-preview-header reveal">
+      <div class="ob-preview-label">Tour Fitur</div>
+      <h2 class="ob-preview-title">Coba dulu sebelum masuk app</h2>
+      <p class="ob-preview-sub">Klik tiap fitur di bawah — kamu bisa lihat tampilan dan cara kerja setiap fitur sebelum mulai.</p>
+    </div>
+
+    <!-- Tab strip -->
+    <div class="ob-tabs reveal">
+      <div class="ob-tab active" data-panel="0">
+        <span class="ob-tab-icon">📝</span>
+        <span>Journal</span>
+      </div>
+      <div class="ob-tab" data-panel="1">
+        <span class="ob-tab-icon">📈</span>
+        <span>Analytics</span>
+      </div>
+      <div class="ob-tab" data-panel="2">
+        <span class="ob-tab-icon">📅</span>
+        <span>Calendar</span>
+      </div>
+      <div class="ob-tab" data-panel="3">
+        <span class="ob-tab-icon">🏢</span>
+        <span>PropFirm</span>
+      </div>
+      <div class="ob-tab" data-panel="4">
+        <span class="ob-tab-icon">🧮</span>
+        <span>Risk Calc</span>
+      </div>
+    </div>
+
+    <!-- Panels -->
+    <div class="ob-panels reveal">
+
+      <!-- Panel 0: Journal -->
+      <div class="ob-panel active" id="ob-panel-0">
+        <div class="ob-panel-text">
+          <div class="ob-panel-step">Fitur 01 — Trade Journal</div>
+          <h3 class="ob-panel-title">Catat trade dalam<br>30 detik</h3>
+          <p class="ob-panel-desc">Abis close posisi, langsung buka app dan log trade kamu. Tidak perlu isi semua kolom — yang penting pair, hasil, dan P&L. Sisanya opsional.</p>
+          <div class="ob-panel-points">
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Pair, direction, session, entry/exit price</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Upload screenshot chart untuk review nanti</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Catat emosi trading — calm, FOMO, revenge?</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>R-multiple otomatis dihitung dari SL & TP</span></div>
+          </div>
+          <a href="https://riskpertrade.me?tour=true" class="ob-panel-cta" target="_blank">
+            📝 Coba Log Trade →
+          </a>
+        </div>
+        <div class="ob-panel-visual">
+          <div class="ob-vis-label">Log Trade — Form Preview</div>
+          <div class="mini-form">
+            <div class="mini-row">
+              <div class="mini-field accent-border">XAUUSD</div>
+              <div class="mini-badge-long">LONG</div>
+              <div class="mini-badge-short" style="opacity:.4">SHORT</div>
+            </div>
+            <div class="mini-row">
+              <div class="mini-field">Session: London</div>
+              <div class="mini-field">Setup: BOS+OB</div>
+            </div>
+            <div class="mini-row">
+              <div class="mini-field">Entry: 2,318.40</div>
+              <div class="mini-field">Exit: 2,330.10</div>
+            </div>
+            <div class="mini-row">
+              <div class="mini-field accent-border" style="color:#22c55e">+$480 <span style="color:var(--text3);font-size:9px">P&L</span></div>
+              <div class="mini-field accent-border">+2.4R</div>
+            </div>
+            <div class="mini-row" style="gap:6px;flex-wrap:wrap">
+              <div class="mini-mood-chip sel">😌 Calm</div>
+              <div class="mini-mood-chip">😤 FOMO</div>
+              <div class="mini-mood-chip">😡 Revenge</div>
+            </div>
+            <button class="mini-submit">✓ Simpan Trade</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 1: Analytics -->
+      <div class="ob-panel" id="ob-panel-1">
+        <div class="ob-panel-text">
+          <div class="ob-panel-step">Fitur 02 — Analytics</div>
+          <h3 class="ob-panel-title">App-nya yang<br>ngerjain analisisnya</h3>
+          <p class="ob-panel-desc">Setelah beberapa trade masuk, dashboard langsung ngasih insight otomatis — kamu tinggal baca dan ambil keputusan berdasarkan data nyata.</p>
+          <div class="ob-panel-points">
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Win rate, profit factor, dan avg R:R real-time</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Breakdown per pair, session, dan setup</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Equity curve visual — lihat progress kamu naik</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Filter: 7 hari, 30 hari, 6 bulan, semua waktu</span></div>
+          </div>
+          <a href="https://riskpertrade.me?tour=true" class="ob-panel-cta" target="_blank">
+            📈 Lihat Dashboard →
+          </a>
+        </div>
+        <div class="ob-panel-visual">
+          <div class="ob-vis-label">Analytics — Dashboard Preview</div>
+          <div class="mini-stat-row">
+            <div class="mini-stat">
+              <div class="mini-stat-lbl">Win Rate</div>
+              <div class="mini-stat-v" style="color:var(--accent2)">68.4%</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-lbl">Prof. Factor</div>
+              <div class="mini-stat-v" style="color:var(--gold)">2.14</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-lbl">Avg R:R</div>
+              <div class="mini-stat-v" style="color:var(--green)">1.8R</div>
+            </div>
+          </div>
+          <div class="mini-equity-wrap">
+            <div style="font-size:9px;color:var(--text3);margin-bottom:8px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.7px">Equity Curve</div>
+            <svg width="100%" height="54" viewBox="0 0 300 54" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="cg2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#8b5cf6" stop-opacity=".3"/>
+                  <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,48 C20,44 40,40 60,36 C80,32 100,34 120,28 C140,22 160,24 180,18 C200,12 220,14 240,9 C260,4 280,6 300,3" fill="none" stroke="#8b5cf6" stroke-width="2" opacity=".8"/>
+              <path d="M0,48 C20,44 40,40 60,36 C80,32 100,34 120,28 C140,22 160,24 180,18 C200,12 220,14 240,9 C260,4 280,6 300,3 L300,54 L0,54 Z" fill="url(#cg2)"/>
+            </svg>
+          </div>
+          <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px;">
+            <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);border-radius:7px;padding:8px 10px;">
+              <div style="color:var(--text3);margin-bottom:2px">Best Pair</div>
+              <div style="color:var(--green);font-family:var(--mono);font-weight:500">XAUUSD +$1,240</div>
+            </div>
+            <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:7px;padding:8px 10px;">
+              <div style="color:var(--text3);margin-bottom:2px">Best Session</div>
+              <div style="color:var(--gold);font-family:var(--mono);font-weight:500">London 74%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 2: Calendar -->
+      <div class="ob-panel" id="ob-panel-2">
+        <div class="ob-panel-text">
+          <div class="ob-panel-step">Fitur 03 — Trading Calendar</div>
+          <h3 class="ob-panel-title">Heatmap P&L<br>per hari</h3>
+          <p class="ob-panel-desc">Lihat pola trading kamu dari perspektif kalender. Hari mana yang paling profit, hari mana yang kamu harus istirahat — semuanya kelihatan jelas.</p>
+          <div class="ob-panel-points">
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Heatmap warna hijau/merah per hari trading</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Klik hari untuk lihat semua trade di hari itu</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Identifikasi hari/minggu yang selalu rugi</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Summary bulanan otomatis — trades, win, P&L</span></div>
+          </div>
+          <a href="https://riskpertrade.me?tour=true" class="ob-panel-cta" target="_blank">
+            📅 Buka Calendar →
+          </a>
+        </div>
+        <div class="ob-panel-visual">
+          <div class="ob-vis-label">Trading Calendar — April 2025</div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:8px;">
+            <div style="font-size:8px;color:var(--text3);text-align:center;padding:2px;font-family:var(--mono)">S</div>
+            <div style="font-size:8px;color:var(--text3);text-align:center;padding:2px;font-family:var(--mono)">M</div>
+            <div style="font-size:8px;color:var(--text3);text-align:center;padding:2px;font-family:var(--mono)">T</div>
+            <div style="font-size:8px;color:var(--text3);text-align:center;padding:2px;font-family:var(--mono)">W</div>
+            <div style="font-size:8px;color:var(--text3);text-align:center;padding:2px;font-family:var(--mono)">T</div>
+            <div style="font-size:8px;color:var(--text3);text-align:center;padding:2px;font-family:var(--mono)">F</div>
+            <div style="font-size:8px;color:var(--text3);text-align:center;padding:2px;font-family:var(--mono)">S</div>
+          </div>
+          <div class="mini-cal-grid" id="ob-cal-grid"></div>
+          <div style="margin-top:12px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;font-size:10px;font-family:var(--mono)">
+            <span style="color:var(--text3)">April Total</span>
+            <span style="color:var(--green)">+$2,840</span>
+            <span style="color:var(--text2)">19W / 9L</span>
+          </div>
+          <div style="margin-top:8px;display:flex;gap:10px;align-items:center;font-size:9px;color:var(--text3)">
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,.4);display:inline-block"></span>Profit</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(239,68,68,.4);display:inline-block"></span>Loss</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:var(--bg3);border:1px solid var(--border);display:inline-block"></span>Tidak trading</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: PropFirm -->
+      <div class="ob-panel" id="ob-panel-3">
+        <div class="ob-panel-text">
+          <div class="ob-panel-step">Fitur 04 — PropFirm Tracker</div>
+          <h3 class="ob-panel-title">Monitor challenge<br>real-time</h3>
+          <p class="ob-panel-desc">Pantau progress challenge PropFirm kamu secara visual — profit target, daily loss, max drawdown, dan trading days dalam satu tampilan.</p>
+          <div class="ob-panel-points">
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Visualisasi equity vs limit PropFirm</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Alert otomatis saat mendekati batas rugi</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Support FTMO, MFF, E8, dan firm lain</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Status on-track / warning langsung kelihatan</span></div>
+          </div>
+          <a href="https://riskpertrade.me?tour=true" class="ob-panel-cta" target="_blank">
+            🏢 Buka PropFirm Tracker →
+          </a>
+        </div>
+        <div class="ob-panel-visual">
+          <div class="ob-vis-label">PropFirm Tracker — Live View</div>
+          <div style="font-family:var(--font);font-size:14px;font-weight:700;margin-bottom:14px">🏢 FTMO $100K Challenge</div>
+          <div class="mini-pf-row">
+            <span style="color:var(--text2);font-size:11px">Profit Target</span>
+            <span style="font-family:var(--mono);font-size:12px;color:var(--green)">$6,240 / $10,000</span>
+          </div>
+          <div class="mini-pf-bar-wrap"><div class="mini-pf-bar" style="width:62.4%;background:var(--green)"></div></div>
+          <div class="mini-pf-row">
+            <span style="color:var(--text2);font-size:11px">Daily Loss Used</span>
+            <span style="font-family:var(--mono);font-size:12px;color:var(--gold)">$280 / $500</span>
+          </div>
+          <div class="mini-pf-bar-wrap"><div class="mini-pf-bar" style="width:56%;background:var(--gold)"></div></div>
+          <div class="mini-pf-row">
+            <span style="color:var(--text2);font-size:11px">Max Drawdown</span>
+            <span style="font-family:var(--mono);font-size:12px;color:var(--text2)">$1,240 / $5,000</span>
+          </div>
+          <div class="mini-pf-bar-wrap"><div class="mini-pf-bar" style="width:24.8%;background:var(--accent)"></div></div>
+          <div style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:6px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);font-size:10px;font-family:var(--mono);color:var(--green)">
+            <span style="width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);display:inline-block"></span>
+            On Track — 62.4% menuju target
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 4: Risk Calc -->
+      <div class="ob-panel" id="ob-panel-4">
+        <div class="ob-panel-text">
+          <div class="ob-panel-step">Fitur 05 — Risk Calculator</div>
+          <h3 class="ob-panel-title">Hitung lot size<br>sebelum entry</h3>
+          <p class="ob-panel-desc">Masukkan balance, berapa persen yang mau di-risk, dan jarak SL — lot size langsung keluar. Tidak perlu hitung manual lagi sebelum entry.</p>
+          <div class="ob-panel-points">
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Input: balance, risk %, jarak SL dalam pips</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Output: lot size yang tepat untuk risk tersebut</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Hitung juga potential profit dari R:R target</span></div>
+            <div class="ob-panel-point"><div class="ob-pp-dot"></div><span>Support berbagai pair forex dan instrumen</span></div>
+          </div>
+          <a href="https://riskpertrade.me?tour=true" class="ob-panel-cta" target="_blank">
+            🧮 Coba Risk Calculator →
+          </a>
+        </div>
+        <div class="ob-panel-visual">
+          <div class="ob-vis-label">Risk Calculator</div>
+          <div class="mini-calc-row">
+            <span style="color:var(--text2)">Account Balance</span>
+            <span style="font-family:var(--mono);color:var(--text)">$10,000</span>
+          </div>
+          <div class="mini-calc-row">
+            <span style="color:var(--text2)">Risk per Trade</span>
+            <span style="font-family:var(--mono);color:var(--accent2)">1.0% = $100</span>
+          </div>
+          <div class="mini-calc-row">
+            <span style="color:var(--text2)">SL Distance</span>
+            <span style="font-family:var(--mono);color:var(--text)">20 pips</span>
+          </div>
+          <div class="mini-calc-row">
+            <span style="color:var(--text2)">Pair</span>
+            <span style="font-family:var(--mono);color:var(--text)">XAUUSD</span>
+          </div>
+          <div class="mini-calc-result">
+            <div>
+              <div style="font-size:9px;color:var(--text3);margin-bottom:2px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.7px">Lot Size</div>
+              <div style="font-family:var(--mono);font-size:22px;font-weight:500;color:var(--green)">0.05</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:9px;color:var(--text3);margin-bottom:2px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.7px">At 2:1 R:R</div>
+              <div style="font-family:var(--mono);font-size:14px;color:var(--green)">+$200 profit</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /ob-panels -->
+
+    <!-- Bottom CTA -->
+    <div class="ob-bottom-strip reveal">
+      <div class="ob-bottom-text">
+        <div class="ob-bottom-title">Siap coba langsung di app?</div>
+        <div class="ob-bottom-sub">Gratis sampai 10 trade — tidak perlu daftar, langsung bisa pakai.</div>
+      </div>
+      <div class="ob-bottom-actions">
+        <a href="https://riskpertrade.me?tour=true" class="btn-primary" target="_blank">🔓 Buka App + Tour Otomatis</a>
+        <a href="http://lynk.id/riskpertrade/ok7m3y56myz2/checkout" class="btn-secondary" target="_blank">🛒 Beli Akses Full</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- ── FAQ ── -->
 <section id="faq">
   <div class="container">
@@ -1028,7 +1532,7 @@ footer{
     <h2 class="reveal">Catat trade pertamamu<br>hari ini.</h2>
     <p class="reveal">Gratis untuk dicoba. Tidak perlu daftar dulu.<br>Cukup buka app dan mulai jurnal trading kamu.</p>
     <div class="final-actions reveal">
-      <a href="https://riskpertrade.me" class="btn-primary" target="_blank">🔓 Buka App Gratis</a>
+      <a href="https://riskpertrade.me?tour=true" class="btn-primary" target="_blank">🔓 Buka App Gratis</a>
       <a href="http://lynk.id/riskpertrade/ok7m3y56myz2/checkout" class="btn-secondary" target="_blank">🛒 Beli Akses Full</a>
     </div>
   </div>
@@ -1081,6 +1585,86 @@ window.addEventListener('scroll', () => {
     navbar.style.borderBottomColor = 'rgba(255,255,255,0.06)';
   }
 });
+
+// ── Onboarding Preview Tabs ──
+(function() {
+  const tabs = document.querySelectorAll('.ob-tab');
+  const panels = document.querySelectorAll('.ob-panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const idx = parseInt(tab.dataset.panel);
+
+      // Update tabs
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      // Update panels
+      panels.forEach(p => p.classList.remove('active'));
+      const target = document.getElementById('ob-panel-' + idx);
+      if (target) target.classList.add('active');
+    });
+  });
+})();
+
+// ── Mini Calendar render ──
+(function() {
+  const grid = document.getElementById('ob-cal-grid');
+  if (!grid) return;
+
+  // Simulate April 2025 data (Mon=weekday start offset=2 for April 1 = Tuesday)
+  const days = 30;
+  const startOffset = 2; // April 1, 2025 is a Tuesday (0=Sun)
+  const pnlData = {
+    1:0, 2:240, 3:-80, 4:0, 5:0,
+    7:180, 8:320, 9:-120, 10:450, 11:0,
+    14:-90, 15:280, 16:110, 17:0, 18:200,
+    22:0, 23:380, 24:-60, 25:290, 26:0,
+    28:150, 29:0, 30:420
+  };
+
+  // Fill empty cells for offset
+  for (let i = 0; i < startOffset; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'mini-cal-day';
+    grid.appendChild(cell);
+  }
+
+  for (let d = 1; d <= days; d++) {
+    const cell = document.createElement('div');
+    cell.className = 'mini-cal-day';
+    cell.style.cssText = 'font-size:8px;font-family:var(--mono);border-radius:4px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;';
+
+    const pnl = pnlData[d];
+    if (pnl === undefined) {
+      // Weekend
+      cell.style.opacity = '.2';
+      cell.textContent = d;
+      cell.style.color = 'var(--text3)';
+    } else if (pnl === 0) {
+      // No trade
+      cell.style.background = 'var(--bg3)';
+      cell.style.border = '1px solid var(--border)';
+      cell.style.color = 'var(--text3)';
+      cell.textContent = d;
+    } else if (pnl > 0) {
+      const intensity = Math.min(pnl / 500, 1);
+      cell.style.background = `rgba(34,197,94,${0.15 + intensity * 0.35})`;
+      cell.style.border = `1px solid rgba(34,197,94,${0.2 + intensity * 0.3})`;
+      cell.style.color = 'var(--green)';
+      cell.textContent = d;
+      cell.title = '+$' + pnl;
+    } else {
+      const intensity = Math.min(Math.abs(pnl) / 200, 1);
+      cell.style.background = `rgba(239,68,68,${0.15 + intensity * 0.3})`;
+      cell.style.border = `1px solid rgba(239,68,68,${0.2 + intensity * 0.25})`;
+      cell.style.color = 'var(--red)';
+      cell.textContent = d;
+      cell.title = '-$' + Math.abs(pnl);
+    }
+    grid.appendChild(cell);
+  }
+})();
 </script>
 </body>
 </html>

@@ -10621,6 +10621,36 @@ try {
   }
 } catch(e) {}
 
+// ── Auto-open tour jika dari landing page (?tour=true) ──
+// Ini menghubungkan landing.html dengan app: klik tombol di landing
+// akan redirect ke app dengan ?tour=true dan tour langsung muncul
+(function() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('tour') === 'true') {
+      // Hapus param dari URL tanpa reload (biar URL bersih)
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, '', cleanUrl);
+      // Buka tour setelah app selesai load (tunggu auth selesai)
+      const tryOpen = (attempts = 0) => {
+        if (document.getElementById('onboard-overlay')) {
+          // Tunggu sampai app selesai init (splash hilang)
+          const splash = document.getElementById('rpt-splash');
+          if (splash && splash.style.display !== 'none' && attempts < 30) {
+            setTimeout(() => tryOpen(attempts + 1), 300);
+          } else {
+            setTimeout(() => openTour(true), 400);
+          }
+        } else if (attempts < 20) {
+          setTimeout(() => tryOpen(attempts + 1), 200);
+        }
+      };
+      tryOpen();
+    }
+  } catch(e) {}
+})();
+
+
 // Left nav step clicks
 document.querySelectorAll('.ob-step-item').forEach(el => {
   el.addEventListener('click', () => obGoTo(parseInt(el.dataset.slide)));
