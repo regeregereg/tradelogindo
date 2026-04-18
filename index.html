@@ -14327,19 +14327,23 @@ var _rtInt = setInterval(function() {
 
 
 
+
+
+
 // ══════════════════════════════════════════════════════════════
 // §STICKY-PROFILE-BAR
-// Uses IntersectionObserver to detect when trader-card / guest-banner
-// leaves the viewport, then shows the sticky mini navbar.
+// Strategy: MutationObserver watches ALL .page class changes.
+// No goPage hook needed — immune to chain-override bugs.
+// IntersectionObserver detects when the header card leaves view.
 // ══════════════════════════════════════════════════════════════
 (function() {
-  var bar     = null;
-  var visible = false;
-  var observer = null;
+  var bar      = null;
+  var visible  = false;
+  var cardObs  = null;   // IntersectionObserver for trader-card/guest-banner
+  var pageObs  = null;   // MutationObserver for page activation
 
-  /* copy live data into bar */
+  /* ── copy live data into bar ── */
   function sync() {
-    // avatar
     var srcAv = document.getElementById('tc-avatar');
     var dstAv = document.getElementById('spb-avatar');
     if (srcAv && dstAv) {
@@ -14350,23 +14354,23 @@ var _rtInt = setInterval(function() {
         dstAv.textContent = srcAv.textContent || '';
       }
     }
-    // name
     var n = document.getElementById('tc-name');
     var sn = document.getElementById('spb-name');
     if (n && sn) sn.textContent = n.textContent || 'Trader';
 
-    // stats
     function cp(sid, did) {
       var s = document.getElementById(sid);
       var d = document.getElementById(did);
-      if (!s||!d) return;
-      d.textContent = s.textContent||'—';
-      d.className = 'spb-pill-val'+(s.classList.contains('pos')?' pos':s.classList.contains('neg')?' neg':' neu');
+      if (!s || !d) return;
+      d.textContent = s.textContent || '—';
+      d.className = 'spb-pill-val' +
+        (s.classList.contains('pos') ? ' pos' :
+         s.classList.contains('neg') ? ' neg' : ' neu');
     }
-    cp('st-pnl','spb-pnl');
-    cp('st-wr', 'spb-wr');
-    cp('st-pf', 'spb-pf');
-    cp('st-n',  'spb-trades');
+    cp('st-pnl', 'spb-pnl');
+    cp('st-wr',  'spb-wr');
+    cp('st-pf',  'spb-pf');
+    cp('st-n',   'spb-trades');
   }
 
   function show() {
@@ -14382,95 +14386,110 @@ var _rtInt = setInterval(function() {
     bar.classList.remove('spb-visible');
   }
 
-  /* Only show on dashboard page */
-  function isDash() {
+  function isDashActive() {
     var d = document.getElementById('page-dashboard');
     return !!(d && d.classList.contains('active'));
   }
 
-  /* Set up IntersectionObserver on the sentinel element */
-  function setupObserver() {
-    if (observer) { observer.disconnect(); observer = null; }
+  /* ── (re)attach IntersectionObserver to the right sentinel ── */
+  function attachCardObserver() {
+    if (cardObs) { cardObs.disconnect(); cardObs = null; }
 
-    // Pick the best sentinel: trader-card if visible, else guest-banner
+    if (!isDashActive()) { hide(); return; }
+
     var card   = document.getElementById('trader-card');
     var banner = document.getElementById('guest-banner');
-    var sentinel = (card && card.style.display !== 'none' && card.offsetParent !== null)
-                   ? card : banner;
+
+    // Pick whichever is currently visible in the DOM
+    var sentinel = null;
+    if (card && card.style.display !== 'none' && card.offsetParent !== null) {
+      sentinel = card;
+    } else if (banner && banner.style.display !== 'none' && banner.offsetParent !== null) {
+      sentinel = banner;
+    }
 
     if (!sentinel) {
-      // No sentinel at all - use scroll fallback
-      window.addEventListener('scroll', scrollFallback, {passive:true});
+      // Nothing to observe — use simple scroll check
+      window.addEventListener('scroll', scrollFallback, { passive: true });
       return;
     }
 
-    observer = new IntersectionObserver(function(entries) {
-      if (!isDash()) { hide(); return; }
-      // isIntersecting=false means element is OUT of view
+    cardObs = new IntersectionObserver(function(entries) {
+      if (!isDashActive()) { hide(); return; }
       if (!entries[0].isIntersecting) {
         show();
       } else {
         hide();
       }
-    }, {
-      root: null,        // viewport
-      threshold: 0,      // fire as soon as ANY part leaves viewport
-      rootMargin: '0px'
-    });
+    }, { root: null, threshold: 0, rootMargin: '0px' });
 
-    observer.observe(sentinel);
+    cardObs.observe(sentinel);
   }
 
-  /* Scroll fallback for when there's no sentinel */
+  /* scroll fallback when no sentinel found */
   function scrollFallback() {
-    if (!isDash()) { hide(); return; }
+    if (!isDashActive()) { hide(); return; }
     if (window.pageYOffset > 80) show(); else hide();
   }
 
-  /* Re-setup observer when auth state changes (card visibility changes) */
-  function maybeReset() {
-    setTimeout(setupObserver, 200);
+  /* ── Watch ALL .page elements for class changes ── */
+  /* This fires whenever ANY page becomes active/inactive            */
+  /* Completely bypasses goPage chain — reliable regardless of hooks */
+  function attachPageObserver() {
+    if (pageObs) return; // already running
+    pageObs = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        if (m.type === 'attributes' && m.attributeName === 'class') {
+          var el = m.target;
+          // A page just became active or inactive
+          if (el.classList.contains('page')) {
+            if (!isDashActive()) {
+              // Navigated away from dashboard — always hide
+              hide();
+            } else {
+              // Returned to dashboard — re-attach card observer
+              setTimeout(attachCardObserver, 80);
+            }
+          }
+        }
+      });
+    });
+
+    document.querySelectorAll('.page').forEach(function(p) {
+      pageObs.observe(p, { attributes: true, attributeFilter: ['class'] });
+    });
+  }
+
+  /* ── Hook updateAll for stat refresh ── */
+  function hookUpdateAll() {
+    var orig = window.updateAll;
+    if (typeof orig !== 'function' || orig._spbHooked) return;
+    window.updateAll = function() {
+      orig.apply(this, arguments);
+      setTimeout(function() {
+        sync();
+        attachCardObserver(); // re-check sentinel (login/logout)
+      }, 150);
+    };
+    window.updateAll._spbHooked = true;
   }
 
   function init() {
     bar = document.getElementById('sticky-profile-bar');
     if (!bar) return;
 
-    // Initial setup
-    setupObserver();
+    attachPageObserver();
+    attachCardObserver();
+    hookUpdateAll();
 
-    // Re-run setup when stats update (user logs in/out changes sentinel)
-    var _origUA = window.updateAll;
-    if (typeof _origUA === 'function') {
-      window.updateAll = function() {
-        _origUA.apply(this, arguments);
-        setTimeout(function() { sync(); setupObserver(); }, 150);
-      };
-    }
-
-    // Hide when navigating away from dashboard
-    var _origGP = window.goPage;
-    if (typeof _origGP === 'function') {
-      window.goPage = function(name) {
-        _origGP.apply(this, arguments);
-        if (name !== 'dashboard') {
-          hide();
-        } else {
-          // Re-entering dashboard: re-setup observer
-          setTimeout(setupObserver, 100);
-        }
-      };
-    }
-
-    // Expose for debugging
+    // expose debug helpers
     window._spbShow = show;
     window._spbHide = hide;
     window._spbSync = sync;
   }
 
-  // Wait for DOM + module scripts to finish
   window.addEventListener('load', function() {
-    setTimeout(init, 300);
+    setTimeout(init, 400);
   });
 
 })();
