@@ -1122,23 +1122,17 @@ body.sb-off #sticky-profile-bar {
     top: 54px;
     padding: 0 14px;
     height: 46px;
-    /* Always pinned — no slide animation on mobile */
+    /* Permanently pinned — no scroll trigger, no slide animation on mobile */
     transform: translateY(0) !important;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.2s ease, visibility 0s linear 0.2s !important;
+    transition: opacity 0.15s ease !important;
   }
-  /* Show bar only when dashboard page is active */
   body.spb-dash #sticky-profile-bar {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
-    transition: opacity 0.2s ease, visibility 0s linear 0s !important;
-  }
-  /* Push main content down to clear topbar + profile bar */
-  body.spb-dash .main {
-    padding-top: 116px !important;
   }
   .spb-pill { min-width: 44px; padding: 2px 7px; }
   .spb-pill-val { font-size: 11px; }
@@ -1149,7 +1143,9 @@ body.sb-off #sticky-profile-bar {
   .topbar{display:flex;}
   .sb-btn{display:none;}
   .sidebar{top:54px;height:calc(100vh - 54px);}
-  .main{margin-left:0!important;padding:14px;padding-top:70px;padding-bottom:84px;}
+  .main{margin-left:0!important;padding:14px;padding-top:16px;padding-bottom:84px;}
+  /* Dashboard page gets extra top space for profile bar (54px topbar + 46px bar + 8px gap) */
+  #page-dashboard.active { padding-top: 108px; }
   .stats{grid-template-columns:repeat(2,1fr);}
   .g2,.g3{grid-template-columns:1fr;}
   .ftg{grid-template-columns:1fr 1fr;}
@@ -14406,14 +14402,15 @@ var _rtInt = setInterval(function() {
       document.body.classList.add('spb-dash');
     } else {
       bar.classList.add('spb-visible');
+      if (!isMobile()) document.body.classList.remove('spb-active');
     }
   }
 
   function hide() {
     visible = false;
     bar.classList.remove('spb-visible');
-    document.body.classList.remove('spb-dash');
     document.body.classList.remove('spb-active');
+    document.body.classList.remove('spb-dash');
   }
 
   function isDashActive() {
@@ -14424,10 +14421,11 @@ var _rtInt = setInterval(function() {
   /* ── (re)attach IntersectionObserver to the right sentinel ── */
   function attachCardObserver() {
     if (cardObs) { cardObs.disconnect(); cardObs = null; }
+    window.removeEventListener('scroll', scrollFallback);
 
     if (!isDashActive()) { hide(); return; }
 
-    // On mobile: always show, no scroll observer needed
+    // Mobile: always show immediately, no scroll needed
     if (isMobile()) { show(); return; }
 
     var card   = document.getElementById('trader-card');
@@ -14515,19 +14513,18 @@ var _rtInt = setInterval(function() {
     attachCardObserver();
     hookUpdateAll();
 
-    // Re-evaluate on resize (e.g. rotate phone or DevTools resize)
+    // Re-evaluate when screen rotates or resizes
     window.addEventListener('resize', function() {
       attachCardObserver();
     });
 
-    // expose debug helpers
     window._spbShow = show;
     window._spbHide = hide;
     window._spbSync = sync;
   }
 
   window.addEventListener('load', function() {
-    setTimeout(init, 400);
+    setTimeout(init, 200);
   });
 
 })();
