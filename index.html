@@ -1122,7 +1122,6 @@ body.sb-off #sticky-profile-bar {
     top: 54px;
     padding: 0 14px;
     height: 46px;
-    /* Permanently pinned — no scroll trigger, no slide animation on mobile */
     transform: translateY(0) !important;
     opacity: 0;
     visibility: hidden;
@@ -1134,6 +1133,9 @@ body.sb-off #sticky-profile-bar {
     visibility: visible !important;
     pointer-events: auto !important;
   }
+  body.spb-dash #page-dashboard {
+    padding-top: 46px;
+  }
   .spb-pill { min-width: 44px; padding: 2px 7px; }
   .spb-pill-val { font-size: 11px; }
   .spb-hide-xs { display: none !important; }
@@ -1143,9 +1145,7 @@ body.sb-off #sticky-profile-bar {
   .topbar{display:flex;}
   .sb-btn{display:none;}
   .sidebar{top:54px;height:calc(100vh - 54px);}
-  .main{margin-left:0!important;padding:14px;padding-top:16px;padding-bottom:84px;}
-  /* Dashboard page gets extra top space for profile bar (54px topbar + 46px bar + 8px gap) */
-  #page-dashboard.active { padding-top: 108px; }
+  .main{margin-left:0!important;padding:14px;padding-top:54px;padding-bottom:84px;}
   .stats{grid-template-columns:repeat(2,1fr);}
   .g2,.g3{grid-template-columns:1fr;}
   .ftg{grid-template-columns:1fr 1fr;}
@@ -14402,7 +14402,6 @@ var _rtInt = setInterval(function() {
       document.body.classList.add('spb-dash');
     } else {
       bar.classList.add('spb-visible');
-      if (!isMobile()) document.body.classList.remove('spb-active');
     }
   }
 
@@ -14425,7 +14424,7 @@ var _rtInt = setInterval(function() {
 
     if (!isDashActive()) { hide(); return; }
 
-    // Mobile: always show immediately, no scroll needed
+    // Mobile: always show, no scroll observer
     if (isMobile()) { show(); return; }
 
     var card   = document.getElementById('trader-card');
@@ -14508,16 +14507,10 @@ var _rtInt = setInterval(function() {
   function init() {
     bar = document.getElementById('sticky-profile-bar');
     if (!bar) return;
-
     attachPageObserver();
     attachCardObserver();
     hookUpdateAll();
-
-    // Re-evaluate when screen rotates or resizes
-    window.addEventListener('resize', function() {
-      attachCardObserver();
-    });
-
+    window.addEventListener('resize', attachCardObserver);
     window._spbShow = show;
     window._spbHide = hide;
     window._spbSync = sync;
