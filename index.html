@@ -194,7 +194,7 @@ window.addEventListener('load', function() {
   });
 });
 </script>
-<meta name="theme-color" content="#0e0e10">
+<meta name="theme-color" content="#000000">
 
 <!-- ════════════════════════════════════════════════════════════
      §HEAD-VERCEL — Speed Insights + Analytics
@@ -235,8 +235,8 @@ window.addEventListener('load', function() {
      ════════════════════════════════════════════════════════════ -->
 <style>
 /* Prevent white flash - set bg color immediately */
-html{background:#09090b;color:#f4f4f5;}
-body{background:#09090b;color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;padding:0;min-height:100vh;}
+html{background:#000000;color:#ffffff;}
+body{background:#000000;color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;padding:0;min-height:100vh;}
 /* Hide all content until app JS initializes (avoids layout flash) */
 #onboard-overlay,#login-screen{display:none;}
 </style>
@@ -373,18 +373,25 @@ document.addEventListener('DOMContentLoaded', function(){
    ════════════════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#09090b;--bg2:#111114;--bg3:#18181c;--bg4:#222227;
-  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
-  --text:#f4f4f5;--text2:#a1a1aa;--text3:#71717a;
+  /* ── Backgrounds: pure black to very dark ── */
+  --bg:#000000;--bg2:#0a0a0a;--bg3:#111111;--bg4:#1a1a1a;
+  /* ── Borders: subtle white ── */
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.14);
+  /* ── Text: white to mid-grey ── */
+  --text:#ffffff;--text2:#a0a0a0;--text3:#606060;
+  /* ── Semantic: green (profit/win), red (loss) ── */
   --green:#22c55e;--gd:rgba(34,197,94,0.1);
   --red:#ef4444;--rd:rgba(239,68,68,0.1);
+  /* ── Brand accent: purple ── */
   --accent:#8b5cf6;--ad:rgba(139,92,246,0.12);
-  --accent2:#a78bfa;
-  --gold:#f59e0b;
+  --accent2:#c4b5fd;
+  --gold:#a0a0a0;
   --font:'Syne',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--mono:'JetBrains Mono','Courier New',Courier,monospace;
   --sbw:216px;
   --radius:14px;
-  --glow:0 0 0 1px rgba(139,92,246,0.15),0 4px 24px rgba(139,92,246,0.08);
+  --glow:0 0 0 1px rgba(139,92,246,0.2),0 4px 28px rgba(139,92,246,0.1);
+  /* ── Logo gradient: white → grey ── */
+  --logo-gradient:linear-gradient(135deg,#ffffff 0%,#888888 100%);
 }
 html,body{height:100%;overflow-x:hidden;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;}
@@ -467,7 +474,7 @@ body::before{
 
 /* Left: form panel */
 .login-card{
-  background:linear-gradient(160deg,#0f0f14 0%,#0a0a10 100%);
+  background:linear-gradient(160deg,#0a0a0a 0%,#000000 100%);
   border:none;border-radius:0;
   padding:40px 36px;width:100%;
   text-align:center;position:relative;overflow:hidden;
@@ -479,7 +486,7 @@ body::before{
 
 /* Right: preview/animation panel */
 .login-preview-col{
-  background:linear-gradient(160deg,#0c0c18 0%,#080810 100%);
+  background:linear-gradient(160deg,#0a0a0a 0%,#000000 100%);
   border-left:1px solid rgba(139,92,246,.12);
   position:relative;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -559,28 +566,28 @@ body::before{
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── SPLASH SCREEN ── */
-#rpt-splash{position:fixed;inset:0;z-index:9999;background:#0a0a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transition:opacity .5s ease,visibility .5s ease;}
+#rpt-splash{position:fixed;inset:0;z-index:9999;background:#000000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transition:opacity .5s ease,visibility .5s ease;}
 #rpt-splash.hidden{opacity:0;visibility:hidden;pointer-events:none;}
 .splash-logo{display:flex;align-items:center;gap:10px;}
 .splash-logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 20px rgba(139,92,246,.5);}
-.splash-logo-text{font-size:17px;font-weight:700;color:#f4f4f5;letter-spacing:-.3px;font-family:var(--font);}
-.splash-logo-text span{color:#8b5cf6;}
+.splash-logo-text{font-size:17px;font-weight:700;background:linear-gradient(135deg,#ffffff 0%,#888888 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.3px;font-family:var(--font);}
+.splash-logo-text span{background:linear-gradient(135deg,#8b5cf6,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .splash-bars{display:flex;align-items:flex-end;gap:5px;height:44px;}
 .splash-bar{width:8px;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#8b5cf6,rgba(139,92,246,.3));transform-origin:bottom;animation:splashBarRise .6s cubic-bezier(.34,1.56,.64,1) both;}
 .splash-bar:nth-child(1){height:18px;animation-delay:.00s;}
 .splash-bar:nth-child(2){height:30px;animation-delay:.07s;}
 .splash-bar:nth-child(3){height:22px;animation-delay:.14s;}
-.splash-bar:nth-child(4){height:40px;animation-delay:.21s;background:linear-gradient(180deg,#a78bfa,#7c3aed);}
+.splash-bar:nth-child(4){height:40px;animation-delay:.21s;background:linear-gradient(180deg,#ffffff,rgba(255,255,255,.3));}
 .splash-bar:nth-child(5){height:28px;animation-delay:.28s;}
 .splash-bar:nth-child(6){height:36px;animation-delay:.35s;}
 .splash-bar:nth-child(7){height:20px;animation-delay:.42s;}
 @keyframes splashBarRise{from{transform:scaleY(0);opacity:0;}to{transform:scaleY(1);opacity:1;}}
-.splash-sub{font-size:11px;color:rgba(161,161,170,.5);letter-spacing:.5px;font-family:var(--font);animation:fadeInUp .4s .7s both ease;}
+.splash-sub{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.5px;font-family:var(--font);animation:fadeInUp .4s .7s both ease;}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 /* ── TOP SYNC BAR ── */
 #rpt-sync-bar{position:fixed;top:0;left:0;right:0;height:2px;z-index:9999;pointer-events:none;overflow:hidden;opacity:0;transition:opacity .2s ease;background:transparent;contain:layout style;}
 #rpt-sync-bar.active{opacity:1;}
-#rpt-sync-bar::after{content:'';position:absolute;top:0;left:-60%;width:60%;height:100%;background:linear-gradient(90deg,transparent,#8b5cf6,#a78bfa,transparent);animation:syncSlide 1.2s ease-in-out infinite;}
+#rpt-sync-bar::after{content:'';position:absolute;top:0;left:-60%;width:60%;height:100%;background:linear-gradient(90deg,transparent,#8b5cf6,#c4b5fd,transparent);animation:syncSlide 1.2s ease-in-out infinite;}
 @keyframes syncSlide{0%{left:-60%;}100%{left:120%;}}
 
 /* ── SIDEBAR ── */
@@ -598,13 +605,13 @@ body::before{
 .sb-btn.off{left:6px;}
 .ovl{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:350;backdrop-filter:blur(4px);}
 .ovl.open{display:block;}
-.topbar{display:none;position:fixed;top:0;left:0;right:0;height:54px;background:rgba(9,9,11,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:300;align-items:center;padding:0 14px;gap:10px;}
-.tlogo{font-size:14px;font-weight:700;display:flex;align-items:center;gap:7px;letter-spacing:-.3px;}
-.tdot{width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#a78bfa);}
+.topbar{display:none;position:fixed;top:0;left:0;right:0;height:54px;background:rgba(0,0,0,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);z-index:300;align-items:center;padding:0 14px;gap:10px;}
+.tlogo{font-size:14px;font-weight:700;display:flex;align-items:center;gap:7px;letter-spacing:-.3px;background:linear-gradient(135deg,#ffffff 0%,#888888 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.tdot{width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#c4b5fd);}
 .hbg{background:none;border:1px solid var(--border);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:15px;transition:all .15s;}
 .hbg:hover{color:var(--text);border-color:var(--border2);}
 .logo{padding:0 18px 18px;font-size:15px;font-weight:700;letter-spacing:-.4px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);margin-bottom:10px;}
-.ldot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#a78bfa);flex-shrink:0;box-shadow:0 0 8px rgba(139,92,246,.5);}
+.ldot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#c4b5fd);flex-shrink:0;box-shadow:0 0 8px rgba(139,92,246,.5);}
 .nlbl{padding:8px 20px 4px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;font-weight:700;}
 .ni{display:flex;align-items:center;gap:9px;padding:9px 20px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .18s;border-left:2px solid transparent;user-select:none;letter-spacing:.1px;}
 .ni:hover{color:var(--text);background:rgba(255,255,255,.03);}
@@ -619,7 +626,7 @@ body::before{
 .page.active{display:block;}
 @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:10px;}
-.pt{font-size:22px;font-weight:700;letter-spacing:-.5px;background:linear-gradient(135deg,#f4f4f5 0%,#a1a1aa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.pt{font-size:22px;font-weight:700;letter-spacing:-.5px;background:linear-gradient(135deg,#ffffff 0%,#888888 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .ps{font-size:12px;color:var(--text2);margin-top:4px;letter-spacing:.2px;}
 /* ── STAT CARDS ── */
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;}
@@ -727,7 +734,7 @@ tr:hover td{background:rgba(139,92,246,.04);}
 .result-btn:hover{border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.06);}
 .result-btn.active-win{background:rgba(0,217,126,.1)!important;border-color:rgba(0,217,126,.5)!important;color:#00d97e!important;}
 .result-btn.active-loss{background:rgba(255,77,77,.1)!important;border-color:rgba(255,77,77,.5)!important;color:#ff4d4d!important;}
-.result-btn.active-be{background:rgba(167,139,250,.1)!important;border-color:rgba(167,139,250,.5)!important;color:#a78bfa!important;}
+.result-btn.active-be{background:rgba(196,181,253,.1)!important;border-color:rgba(196,181,253,.5)!important;color:#c4b5fd!important;}
 .emotion-btn:hover{border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.05);}
 .emotion-btn.active{background:rgba(139,92,246,.12)!important;border-color:rgba(139,92,246,.45)!important;color:var(--accent2)!important;}
 #md-trade .md{border-radius:20px;}
@@ -879,7 +886,7 @@ select.fi option{background:var(--bg3);}
 }
 .ob-card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:1px;z-index:2;
-  background:linear-gradient(90deg,transparent 0%,rgba(182, 182, 182, 0.45) 25%,rgba(139,92,246,.5) 60%,rgba(167,139,250,.3) 80%,transparent 100%);
+  background:linear-gradient(90deg,transparent 0%,rgba(182, 182, 182, 0.45) 25%,rgba(139,92,246,.5) 60%,rgba(196,181,253,.3) 80%,transparent 100%);
 }
 .ob-card::after{
   content:'';position:absolute;width:320px;height:320px;border-radius:50%;
@@ -911,7 +918,7 @@ select.fi option{background:var(--bg3);}
 @keyframes obPulse{0%,100%{opacity:.5;transform:scale(1);}50%{opacity:1;transform:scale(1.35);}}
 .ob-brand-name{
   font-size:12px;font-weight:700;letter-spacing:-.1px;
-  background:linear-gradient(135deg,#f4f4f5,rgba(167,139,250,.7));
+  background:linear-gradient(135deg,#f4f4f5,rgba(196,181,253,.7));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
 .ob-steps-list{display:flex;flex-direction:column;gap:2px;padding:0 10px;flex:1;overflow:hidden;}
@@ -1858,7 +1865,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   }
   #ana-period-tabs .ptab::before {
     content:''; position:absolute; inset:0; opacity:0; transition:opacity .2s;
-    background:linear-gradient(135deg, rgba(167,139,250,.18), rgba(34,197,94,.08));
+    background:linear-gradient(135deg, rgba(196,181,253,.18), rgba(34,197,94,.08));
   }
   #ana-period-tabs .ptab:hover::before { opacity:1; }
   #ana-period-tabs .ptab.active {
@@ -2144,7 +2151,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   .ana-tag i { font-size:10px; }
   .ana-tag-green  { background:rgba(34,197,94,.12);  color:#22c55e; border:1px solid rgba(34,197,94,.22);  }
   .ana-tag-red    { background:rgba(239,68,68,.1);   color:#ef4444; border:1px solid rgba(239,68,68,.2);   }
-  .ana-tag-purple { background:rgba(139,92,246,.12); color:#a78bfa; border:1px solid rgba(139,92,246,.22); }
+  .ana-tag-purple { background:rgba(139,92,246,.12); color:#c4b5fd; border:1px solid rgba(139,92,246,.22); }
   .ana-tag-gold   { background:rgba(245,158,11,.1);  color:#f59e0b; border:1px solid rgba(245,158,11,.2);  }
 
   /* ══ DIVIDER GLOW ══ */
@@ -2229,8 +2236,8 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   "description": "Trading Journal & PropFirm Tracker",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#09090b",
-  "theme_color": "#09090b",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "orientation": "portrait-primary",
   "icons": [
     { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAGASURBVHic7dAxAQAAAMKg9U9tDB+gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAeAMBuAABHgAAAABJRU5ErkJggg==", "sizes": "128x128", "type": "image/png" }
@@ -2313,9 +2320,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
             <!-- Slide 1: Welcome -->
             <div class="ob-slide">
-              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#a78bfa;box-shadow:0 0 6px rgba(139,92,246,.9);"></div>Selamat datang</div>
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#c4b5fd;box-shadow:0 0 6px rgba(139,92,246,.9);"></div>Selamat datang</div>
               <div class="ob-title">RiskPerTrade itu apa? 🤔</div>
-              <div class="ob-subtitle">Bayangin kamu punya buku catatan trading yang <em style="color:#a78bfa;font-style:normal">otomatis ngitung semuanya</em> — win rate, profit, pola kapan kamu sering kalah. Itu RiskPerTrade.</div>
+              <div class="ob-subtitle">Bayangin kamu punya buku catatan trading yang <em style="color:#c4b5fd;font-style:normal">otomatis ngitung semuanya</em> — win rate, profit, pola kapan kamu sering kalah. Itu RiskPerTrade.</div>
               <div class="ob-features">
                 <div class="ob-feature">
                   <div class="ob-feature-icon" style="background:rgba(0,217,126,.08);color:#00d97e;font-size:18px;"><i class="bi bi-pencil-square"></i></div>
@@ -2325,7 +2332,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
                   </div>
                 </div>
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:18px;"><i class="bi bi-graph-up-arrow"></i></div>
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#c4b5fd;font-size:18px;"><i class="bi bi-graph-up-arrow"></i></div>
                   <div>
                     <div class="ob-feature-name">Lihat pola kamu</div>
                     <div class="ob-feature-desc">App ini otomatis ngasih tau: kamu paling sering profit di pair apa, sesi mana, dan kapan kamu biasa kalah.</div>
@@ -2343,9 +2350,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
             <!-- Slide 2: Journal -->
             <div class="ob-slide">
-              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#a78bfa;box-shadow:0 0 6px rgba(139,92,246,.9);"></div>Langkah 1</div>
+              <div class="ob-slide-tag"><div class="ob-slide-tag-dot" style="background:#c4b5fd;box-shadow:0 0 6px rgba(139,92,246,.9);"></div>Langkah 1</div>
               <div class="ob-title">Catat trade, semudah ini</div>
-              <div class="ob-subtitle">Abis close posisi? Buka app, klik <strong style="color:#a78bfa">+ Log Trade</strong>, isi beberapa kolom. Selesai dalam 30 detik.</div>
+              <div class="ob-subtitle">Abis close posisi? Buka app, klik <strong style="color:#c4b5fd">+ Log Trade</strong>, isi beberapa kolom. Selesai dalam 30 detik.</div>
               <div class="ob-features">
                 <div class="ob-feature">
                   <div class="ob-feature-icon" style="background:rgba(0,217,126,.08);color:#00d97e;font-size:18px;"><i class="bi bi-plus-circle-fill"></i></div>
@@ -2355,7 +2362,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
                   </div>
                 </div>
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:18px;"><i class="bi bi-camera-fill"></i></div>
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#c4b5fd;font-size:18px;"><i class="bi bi-camera-fill"></i></div>
                   <div>
                     <div class="ob-feature-name">Upload screenshot chart (opsional)</div>
                     <div class="ob-feature-desc">Bisa lampirkan foto chart kamu supaya gampang direview nanti. Berguna banget saat mau evaluasi setup.</div>
@@ -2385,7 +2392,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
                   </div>
                 </div>
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:18px;"><i class="bi bi-lightbulb-fill"></i></div>
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#c4b5fd;font-size:18px;"><i class="bi bi-lightbulb-fill"></i></div>
                   <div>
                     <div class="ob-feature-name">Insight otomatis</div>
                     <div class="ob-feature-desc">Contoh: <span style="color:#00d97e">"XAUUSD di sesi London — win rate 72% kamu"</span> atau <span style="color:#f59e0b">"Kamu sering loss hari Senin"</span>. Insight ini muncul sendiri.</div>
@@ -2422,7 +2429,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
                   </div>
                 </div>
                 <div class="ob-feature">
-                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#a78bfa;font-size:18px;"><i class="bi bi-calendar-check-fill"></i></div>
+                  <div class="ob-feature-icon" style="background:rgba(139,92,246,.08);color:#c4b5fd;font-size:18px;"><i class="bi bi-calendar-check-fill"></i></div>
                   <div>
                     <div class="ob-feature-name">Hari trading minimum</div>
                     <div class="ob-feature-desc">Tracker otomatis hitung sudah berapa hari trading — supaya kamu tidak lupa memenuhi syarat minimum hari.</div>
@@ -2445,19 +2452,19 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
                     <div class="ob-cta-badge">Gratis · Tanpa akun</div>
                   </div>
                   <div class="ob-cta-card primary" onclick="closeTour()">
-                    <div class="ob-cta-icon" style="color:#a78bfa;font-size:22px;"><i class="bi bi-cloud-check-fill"></i></div>
+                    <div class="ob-cta-icon" style="color:#c4b5fd;font-size:22px;"><i class="bi bi-cloud-check-fill"></i></div>
                     <div class="ob-cta-label">Simpan ke Cloud</div>
                     <div class="ob-cta-desc">Login dengan Google — data tersimpan permanen, bisa dibuka dari HP atau laptop manapun.</div>
-                    <div class="ob-cta-badge" style="background:rgba(167,139,250,.25);color:#c4b5fd;border-color:rgba(167,139,250,.35);">Sync otomatis ✓</div>
+                    <div class="ob-cta-badge" style="background:rgba(196,181,253,.25);color:#c4b5fd;border-color:rgba(196,181,253,.35);">Sync otomatis ✓</div>
                   </div>
                 </div>
                 <div class="ob-feature" style="margin-top:8px;border-color:rgba(139,92,246,.12);background:rgba(139,92,246,.04);">
                   <div class="ob-feature-icon" style="background:rgba(139,92,246,.12);">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#a78bfa" stroke="none"/></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#c4b5fd" stroke="none"/></svg>
                   </div>
                   <div>
-                    <div class="ob-feature-name" style="color:#a78bfa;">Butuh akses penuh?</div>
-                    <div class="ob-feature-desc">Hubungi <a href="https://www.instagram.com/journalingtoolsid/" target="_blank" style="color:#a78bfa;font-weight:600;text-decoration:none;">@journalingtoolsid</a> di Instagram untuk info akses lengkap.</div>
+                    <div class="ob-feature-name" style="color:#c4b5fd;">Butuh akses penuh?</div>
+                    <div class="ob-feature-desc">Hubungi <a href="https://www.instagram.com/journalingtoolsid/" target="_blank" style="color:#c4b5fd;font-weight:600;text-decoration:none;">@journalingtoolsid</a> di Instagram untuk info akses lengkap.</div>
                   </div>
                 </div>
               </div>
@@ -2505,7 +2512,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
     <!-- Brand mark -->
     <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px">
-      <div style="width:8px;height:8px;border-radius:50%;background:#a78bfa;box-shadow:0 0 10px rgba(167,139,250,.8);animation:lp-pulse-dot 2.5s ease-in-out infinite"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:#c4b5fd;box-shadow:0 0 10px rgba(196,181,253,.8);animation:lp-pulse-dot 2.5s ease-in-out infinite"></div>
       <span style="font-size:13px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.5px">RiskPerTrade</span>
     </div>
 
@@ -2561,7 +2568,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.1);border-radius:8px;padding:7px 11px;margin-top:12px;text-align:left">
         <div style="font-size:10px;color:rgba(255,255,255,.25);line-height:1.5">Akun cloud memerlukan akses terdaftar. Belum punya?
           <a href="https://www.instagram.com/journalingtoolsid/" target="_blank"
-            style="color:#a78bfa;text-decoration:none;font-weight:600">@journalingtoolsid →</a>
+            style="color:#c4b5fd;text-decoration:none;font-weight:600">@journalingtoolsid →</a>
         </div>
       </div>
     </div>
@@ -2570,7 +2577,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <div id="login-step-sent" style="display:none;text-align:center">
       <!-- Animated envelope icon -->
       <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(139,92,246,.06));border:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 8px 24px rgba(139,92,246,.15)">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
       </div>
 
       <div style="font-size:20px;font-weight:800;color:#f4f4f5;margin-bottom:6px;letter-spacing:-.4px">Link sudah terkirim!</div>
@@ -2579,9 +2586,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <!-- Email display -->
       <div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
         <div style="width:28px;height:28px;border-radius:8px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         </div>
-        <div id="sent-email-display" style="font-family:var(--mono);font-size:13px;font-weight:600;color:#a78bfa;flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis">—</div>
+        <div id="sent-email-display" style="font-family:var(--mono);font-size:13px;font-weight:600;color:#c4b5fd;flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis">—</div>
       </div>
 
       <!-- Steps -->
@@ -2591,7 +2598,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           Buka email — cari dari <strong style="color:rgba(255,255,255,.6)">noreply@riskpertrade.me</strong>
         </div>
         <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,.45)">
-          <div style="width:20px;height:20px;border-radius:50%;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#a78bfa;flex-shrink:0">2</div>
+          <div style="width:20px;height:20px;border-radius:50%;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#c4b5fd;flex-shrink:0">2</div>
           Klik tombol <strong style="color:rgba(255,255,255,.6)">"Masuk ke RiskPerTrade"</strong>
         </div>
         <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(255,255,255,.45)">
@@ -2640,16 +2647,16 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px 16px;animation:lp-float 4s ease-in-out infinite;animation-delay:1.3s">
         <div style="display:flex;align-items:flex-start;gap:9px">
           <div style="width:28px;height:28px;border-radius:8px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
-            <i class="bi bi-lightbulb-fill" style="font-size:12px;color:#a78bfa"></i>
+            <i class="bi bi-lightbulb-fill" style="font-size:12px;color:#c4b5fd"></i>
           </div>
           <div>
-            <div style="font-size:10px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Insight Otomatis</div>
+            <div style="font-size:10px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Insight Otomatis</div>
             <div id="lp-insight-ticker" style="height:18px;overflow:hidden;position:relative">
               <div id="lp-insight-inner" style="display:flex;flex-direction:column;gap:18px">
-                <div style="font-size:12px;color:rgba(255,255,255,.65);line-height:1.4">XAUUSD di London — win rate <strong style="color:#a78bfa">72%</strong></div>
+                <div style="font-size:12px;color:rgba(255,255,255,.65);line-height:1.4">XAUUSD di London — win rate <strong style="color:#c4b5fd">72%</strong></div>
                 <div style="font-size:12px;color:rgba(255,255,255,.65);line-height:1.4">Kamu lebih profit hari <strong style="color:#00d97e">Rabu</strong></div>
                 <div style="font-size:12px;color:rgba(255,255,255,.65);line-height:1.4">Emosi Calm = <strong style="color:#38bdf8">68% WR</strong></div>
-                <div style="font-size:12px;color:rgba(255,255,255,.65);line-height:1.4">XAUUSD di London — win rate <strong style="color:#a78bfa">72%</strong></div>
+                <div style="font-size:12px;color:rgba(255,255,255,.65);line-height:1.4">XAUUSD di London — win rate <strong style="color:#c4b5fd">72%</strong></div>
               </div>
             </div>
           </div>
@@ -2665,7 +2672,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             <div style="font-size:9px;color:rgba(255,255,255,.2);margin-top:2px;text-transform:uppercase;letter-spacing:.5px">Win Rate</div>
           </div>
           <div style="text-align:center;border-left:1px solid rgba(255,255,255,.06);border-right:1px solid rgba(255,255,255,.06)">
-            <div style="font-size:16px;font-weight:800;color:#a78bfa;font-family:var(--mono);line-height:1">1.8</div>
+            <div style="font-size:16px;font-weight:800;color:#c4b5fd;font-family:var(--mono);line-height:1">1.8</div>
             <div style="font-size:9px;color:rgba(255,255,255,.2);margin-top:2px;text-transform:uppercase;letter-spacing:.5px">Profit Factor</div>
           </div>
           <div style="text-align:center">
@@ -2688,7 +2695,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
   <!-- Not-invited panel — separate full-width panel, NOT inside login-wrapper -->
   <div id="notinvited-panel" style="display:none;width:100%;max-width:420px">
-    <div style="background:linear-gradient(160deg,#0f0f14 0%,#0a0a10 100%);border:1px solid rgba(139,92,246,.2);border-radius:26px;padding:44px 36px;text-align:center;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(139,92,246,.06),0 40px 100px rgba(0,0,0,.8)">
+    <div style="background:linear-gradient(160deg,#0a0a0a 0%,#000000 100%);border:1px solid rgba(139,92,246,.2);border-radius:26px;padding:44px 36px;text-align:center;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(139,92,246,.06),0 40px 100px rgba(0,0,0,.8)">
       <!-- Top gradient line -->
       <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,.5) 50%,transparent)"></div>
       <!-- Ambient glow -->
@@ -2696,7 +2703,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
       <!-- Lock icon with premium style -->
       <div style="width:56px;height:56px;border-radius:16px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 20px rgba(139,92,246,.15)">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
 
       <div style="font-size:20px;font-weight:800;color:#f4f4f5;letter-spacing:-.4px;margin-bottom:8px">Akses Terbatas</div>
@@ -2774,7 +2781,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
      §SIDEBAR — Desktop Sidebar Navigation
      ════════════════════════════════════════════════════════════ -->
 <nav class="sidebar off" id="sb">
-  <div class="logo"><img src="data:image/png;base64,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" alt="RPT" style="width:28px;height:28px;object-fit:contain;flex-shrink:0"><span style="background:linear-gradient(135deg,#f4f4f5 0%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">RiskPerTrade</span></div>
+  <div class="logo"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAAOw0lEQVR42u2ce5BU1Z3Hv+ece28/Zqa7h3lAIgiIwuoWsmGr1toFjSsmRmW3rBVX/CcbTDZmqd0F3UJ8pVajjpQIIVUJGhNEY7IuwsSQkJSazfooLYNhNVbtGkAEBEQZ5tHd0+++5/z2j3v7Tvc8G2WAIb8vdWpgqu89j885v/P7/c5pBAAC66yV5CFgwCwGzGLALAbMYsAsBsxiwAyYxYBZDJjFgFkMmMWAWQyYAbMYMIsBsxgwiwGzGDCLAbMYMANmMWAWA2YxYBYDZjFgFgNmwCwGzGLALAbMYsAsBsxiwAyYxYBZE1PWeL5cCAEhxAk/R0Q1P8ezvhOt65P2qZ52nGh/62ovzuD/CE1KCSEEjDHj0vnBdUkpYYyBMeasWcHjCrh1UisaGxuhtfZqqrOqUqmE7p5eaO0Gv1PK9t4TyNSsKgCIxWJIJOIwWoMgRu108BZj0JdMIpfLVdVlwRhdNakkAAOlJNrbJ8O2LBCZQW/6xGsXUlpIpdNIpVL+e89wwEopaK3x2KMb8ZWvLEM6nYRSqgbKaCbQLZdx5MOj2Ld/P36541fYvn07kskUhFAAKqZsoNmWZcF1XaxevRr33XcvUqk+KGtk90JQrWns7unF/v0H8NJLL2Pr1q04ePCDYFUbYyCEBJFBJBLBG2+8jvPPm4F8oQAp5aceftfViMcn4Vv334+OjgeDvkyIPTgUshAKhxF1wz7gOve5aATz2lrxufl/jhuW3Ii9e9/FmjVrsXnzk1UDP/RdlmUhFAojGonCssVoi6ZmQsUTccyZMxtXX30tVq26Dd/buBFrHnoYxWIJljVgOYgI0WgY0YYohBKQ4tP7qK5rEAqHYNtq4nnRWnurTetKMXUV19XIZ/PIpNJIJ3sxa+YsPPHEZjz11JOIRqM1ZrnWUfH2aqM1jGtGLoPqKuZLyKQzSCd7EWuM4d5/vx+/+e9fY+bMGXDdMqRUAWDt+s+6pu7+jF7ccXOwxh2wEBWvk/wigkKGQJpAGv5PvxhAkOfwSEvAshXyhRxSyW58+cv/gCc2/RAC0nfAhjfxEKZSOSCEZ2KNgNEEowGjB+oGCUgpIJVXl6vLSCWPY8FfXYafPdeJttYWEOlg6RvSVe2uLn7bhazpp/dv5e/3uravmmCM9pzIcXLsxtVEj6bGWJNfPVU5K97eWi7lUSgUfbNe8XAFkn3HcePSm7Bz55v49oYNwV4/lgwZNDRFAeEM2SaMLiGbzQYeuxACtu0g2XccF8+bj0cf/S6W3HBTACseb4YdjsIOhwatDwFAI5fNDGtZbNuGE4oPZ6QBqMAynRWApZR44YUX0NV1HEopUGXQCYjH45g7dy6mTz8Pmf6+KkdGwLIsFPL9uPPOVejs7MThI0fGdHSICJZt45VXX8OhQ4cCX4AIcEIOZp03C/Pnz0exkIfruoHpdxwH/eleXL/k77F48dPYseNXkFKis/OnmDylDeVSOfisEIDWBrFYDIsWXQFZZVqIDCzbxtGjH+G1116HlKJmihlNaGhoxNtv/R4CYlxMNZ3sopQiALTph98nIqJ0qoeymSRlM0nK9PdRuZSjefPmjvh8e3s7fWfDetJukTL9fcGz2UySUsnjRER0xx2rCQBZlkWWZREAuuuuO4mIKJU8Hnw+neohIqJrrr5m2Lps26avfnUZ9fZ0UT7XX1NfOtlDxmjavr3T75c1ar+nTPkM9fX1UD6XCt6TTnUTkaFnt/zHmOMmPf/+pJZTkqocmJQUrMbGhkYopeA4DpRSNaWrqwsrVt6G737vMTQ0JmriYS9k0bj88s/7jpyuaw5Ho54n74QcKGugLtd1sWnTZnz9luVwnFCNCZdKoljI4rJLL8OM6edCaxeWZQ1pr23bUEqhqakBGBIfe5GoZVt+f0NDnldKQUoBMw4pidOWizbGQGs9bPE6LLFmzUM4duwoHMcJTJeUAkaXMH36dESjERBRXanDkeoDANu2sW3bNrz66iuIRhuDTJYQAuWyi0RzCy686MIBT3qEdo822cZ6briwbwIDFmPA8DzLY8e68OGRwzWAK8mBlpZJiMViJy0HLITAiy++CCHtQalKzwmc1Nw8YnhWT9cqfgad4sTwGXiaJII0oxfyyGFHzZiTHztms7lRsnMWJqJOU6tphKnvgVRSgUijraUVU8+ZhlJpwLslIliWhe7ubqRSKf93J5ATJuGVQW0gIsycOXMkm4KMD58+4T4pMOBx/xEA9kKlioNRYe4bMWhdBgDcvnoV2idPQX+6N/gcEUEqG/v370ehUKw7HyyECE6MqnPZSimUy2UkEnEsWXI9SsVczTulFHDdIo4ePTry3OQVPHQ+53K5ER2T9vZ23HrrSqxY8a/IZpJQStY4S0Io7NixI5go9Yx6oVDwjwJLQ5wvpRQ2bFiPqVOnob8/FUwmYwzC4Qj27t6Nd955B/CPLhnwWKdFbgmPrFuL7u4eL9FB5AcThESiGXPmzMa0aTOQzSRrTJoxBpFoA97ftwdbt26DEML3uq1R6zNG44ILzsdFF10Ix3E8SESwHRszZszAyhUrsPDShcj0pwcsih+CWXYYz/3s58jn81CWVROyMeARXExjDK644vIRqtcoFYs1Zrna23WcCFbfcTf6+pJVqUoadSso5LPo6HgAHR0P1HjBUko4oTBABpn+dJVpJhhjEAqHcbzrYzz2/R/4+XMzTFWi1gmkenMCZ/kenOnPjOgFV/bnwQPZFJuE9evXobOzs+48dK1pFzUnN1prlEolgLykRq2HLhAON+KWry/HkSNHTvo57VkPeKS7TcMfAxJsJ4yOBx/A3fd80z+jdU+4viCqrapD1OSNvWSE44QRjjTgnrvuwo+efjrIeH3aePuPyou2LXtgcMmLyF3XDVZa9T7YFEugo6MDd9/zTShlQesTu6MlguTJ4JOrqhBGCDiOg4bGBHp7erBi5a14/PEfeJbC6EFZDIGBUzBRR+0CddvwswGwEEBfMomSfyIj4B3pNTcnYFkWtNZVJzUC2i1j0aJFeOihNcjnCyc8SIYIDY1NgLBH/VzXsY+w/Uc/xsNrH8G+ffuglITWxs8HEYSQwd0yMjKIkSv5orGSL+JUL99TBbi6X56jFMKyZTdj55u7YFkKIKDsurh04UJs2/YstNYg8p6TUiKXzeCSS/4S3/inW/DI2vWwbRuuW991V8+8O/j1b/4L7+/bD9tyYKri4HK5jMOHjuAPu3dj587f4uOPj3kDU7PnSkjpWYHK3JIiDIIObpFUQrFSuYRoNDLUdfQv8XkXAExdbZ/QJrq7uxu9vb01v/v5L36Bzs6fYulNS5FO9cKyvBUnlUKhkMHtt6/C1me34YMPDp2Qc+U4Eaxf9x08//wLdSVgiFAF1zvINwaIRycj4rTC1QV097/vT94QAC8xUywWUSqVIWXtHu+W87j44nmIRhuQy2VPbULp9KQovVsTQniH+N5Pb0++99770N+fgWUP3L4QQqBcKqGttR0bvr0Ora0tiMdiiMficBzHM51jqLGhwb+U58CyrCFFKRXcwQ6O/IQABCCVg2v/7GHc9qXf4Z+veg0rrtmJf7z8ObQ1zQRR0VvhQiGVSmHfe+9BWU6QEJFSoFAoYM7sOXjqqU2Ydd5MJOIJtDS3IOSEzzbAA45HJVypFNd1IaXCnr178ejGjYhGY3DdgTBIKYVsJo2/WXwtfv/2LuzatRN79u7BF77wRZTL5bpWsuu6cLWGq13v71XF2xaoZmgEBARJ/N1frMPiuasQo88iVEogWm7B56Zch2VXbEMs0gYiDWUpGGPwk588AznoREpKhVw2gyVLrsebb76BXbt+i917d+Oqq74Y9G1CA653qyEykFLi4bWP4MjhDxAKhf39csDc5QsFtLW1Ydq0qZg8eTLC4ep7VnTS7EzlLvS5LZdg4fTlyKdLMAaAKoCMQSZbwLmN83HJBV/zEyMaQkhs2bIVf/i//0VTU7wmtBJCoD+dRjQawTnnfAatra0IR+yzdQWPtMoIUkr09PTgwY4HEQo3QLtuzcqSUqJcLqNYLIJIe47PSZdCxepPbZ0HISVcKUCWAcGCkYCwFMglnD95IQDp36gUyGQzWL78X1AoFBEOh+GWy8G885IzBqVS2bNcGhMbsNF+bOv694hd716xcfUwy9rzbL3cssTjj2/Ck09uRjzRCqGEZ0b99xj/uqnWumbRGkOBua2+B+26GoZqqhk9bq3a07Uw/sUmAZAFkIKA8f4QDVypFV6blFJ4+dWXcePSpcjly4glWr1+ua43WTVAWvix/AQPkxqborAsC4mWRFVVXoJAjXCTn4hg/NVw881fw3vv7cWqVf+GRKJ10CddABYcxwl+E4169TVPaqmqTwNQNZ8bWxpkPPN5uOt3MG4ZyiiQcCGUhDACdlnDiYSw56OXqmJhCa0JSins2PFLLFiwAPd/6z5cu/gaRBujNe8HFJyQNTEBV0zqSy+/AoJELp+Bqnw7AATbstHVdXzEWLD6K50dHWuwZcuzuO66v8WcP5kD2w+dyBAikQYcOHAweO6tt97Cfz7zDHK5TJBbNsYgEmnEwYMH64w9CSACwYUQCh/2vo3X92/AX89ZBTcvUaYShLDQ2BTF7uRO7Nz346A9lYxV5V7Zu+++i+uX3IB58y7GlVdeidmzL4Dt2N5XYCJRvH/gwLjHw2f010eHJhxG2GeEd9d4rIGqHDbUPzIy+HbG5/90JRbM/AaaQs0o6hJ2H38eO/7nbqRzH0FAgob5Yl3lMv2JHIpMKMCVDo4UttQ72AM3MYZ6ytXvEVLWXDr/pPUNHSKv3pAVR7zps8gXMujPH/YnjRzzK5+1N0lORpvOohV8+iX8VCXB0MB5sBDSN+V0xreeAdc7TEIMrGeiidRyVn1DJYaEdQyYdVrF/40SA2YxYBYDZjFgFgNmMWAWA2bALAbMYsAsBsxiwCwGzGLADJjFgFkMmMWAWQyYxYBZDJjFgBkwiwGzGDCLAbMYMIsBsxgwA2YxYBYDZjFgFgNmMWAWA2bALAbMYsAsBsxiwKyTq/8HLEpLh0GURCQAAAAASUVORK5CYII=" alt="RPT" style="width:28px;height:28px;object-fit:contain;flex-shrink:0"><span style="background:linear-gradient(135deg,#ffffff 0%,#888888 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">RiskPerTrade</span></div>
 
   <!-- USER PILL -->
   <div class="user-pill" id="user-pill">
@@ -2857,11 +2864,11 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
     <!-- Trader Identity Card (shown when logged in) — includes Starting Balance -->
     <div id="trader-card" style="display:none;background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(124,58,237,.06));border:1px solid rgba(139,92,246,.25);border-radius:16px;padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden">
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(167,139,250,.08),transparent 60%);pointer-events:none"></div>
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(196,181,253,.08),transparent 60%);pointer-events:none"></div>
       <!-- Row 1: Avatar + Name + Share -->
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:relative">
         <!-- Avatar -->
-        <div id="tc-avatar" style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid rgba(167,139,250,.3);box-shadow:0 0 20px rgba(139,92,246,.3)"></div>
+        <div id="tc-avatar" style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid rgba(196,181,253,.3);box-shadow:0 0 20px rgba(139,92,246,.3)"></div>
         <!-- Info -->
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -2899,7 +2906,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             Klik <strong style="color:var(--text);background:rgba(139,92,246,.12);padding:1px 6px;border-radius:4px">+ Log Trade</strong> di atas — isi pair & profit/loss trade kamu
           </div>
           <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)">
-            <div style="width:20px;height:20px;border-radius:50%;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.35);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#a78bfa;flex-shrink:0">2</div>
+            <div style="width:20px;height:20px;border-radius:50%;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.35);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#c4b5fd;flex-shrink:0">2</div>
             Dashboard otomatis update — lihat grafik dan statistik kamu
           </div>
           <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)">
@@ -2976,8 +2983,8 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           <svg width="80" height="80" viewBox="0 0 80 80" style="overflow:visible">
             <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="5"/>
             <circle id="goal-wr-ring" cx="40" cy="40" r="32" fill="none" stroke="url(#ring-purple)" stroke-width="5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="201" transform="rotate(-90 40 40)" style="transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)"/>
-            <defs><linearGradient id="ring-purple" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
-            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:12px;font-weight:800;font-family:var(--mono);fill:#a78bfa" id="goal-wr-cur">—</text>
+            <defs><linearGradient id="ring-purple" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#c4b5fd"/></linearGradient></defs>
+            <text x="40" y="37" text-anchor="middle" dominant-baseline="middle" style="font-size:12px;font-weight:800;font-family:var(--mono);fill:#c4b5fd" id="goal-wr-cur">—</text>
             <text x="40" y="51" text-anchor="middle" dominant-baseline="middle" style="font-size:8px;fill:rgba(255,255,255,.25);font-family:var(--mono)" id="goal-wr-target">—</text>
           </svg>
           <div style="text-align:center">
@@ -3026,7 +3033,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div style="display:flex;align-items:center;gap:10px">
         <div style="font-size:9px;color:var(--text3);font-family:var(--mono);white-space:nowrap" id="goals-month-label">—</div>
         <div style="flex:1;height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden">
-          <div id="goals-month-bar" style="height:100%;border-radius:2px;background:linear-gradient(90deg,rgba(139,92,246,.5),rgba(167,139,250,.8));transition:width .8s ease;width:0%"></div>
+          <div id="goals-month-bar" style="height:100%;border-radius:2px;background:linear-gradient(90deg,rgba(139,92,246,.5),rgba(196,181,253,.8));transition:width .8s ease;width:0%"></div>
         </div>
         <div style="font-size:9px;color:var(--text3);font-family:var(--mono);white-space:nowrap" id="goals-month-pct">0% bulan berlalu</div>
       </div>
@@ -3239,7 +3246,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
               <div class="dna-stat-dot" style="background:#8b5cf6;box-shadow:0 0 6px rgba(139,92,246,0.8);"></div>
               <span class="dna-stat-name">Discipline</span>
               <div class="dna-stat-bar-wrap"><div id="dna-b1" class="dna-stat-bar" style="background:linear-gradient(90deg,#8b5cf6,rgba(139,92,246,0.15));box-shadow:0 0 8px rgba(139,92,246,0.4);"></div></div>
-              <span id="dna-v1" class="dna-stat-val" style="color:#a78bfa;text-shadow:0 0 10px rgba(139,92,246,0.5);">—</span>
+              <span id="dna-v1" class="dna-stat-val" style="color:#c4b5fd;text-shadow:0 0 10px rgba(139,92,246,0.5);">—</span>
             </div>
             <div class="dna-stat-item">
               <div class="dna-stat-dot" style="background:rgba(255,255,255,0.25);"></div>
@@ -3254,9 +3261,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
               <span id="dna-v3" class="dna-stat-val" style="color:#4ade80;text-shadow:0 0 10px rgba(74,222,128,0.4);">—</span>
             </div>
             <div class="dna-stat-item">
-              <div class="dna-stat-dot" style="background:#a78bfa;box-shadow:0 0 5px rgba(167,139,250,0.6);opacity:.85;"></div>
+              <div class="dna-stat-dot" style="background:#c4b5fd;box-shadow:0 0 5px rgba(196,181,253,0.6);opacity:.85;"></div>
               <span class="dna-stat-name">Endurance</span>
-              <div class="dna-stat-bar-wrap"><div id="dna-b4" class="dna-stat-bar" style="background:linear-gradient(90deg,#a78bfa,rgba(167,139,250,0.12));box-shadow:0 0 6px rgba(167,139,250,0.35);"></div></div>
+              <div class="dna-stat-bar-wrap"><div id="dna-b4" class="dna-stat-bar" style="background:linear-gradient(90deg,#c4b5fd,rgba(196,181,253,0.12));box-shadow:0 0 6px rgba(196,181,253,0.35);"></div></div>
               <span id="dna-v4" class="dna-stat-val" style="color:#c4b5fd;text-shadow:0 0 10px rgba(196,181,253,0.4);">—</span>
             </div>
             <div class="dna-stat-item">
@@ -3514,12 +3521,12 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       </div>
       <!-- Text -->
       <div class="ana-score-text">
-        <div class="ana-score-heading" id="ana-score-heading" style="background:linear-gradient(135deg,#f4f4f5,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Performance Score</div>
+        <div class="ana-score-heading" id="ana-score-heading" style="background:linear-gradient(135deg,#f4f4f5,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Performance Score</div>
         <div class="ana-score-sub" id="ana-score-sub">Hitung ulang dari semua trade kamu</div>
         <!-- Quick pills -->
         <div class="ana-score-pills" id="ana-score-pills">
           <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#22c55e"></span><span id="pill-wr" style="color:#22c55e">WR —</span></div>
-          <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#a78bfa"></span><span id="pill-pf" style="color:#a78bfa">PF —</span></div>
+          <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#c4b5fd"></span><span id="pill-pf" style="color:#c4b5fd">PF —</span></div>
           <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#f59e0b"></span><span id="pill-rr" style="color:#f59e0b">R:R —</span></div>
           <div class="ana-kpi-pill"><span class="ana-kpi-dot" style="background:#22d3ee"></span><span id="pill-n"  style="color:#22d3ee">0 Trades</span></div>
         </div>
@@ -3655,7 +3662,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <div class="ana-chart-card">
       <div class="ana-chart-header">
         <div class="ana-chart-title">
-          <span class="ana-chart-dot" style="background:#a78bfa;box-shadow:0 0 0 0 rgba(167,139,250,.4)"></span>
+          <span class="ana-chart-dot" style="background:#c4b5fd;box-shadow:0 0 0 0 rgba(196,181,253,.4)"></span>
           Cumulative R
         </div>
         <span class="ana-tag ana-tag-purple"><i class="bi bi-graph-up"></i> Edge Tracker</span>
@@ -3734,13 +3741,13 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <div class="ana-premium-card" style="margin-bottom:14px">
       <div class="ana-card-header">
         <div class="ana-card-title">
-          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08))"><i class="bi bi-arrows-expand" style="color:#a78bfa"></i></div>
+          <div class="ana-card-title-icon" style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(139,92,246,.08))"><i class="bi bi-arrows-expand" style="color:#c4b5fd"></i></div>
           MAE / MFE Analysis
         </div>
         <span class="ana-card-badge" style="background:rgba(139,92,246,.1);color:#c4b5fd;border:1px solid rgba(139,92,246,.22)">SL Optimizer</span>
       </div>
       <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.12);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--text2);line-height:1.6">
-        <strong style="color:#a78bfa">MAE</strong> (Maximum Adverse Excursion) = seberapa jauh price melawan kamu sebelum balik.<br>
+        <strong style="color:#c4b5fd">MAE</strong> (Maximum Adverse Excursion) = seberapa jauh price melawan kamu sebelum balik.<br>
         <strong style="color:#00d97e">MFE</strong> (Maximum Favorable Excursion) = seberapa jauh price menguntungkan sebelum exit.<br>
         <span style="color:var(--text3)">Insight: jika MAE wins kamu kecil, SL kamu sudah bagus. Jika MFE jauh melebihi exit, kamu exit terlalu cepat.</span>
       </div>
@@ -3767,7 +3774,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         </div>
         <div class="ana-stat-card">
           <div class="ana-stat-label">MFE/MAE Ratio</div>
-          <div class="ana-stat-val" id="adv-mfe-mae-ratio" style="color:#a78bfa">—</div>
+          <div class="ana-stat-val" id="adv-mfe-mae-ratio" style="color:#c4b5fd">—</div>
           <div class="ana-stat-sub">&gt;2 = SL placement baik</div>
         </div>
         <div class="ana-stat-card">
@@ -3814,7 +3821,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         </div>
         <div class="ana-stat-card">
           <div class="ana-stat-label">Terlama</div>
-          <div class="ana-stat-val" id="adv-hold-max" style="color:#a78bfa">—</div>
+          <div class="ana-stat-val" id="adv-hold-max" style="color:#c4b5fd">—</div>
           <div class="ana-stat-sub">holding terlama</div>
         </div>
         <div class="ana-stat-card">
@@ -4099,9 +4106,9 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <div style="position:relative;height:160px"><canvas id="finDonutC"></canvas></div>
         <div id="fin-donut-legend" style="display:flex;justify-content:center;gap:16px;margin-top:12px;flex-wrap:wrap">
           <div style="display:flex;align-items:center;gap:6px">
-            <span style="width:10px;height:10px;border-radius:50%;background:#a78bfa;display:inline-block"></span>
+            <span style="width:10px;height:10px;border-radius:50%;background:#c4b5fd;display:inline-block"></span>
             <span style="font-size:12px;color:var(--text2)">Pemasukan</span>
-            <span id="fin-donut-in" style="font-size:12px;font-weight:600;font-family:var(--mono);color:#a78bfa">0</span>
+            <span id="fin-donut-in" style="font-size:12px;font-weight:600;font-family:var(--mono);color:#c4b5fd">0</span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <span style="width:10px;height:10px;border-radius:50%;background:#f472b6;display:inline-block"></span>
@@ -4247,7 +4254,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             </button>
             <button class="mood-btn" data-mood="Greed"
               style="flex:1;padding:7px 4px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:5px">
-              <i class="bi bi-currency-dollar" style="color:#a78bfa;font-size:12px"></i> Greed
+              <i class="bi bi-currency-dollar" style="color:#c4b5fd;font-size:12px"></i> Greed
             </button>
           </div>
           <textarea class="ta" id="daily-mental" placeholder="Catatan kondisi mental hari ini..." style="min-height:60px"></textarea>
@@ -4487,7 +4494,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap">
           <div style="font-size:13px;font-weight:700;color:var(--text);letter-spacing:-.1px">Data kamu belum aman</div>
           <!-- Trade counter pill -->
-          <div id="anon-trade-counter" style="font-size:10px;font-family:var(--mono);font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.25)">
+          <div id="anon-trade-counter" style="font-size:10px;font-family:var(--mono);font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(139,92,246,.15);color:#c4b5fd;border:1px solid rgba(139,92,246,.25)">
             0 / 10 trade
           </div>
         </div>
@@ -4516,19 +4523,19 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     title="Tutup">✕</button>
 
   <!-- Main bubble card -->
-  <div style="background:linear-gradient(160deg,#13102a 0%,#0d0d18 100%);border:1px solid rgba(139,92,246,.35);border-radius:20px;padding:20px;width:272px;box-shadow:0 16px 48px rgba(0,0,0,.6),0 0 0 1px rgba(139,92,246,.08),0 0 60px rgba(139,92,246,.06);position:relative;overflow:hidden">
+  <div style="background:linear-gradient(160deg,#0e0a1e 0%,#07050f 100%);border:1px solid rgba(139,92,246,.35);border-radius:20px;padding:20px;width:272px;box-shadow:0 16px 48px rgba(0,0,0,.6),0 0 0 1px rgba(139,92,246,.08),0 0 60px rgba(139,92,246,.06);position:relative;overflow:hidden">
 
     <!-- Ambient glow top-right -->
     <div style="position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.18),transparent 70%);pointer-events:none"></div>
     <!-- Ambient glow bottom-left -->
-    <div style="position:absolute;bottom:-30px;left:-20px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.1),transparent 70%);pointer-events:none"></div>
+    <div style="position:absolute;bottom:-30px;left:-20px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(196,181,253,.1),transparent 70%);pointer-events:none"></div>
 
     <!-- Header: logo + label -->
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;position:relative">
       <div style="width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;box-shadow:0 0 0 1px rgba(139,92,246,.4),0 4px 12px rgba(139,92,246,.3)">📓</div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#f4f4f5;letter-spacing:-.2px;line-height:1.2">RiskPerTrade</div>
-        <div style="font-size:10px;color:rgba(167,139,250,.7);font-family:var(--mono);margin-top:1px">Trading Journal</div>
+        <div style="font-size:10px;color:rgba(196,181,253,.7);font-family:var(--mono);margin-top:1px">Trading Journal</div>
       </div>
       <div style="margin-left:auto;display:flex;align-items:center;gap:5px;flex-shrink:0">
         <div style="width:6px;height:6px;border-radius:50%;background:#00d97e;box-shadow:0 0 6px rgba(0,217,126,.6)"></div>
@@ -4542,7 +4549,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         Tau kenapa trading kamu<br>belum konsisten?
       </div>
       <div style="font-size:12px;color:rgba(212,212,216,.7);line-height:1.6">
-        Kebanyakan trader kalah bukan karena strategi — tapi karena tidak pernah <strong style="color:#a78bfa">review trade mereka sendiri</strong>.
+        Kebanyakan trader kalah bukan karena strategi — tapi karena tidak pernah <strong style="color:#c4b5fd">review trade mereka sendiri</strong>.
       </div>
     </div>
 
@@ -4582,21 +4589,21 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
   <div class="md" style="max-width:420px;padding:0;overflow-y:auto;background:linear-gradient(160deg,#13102a 0%,#0d0b1e 60%,#0a0a14 100%);border:1px solid rgba(139,92,246,.3)">
 
     <!-- Top gradient bar -->
-    <div style="height:3px;background:linear-gradient(90deg,#8b5cf6,#a78bfa,#8b5cf6);background-size:200% 100%;animation:gradientShift 3s ease infinite;position:sticky;top:0;z-index:1"></div>
+    <div style="height:3px;background:linear-gradient(90deg,#8b5cf6,#c4b5fd,#8b5cf6);background-size:200% 100%;animation:gradientShift 3s ease infinite;position:sticky;top:0;z-index:1"></div>
 
     <div style="padding:28px 28px 24px;position:relative;overflow:visible">
       <!-- Ambient glow -->
       <div style="position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.15),transparent 70%);pointer-events:none"></div>
-      <div style="position:absolute;bottom:-40px;left:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.08),transparent 70%);pointer-events:none"></div>
+      <div style="position:absolute;bottom:-40px;left:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(196,181,253,.08),transparent 70%);pointer-events:none"></div>
 
       <!-- Header -->
       <div style="position:relative;margin-bottom:20px">
         <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);border-radius:20px;padding:5px 12px;margin-bottom:14px">
           <div style="width:6px;height:6px;border-radius:50%;background:#8b5cf6;box-shadow:0 0 6px rgba(139,92,246,.7)"></div>
-          <span style="font-size:10px;font-weight:700;color:#a78bfa;letter-spacing:.8px;text-transform:uppercase;font-family:var(--mono)">Full Access</span>
+          <span style="font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.8px;text-transform:uppercase;font-family:var(--mono)">Full Access</span>
         </div>
         <div style="font-size:20px;font-weight:800;color:#f4f4f5;letter-spacing:-.5px;line-height:1.2;margin-bottom:8px">
-          Jadikan trading kamu<br>lebih <span style="color:#a78bfa">terstruktur.</span>
+          Jadikan trading kamu<br>lebih <span style="color:#c4b5fd">terstruktur.</span>
         </div>
         <p style="font-size:13px;color:rgba(212,212,216,.65);line-height:1.7;margin:0">
           Trader yang konsisten bukan yang paling pintar — tapi yang paling <strong style="color:rgba(212,212,216,.9)">sadar pola trading mereka sendiri</strong>. Journal adalah caranya.
@@ -4605,7 +4612,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 
       <!-- Feature list — journal-first -->
       <div style="background:rgba(255,255,255,.03);border:1px solid rgba(139,92,246,.15);border-radius:14px;padding:16px;margin-bottom:20px;position:relative">
-        <div style="font-size:9px;font-weight:700;color:rgba(167,139,250,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-family:var(--mono)">Yang kamu dapat</div>
+        <div style="font-size:9px;font-weight:700;color:rgba(196,181,253,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-family:var(--mono)">Yang kamu dapat</div>
         <div style="display:flex;flex-direction:column;gap:11px">
 
           <div style="display:flex;align-items:flex-start;gap:12px">
@@ -4685,13 +4692,13 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 /* Period selector */
 .rc-period-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .rc-period-btn{padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#a1a1aa;font-size:11px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:.4px;transition:all .2s;}
-.rc-period-btn.active{background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.45);color:#a78bfa;}
+.rc-period-btn.active{background:rgba(139,92,246,.18);border-color:rgba(139,92,246,.45);color:#c4b5fd;}
 .rc-period-label{font-size:10px;color:#71717a;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-right:4px;}
 
 /* THE CARD */
 .rpc-card{
   width:100%;aspect-ratio:16/8.4;border-radius:22px;position:relative;overflow:hidden;
-  background:#080810;border:1px solid rgba(139,92,246,.18);
+  background:#000000;border:1px solid rgba(139,92,246,.18);
   font-family:'Syne',sans-serif;
   box-shadow:0 0 0 1px rgba(255,255,255,.03),0 32px 80px rgba(0,0,0,.7);
 }
@@ -4701,7 +4708,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 /* Dot-grid texture */
 .rpc-dots{position:absolute;inset:0;pointer-events:none;opacity:.055;background-image:radial-gradient(rgba(139,92,246,.9) 1px,transparent 1px);background-size:28px 28px;}
 /* Bottom gradient bar */
-.rpc-bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,rgba(139,92,246,.5) 20%,rgba(167,139,250,.9) 50%,rgba(139,92,246,.5) 80%,transparent 100%);}
+.rpc-bar{position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,rgba(139,92,246,.5) 20%,rgba(196,181,253,.9) 50%,rgba(139,92,246,.5) 80%,transparent 100%);}
 
 /* Inner layout */
 .rpc-inner{position:relative;z-index:2;height:100%;display:grid;grid-template-rows:auto 1fr auto;padding:30px 36px 24px;}
@@ -4709,15 +4716,15 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 /* Top row */
 .rpc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;}
 .rpc-brand{display:flex;align-items:center;gap:8px;}
-.rpc-brand-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#a78bfa);box-shadow:0 0 8px rgba(139,92,246,.7);}
+.rpc-brand-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#c4b5fd);box-shadow:0 0 8px rgba(139,92,246,.7);}
 .rpc-brand-name{font-size:11px;font-weight:700;color:rgba(255,255,255,.28);letter-spacing:1px;text-transform:uppercase;}
-.rpc-badge{padding:5px 13px;border-radius:20px;background:rgba(139,92,246,.14);border:1px solid rgba(139,92,246,.28);font-size:10px;font-weight:700;color:#a78bfa;letter-spacing:.6px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;}
+.rpc-badge{padding:5px 13px;border-radius:20px;background:rgba(139,92,246,.14);border:1px solid rgba(139,92,246,.28);font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.6px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;}
 
 /* Trader name row */
 .rpc-trader-row{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;}
 .rpc-name-col{}
 .rpc-trader-name{font-size:clamp(20px,3.5vw,30px);font-weight:800;color:#f4f4f5;letter-spacing:-.8px;line-height:1;margin-bottom:5px;}
-.rpc-tagline{font-size:11px;color:#a78bfa;font-family:'JetBrains Mono',monospace;letter-spacing:.3px;opacity:.85;}
+.rpc-tagline{font-size:11px;color:#c4b5fd;font-family:'JetBrains Mono',monospace;letter-spacing:.3px;opacity:.85;}
 
 /* Stats row */
 .rpc-stats{display:flex;gap:0;align-items:flex-end;}
@@ -4727,7 +4734,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 .rpc-stat-lbl{font-size:9px;color:#71717a;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:5px;}
 .rpc-stat-val{font-size:clamp(16px,2.8vw,22px);font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:-1px;line-height:1;}
 .rpc-stat-sub{font-size:9px;color:#71717a;margin-top:3px;font-family:'JetBrains Mono',monospace;}
-.rpc-val-pos{color:#22c55e;}.rpc-val-neg{color:#ef4444;}.rpc-val-pur{color:#a78bfa;}.rpc-val-neu{color:#f4f4f5;}
+.rpc-val-pos{color:#22c55e;}.rpc-val-neg{color:#ef4444;}.rpc-val-pur{color:#c4b5fd;}.rpc-val-neu{color:#f4f4f5;}
 
 /* Mini equity bars */
 .rpc-bars{display:flex;align-items:flex-end;gap:3px;height:32px;}
@@ -4743,7 +4750,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
 .rc-act-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;font-size:12px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;transition:all .2s;letter-spacing:.3px;min-width:130px;}
 .rc-act-primary{background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;border:none;box-shadow:0 4px 20px rgba(139,92,246,.35);}
 .rc-act-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 6px 24px rgba(139,92,246,.5);}
-.rc-act-secondary{background:rgba(255,255,255,.05);color:#a78bfa;border:1px solid rgba(139,92,246,.3);}
+.rc-act-secondary{background:rgba(255,255,255,.05);color:#c4b5fd;border:1px solid rgba(139,92,246,.3);}
 .rc-act-secondary:hover{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.5);}
 .rc-act-ghost{background:rgba(255,255,255,.03);color:#a1a1aa;border:1px solid rgba(255,255,255,.08);}
 .rc-act-ghost:hover{background:rgba(255,255,255,.06);color:#a1a1aa;}
@@ -4918,7 +4925,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
         <div style="font-size:10px;color:var(--text3);margin-top:4px">Berapa target P&L kamu bulan ini?</div>
       </div>
       <div>
-        <label class="fl" style="margin-bottom:5px"><i class="bi bi-bullseye" style="color:#a78bfa;margin-right:4px"></i>Target Win Rate (%)</label>
+        <label class="fl" style="margin-bottom:5px"><i class="bi bi-bullseye" style="color:#c4b5fd;margin-right:4px"></i>Target Win Rate (%)</label>
         <div style="position:relative">
           <input class="fi" type="number" id="goals-in-wr" placeholder="60" min="0" max="100" step="1">
           <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);font-family:var(--mono)">%</span>
@@ -5143,7 +5150,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             </div>
           </div>
           <div class="fgg">
-            <label class="fl"><i class="bi bi-box-arrow-right" style="margin-right:3px;color:#a78bfa"></i>Exit Price</label>
+            <label class="fl"><i class="bi bi-box-arrow-right" style="margin-right:3px;color:#c4b5fd"></i>Exit Price</label>
             <div style="position:relative">
               <input class="fi" type="number" id="f-ex" placeholder="0.00000" step="any" oninput="calcRR()">
               <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3);font-family:var(--mono)">price</span>
@@ -5209,7 +5216,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           </button>
           <button type="button" class="result-btn" id="res-be" onclick="setResult('Breakeven')"
             style="padding:11px 8px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;color:var(--text2)">
-            <i class="bi bi-dash-circle-fill" style="font-size:15px;color:#a78bfa"></i> BE
+            <i class="bi bi-dash-circle-fill" style="font-size:15px;color:#c4b5fd"></i> BE
           </button>
         </div>
         <input type="hidden" id="f-res" value="Win">
@@ -5322,7 +5329,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
           </button>
           <button type="button" class="emotion-btn" data-em="FOMO" onclick="setEmotion('FOMO')"
             style="padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px">
-            <i class="bi bi-lightning-charge" style="color:#a78bfa;font-size:13px"></i> FOMO
+            <i class="bi bi-lightning-charge" style="color:#c4b5fd;font-size:13px"></i> FOMO
           </button>
           <button type="button" class="emotion-btn" data-em="Impatient" onclick="setEmotion('Impatient')"
             style="padding:9px 6px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-family:var(--font);transition:all .18s;font-size:11px;font-weight:500;color:var(--text2);display:flex;align-items:center;justify-content:center;gap:5px">
@@ -5460,7 +5467,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       <div id="share-preview" style="border-radius:16px;margin-bottom:16px;font-family:'Syne',-apple-system,sans-serif;position:relative;overflow:hidden;transition:all .3s">
 
         <!-- DARK TEMPLATE (default) -->
-        <div id="sp-tpl-dark" style="background:linear-gradient(145deg,#0d0d14 0%,#130e2a 45%,#09131f 100%);padding:26px 24px">
+        <div id="sp-tpl-dark" style="background:linear-gradient(145deg,#000000 0%,#0a061a 45%,#020810 100%);padding:26px 24px">
 
           <!-- Noise overlay -->
           <div style="position:absolute;inset:0;opacity:.025;pointer-events:none;background-image:url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E')"></div>
@@ -5475,7 +5482,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
               <div id="sp-avatar" style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#7c6af7,#5b21b6);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff;flex-shrink:0;overflow:hidden;border:1.5px solid rgba(139,92,246,.45)"></div>
               <div>
                 <div id="sp-name" style="font-size:15px;font-weight:800;color:#f4f4f5;line-height:1.2;letter-spacing:-.3px"></div>
-                <div style="font-size:9px;color:rgba(167,139,250,.7);font-family:'JetBrains Mono',monospace;margin-top:2px;letter-spacing:.5px;text-transform:uppercase">Trader</div>
+                <div style="font-size:9px;color:rgba(196,181,253,.7);font-family:'JetBrains Mono',monospace;margin-top:2px;letter-spacing:.5px;text-transform:uppercase">Trader</div>
               </div>
             </div>
             <div style="text-align:right">
@@ -5513,7 +5520,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             <div style="flex:1;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.15);border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:10px">
               <div>
                 <div style="font-size:8px;color:#a1a1aa;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Avg R:R</div>
-                <div id="sp-rr" style="font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#a78bfa">—</div>
+                <div id="sp-rr" style="font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#c4b5fd">—</div>
               </div>
               <div style="width:1px;height:24px;background:rgba(255,255,255,.07)"></div>
               <div>
@@ -5602,7 +5609,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
             <div style="flex:1;border-top:1px solid rgba(139,92,246,.15);padding-top:10px;display:flex;gap:16px">
               <div>
                 <div style="font-size:7px;color:rgba(139,92,246,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;font-family:'JetBrains Mono',monospace">AVG R:R</div>
-                <div id="sp-rr-n" style="font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#a78bfa;text-shadow:0 0 10px rgba(167,139,250,.4)">—</div>
+                <div id="sp-rr-n" style="font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#c4b5fd;text-shadow:0 0 10px rgba(196,181,253,.4)">—</div>
               </div>
               <div>
                 <div style="font-size:7px;color:rgba(139,92,246,.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;font-family:'JetBrains Mono',monospace">STREAK</div>
@@ -6254,7 +6261,7 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
       var grade, gradeColor, gradeMsg;
       if(score>=85)      { grade='S'; gradeColor='#f59e0b'; gradeMsg='Elite Trader 🏆'; }
       else if(score>=70) { grade='A'; gradeColor='#22c55e'; gradeMsg='Konsisten & Profitable ⚡'; }
-      else if(score>=55) { grade='B'; gradeColor='#a78bfa'; gradeMsg='On The Right Track 📈'; }
+      else if(score>=55) { grade='B'; gradeColor='#c4b5fd'; gradeMsg='On The Right Track 📈'; }
       else if(score>=40) { grade='C'; gradeColor='#22d3ee'; gradeMsg='Terus Berkembang 💪'; }
       else if(n>0)       { grade='D'; gradeColor='#ef4444'; gradeMsg='Perlu Evaluasi 🔍'; }
       else               { grade='—'; gradeColor='rgba(255,255,255,.25)'; gradeMsg='Log trade pertamamu 🚀'; }
@@ -7072,7 +7079,7 @@ function _initLoginPreview() {
       const pct = Math.round((v/max)*100);
       const isLast = i === data.length - 1;
       bar.style.cssText = `flex:1;height:${pct}%;border-radius:2px 2px 0 0;transition:height .3s;` +
-        `background:${isLast ? 'linear-gradient(180deg,#a78bfa,#7c3aed)' : `rgba(0,217,126,${0.2 + 0.5*(i/data.length)})`}`;
+        `background:${isLast ? 'linear-gradient(180deg,#c4b5fd,#7c3aed)' : `rgba(0,217,126,${0.2 + 0.5*(i/data.length)})`}`;
       barsEl.appendChild(bar);
     });
   }
@@ -7416,7 +7423,7 @@ function _showPostTradeInsight(newTrade) {
   if (!trades || trades.length < 5) return;
 
   const hist = trades.filter(t => t.firestoreId !== newTrade.firestoreId);
-  let msg = null, color = '#a78bfa', icon = '💡';
+  let msg = null, color = '#c4b5fd', icon = '💡';
 
   // Check: how does user do with this pair historically?
   if (newTrade.pair) {
@@ -7601,7 +7608,7 @@ window.setEmotion = function(em) {
 
 // ── TRADE SELF RATING ─────────────────────────────────
 const _RATING_LABELS = ['','Buruk','Di bawah rata-rata','Rata-rata','Bagus','Eksekusi sempurna'];
-const _RATING_COLORS = ['','#ff4d4d','#fb923c','#f59e0b','#00d97e','#a78bfa'];
+const _RATING_COLORS = ['','#ff4d4d','#fb923c','#f59e0b','#00d97e','#c4b5fd'];
 window.setTradeRating = function(r) {
   $('f-rating').value = r;
   document.querySelectorAll('.star-btn').forEach(b => {
@@ -8256,7 +8263,7 @@ function _detectTraderType(tArr) {
     return { label: `${sesName} Trader`, icon: '🕐', color: '#00d97e', desc: `Mayoritas trading di sesi ${topSes[0]}`, meta: `${Math.round(topSesPct*100)}% trades di ${sesName} · ${tArr.length} total` };
   }
   if (topPairPct >= 0.6 && topPair) {
-    return { label: 'Specialist', icon: '🎯', color: '#a78bfa', desc: `Fokus pada ${topPair[0]} — edge yang terdefinisi`, meta: `${Math.round(topPairPct*100)}% trades di ${topPair[0]} · ${tArr.length} total` };
+    return { label: 'Specialist', icon: '🎯', color: '#c4b5fd', desc: `Fokus pada ${topPair[0]} — edge yang terdefinisi`, meta: `${Math.round(topPairPct*100)}% trades di ${topPair[0]} · ${tArr.length} total` };
   }
   if (freqPerWeek >= 10) {
     return { label: 'Active Trader', icon: '📊', color: '#fb923c', desc: 'Frekuensi tinggi, aktif mengambil peluang', meta: `~${freqPerWeek.toFixed(1)} trades/minggu` };
@@ -8330,7 +8337,7 @@ function _detectPatterns(tArr) {
   if (bestDay && bestDay[1] > 30 && bestDay[0] !== worstDay?.[0]) {
     const wr = Math.round((dowW[bestDay[0]]||0) / dowN[bestDay[0]] * 100);
     insights.push({
-      icon: '📅', color: '#a78bfa', priority: 6,
+      icon: '📅', color: '#c4b5fd', priority: 6,
       title: `${dowNames[bestDay[0]]} — Hari paling profitable`,
       desc: `+$${parseFloat(bestDay[1]).toFixed(0)} · ${wr}% WR dari ${dowN[bestDay[0]]} trade. Prioritaskan hari ini.`,
     });
@@ -8733,7 +8740,7 @@ function lineChartBase(yFmt, labelFmt) {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: '#1a1a1e',
+        backgroundColor: '#111111',
         borderColor: 'rgba(255,255,255,0.12)',
         borderWidth: 1,
         titleColor: '#666',
@@ -9331,7 +9338,7 @@ function getArchetype(s){
 }
 function renderDNA(){
   const scores=calcDNA(trades);
-  const colors=['#00d97e','#8b5cf6','rgba(255,255,255,0.5)','#22c55e','#a78bfa','rgba(255,255,255,0.4)'];
+  const colors=['#00d97e','#8b5cf6','rgba(255,255,255,0.5)','#22c55e','#c4b5fd','rgba(255,255,255,0.4)'];
   scores.forEach((s,i)=>{
     const b=$('dna-b'+i),v=$('dna-v'+i);
     if(b)setTimeout(()=>{b.style.width=s+'%';},i*60);
@@ -9612,7 +9619,7 @@ function renderTable(){
     let badges = '';
     const starLabels=['','Buruk','Di bawah rata-rata','Rata-rata','Bagus','Sempurna'];
     if (t.rating > 0) {
-      const starColor = t.rating >= 4 ? '#a78bfa' : t.rating >= 3 ? '#f59e0b' : '#71717a';
+      const starColor = t.rating >= 4 ? '#c4b5fd' : t.rating >= 3 ? '#f59e0b' : '#71717a';
       const rInt = Math.min(5, Math.max(1, parseInt(t.rating)||0));
       badges += `<span title="${escHtml(starLabels[rInt]||'')}" style="font-size:10px;color:${starColor};letter-spacing:0">${'★'.repeat(rInt)}</span>`;
     }
@@ -9620,7 +9627,7 @@ function renderTable(){
       const mkCount = String(t.mistakes).split(',').filter(Boolean).length;
       badges += ` <span title="Mistake: ${escHtml(String(t.mistakes))}" style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:rgba(255,77,77,.2);border:1px solid rgba(255,77,77,.3);font-size:8px;color:#ff4d4d;font-weight:700;font-family:var(--mono)">${mkCount}</span>`;
     }
-    const emColors={'FOMO':'#a78bfa','Revenge':'#ff4d4d','Impatient':'#fb923c','Anxious':'#f59e0b','Calm':'#00d97e','Confident':'#38bdf8'};
+    const emColors={'FOMO':'#c4b5fd','Revenge':'#ff4d4d','Impatient':'#fb923c','Anxious':'#f59e0b','Calm':'#00d97e','Confident':'#38bdf8'};
     if (t.emotion && emColors[t.emotion]) {
       badges += ` <span title="${escHtml(t.emotion)}" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${emColors[t.emotion]};flex-shrink:0;vertical-align:middle"></span>`;
     }
@@ -9930,7 +9937,7 @@ function _renderRatingInsight(ft) {
     if (t.result === 'Win') byRating[t.rating].wins++;
   });
   const STAR_LABELS = ['','Buruk','Di bawah rata-rata','Rata-rata','Bagus','Sempurna'];
-  const STAR_COLORS = ['','#ff4d4d','#fb923c','#f59e0b','#00d97e','#a78bfa'];
+  const STAR_COLORS = ['','#ff4d4d','#fb923c','#f59e0b','#00d97e','#c4b5fd'];
 
   // Find best performing rating for highlight
   const bestRating = [1,2,3,4,5].filter(r => byRating[r])
@@ -10306,7 +10313,7 @@ function renderFinance() {
   finLineC=new Chart($('finLineC').getContext('2d'),{
     type:'line',
     data:{labels:lineLabels,datasets:[
-      {label:'Pemasukan',data:allM.map(m=>inMap[m]||0),borderColor:'#a78bfa',backgroundColor:'rgba(139,92,246,.08)',borderWidth:2,fill:true,tension:.35,pointRadius:allM.length<15?4:0,pointHoverRadius:6,pointBackgroundColor:'#a78bfa',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2},
+      {label:'Pemasukan',data:allM.map(m=>inMap[m]||0),borderColor:'#c4b5fd',backgroundColor:'rgba(139,92,246,.08)',borderWidth:2,fill:true,tension:.35,pointRadius:allM.length<15?4:0,pointHoverRadius:6,pointBackgroundColor:'#c4b5fd',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2},
       {label:'Pengeluaran',data:allM.map(m=>outMap[m]||0),borderColor:'#f472b6',backgroundColor:'rgba(244,114,182,.05)',borderWidth:2,fill:true,tension:.35,pointRadius:allM.length<15?4:0,pointHoverRadius:6,pointBackgroundColor:'#f472b6',pointHoverBorderColor:'#fff',pointHoverBorderWidth:2}
     ]},
     options:lineOpts
@@ -10316,7 +10323,7 @@ function renderFinance() {
   const katMap={};
   ft.filter(t=>t.jenis==='Pemasukan').forEach(t=>{const k=t.kategori||'Lainnya';katMap[k]=(katMap[k]||0)+(t.nominal||0);});
   const katKeys=Object.keys(katMap).sort((a,b)=>katMap[b]-katMap[a]);
-  const katColors={'Produk':'#a78bfa','Jasa':'#7c6af7','Operasional':'#c4b5fd','Marketing':'#f472b6','Lainnya':'rgba(139,92,246,.35)'};
+  const katColors={'Produk':'#c4b5fd','Jasa':'#7c6af7','Operasional':'#c4b5fd','Marketing':'#f472b6','Lainnya':'rgba(139,92,246,.35)'};
   if(finBarC)finBarC.destroy();
   finBarC=new Chart($('finBarC').getContext('2d'),{
     type:'bar',
@@ -10329,7 +10336,7 @@ function renderFinance() {
   if(income>0||expense>0){
     finDonutC=new Chart($('finDonutC').getContext('2d'),{
       type:'doughnut',
-      data:{labels:['Pemasukan','Pengeluaran'],datasets:[{data:[income,expense],backgroundColor:['#a78bfa','#f472b6'],borderWidth:0,hoverOffset:4}]},
+      data:{labels:['Pemasukan','Pengeluaran'],datasets:[{data:[income,expense],backgroundColor:['#c4b5fd','#f472b6'],borderWidth:0,hoverOffset:4}]},
       options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1a1e',borderColor:'rgba(139,92,246,.3)',borderWidth:1,bodyColor:'#f0f0f0',bodyFont:{family:'JetBrains Mono',size:11},padding:10,displayColors:false,callbacks:{label:c=>`${c.label}: ${fRp(c.raw)}`}}}}
     });
   }
@@ -11567,7 +11574,7 @@ window.goPage = function(name) {
     const wrCurEl  = document.getElementById('goal-wr-cur');
     const wrTgtEl  = document.getElementById('goal-wr-target');
     const wrPctEl  = document.getElementById('goal-wr-pct');
-    if (wrCurEl) { wrCurEl.textContent = n > 0 ? curWr.toFixed(1) + '%' : '—'; wrCurEl.setAttribute('fill', curWr >= (hasGoals && _goals.wr ? _goals.wr : 50) ? '#a78bfa' : '#ef4444'); }
+    if (wrCurEl) { wrCurEl.textContent = n > 0 ? curWr.toFixed(1) + '%' : '—'; wrCurEl.setAttribute('fill', curWr >= (hasGoals && _goals.wr ? _goals.wr : 50) ? '#c4b5fd' : '#ef4444'); }
     if (wrTgtEl) wrTgtEl.textContent = hasGoals && _goals.wr ? '/' + _goals.wr + '%' : '';
     const wrRatio = (hasGoals && _goals.wr) ? Math.min(100, Math.max(0, (curWr / _goals.wr) * 100)) : 0;
     _setRing('goal-wr-ring', hasGoals && _goals.wr ? wrRatio : 0);
@@ -11854,7 +11861,7 @@ window.goPage = function(name) {
           const isLast = i === barData.length - 1;
           const isPos = v >= 0;
           b.style.cssText = `width:6px;height:${pct}%;border-radius:2px 2px 0 0;` +
-            `background:${isLast ? 'linear-gradient(180deg,#a78bfa,#7c3aed)' :
+            `background:${isLast ? 'linear-gradient(180deg,#c4b5fd,#7c3aed)' :
               (isPos ? `rgba(139,92,246,${0.25 + 0.5 * (i / barData.length)})` : 'rgba(239,68,68,.35)')};`;
           barsEl.appendChild(b);
         });
@@ -11908,7 +11915,7 @@ window.goPage = function(name) {
       }
       const canvas = await html2canvas(card, {
         scale: 3,
-        backgroundColor: '#080810',
+        backgroundColor: '#000000',
         useCORS: true,
         logging: false,
       });
@@ -12072,7 +12079,7 @@ riskpertrade.me`;
       </button>
 
       <button class="bmp-item" id="bmp-playbook" onclick="bnMoreGo('playbook')">
-        <span class="bmp-icon" style="background:rgba(139,92,246,0.15);color:#a78bfa;"><i class="bi bi-book-half"></i></span>
+        <span class="bmp-icon" style="background:rgba(139,92,246,0.15);color:#c4b5fd;"><i class="bi bi-book-half"></i></span>
         <span class="bmp-label">Playbook</span>
         <i class="bi bi-chevron-right bmp-arrow"></i>
       </button>
