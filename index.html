@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function(){
    ════════════════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#09090b;--bg2:#111114;--bg3:#18181c;--bg4:#222227;
+  --bg:#151515;--bg2:#090909;--bg3:#18181c;--bg4:#222227;
   --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
   --text:#f4f4f5;--text2:#a1a1aa;--text3:#71717a;
   --green:#22c55e;--gd:rgba(34,197,94,0.1);
@@ -798,6 +798,12 @@ select.fi option{background:var(--bg3);}
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--text3);}
 
+/* ── Hide scrollbar on mobile ── */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar { display: none; }
+  html, body { scrollbar-width: none; -ms-overflow-style: none; }
+}
+
 /* ── ONBOARDING TOUR — FIXED & POLISHED ── */
 #onboard-overlay{
   position:fixed;inset:0;
@@ -1006,146 +1012,223 @@ select.fi option{background:var(--bg3);}
 /* ════════════════════════════════════════════════════════════
    §CSS-STICKY-PROFILE — Sticky Mini Profile Navbar
    ════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════
+   STICKY PROFILE BAR — desktop baseline
+   ══════════════════════════════════════ */
 #sticky-profile-bar {
   position: fixed;
   top: 0;
   left: var(--sbw);
   right: 0;
-  height: 52px;
+  height: 50px;
   z-index: 250;
   display: flex;
   align-items: center;
-  padding: 0 24px;
-  gap: 12px;
-  background: rgba(9,9,11,0.88);
-  backdrop-filter: blur(24px) saturate(1.5);
-  -webkit-backdrop-filter: blur(24px) saturate(1.5);
-  border-bottom: 1px solid rgba(139,92,246,0.22);
-  box-shadow: 0 4px 28px rgba(0,0,0,0.45), 0 1px 0 rgba(139,92,246,0.12);
+  padding: 0 28px;
+  gap: 14px;
+  background: rgba(9,9,11,0.82);
+  backdrop-filter: blur(32px) saturate(1.6);
+  -webkit-backdrop-filter: blur(32px) saturate(1.6);
+  border-bottom: 1px solid rgba(255,255,255,0.055);
+  box-shadow: 0 1px 0 rgba(139,92,246,0.10), 0 8px 32px rgba(0,0,0,0.35);
   transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;
-  /* match sidebar transition timing */
-  transition: transform 0.42s cubic-bezier(0.34,1.22,0.64,1),
-              opacity   0.28s ease,
+  transition: transform 0.36s cubic-bezier(0.32,1.18,0.58,1),
+              opacity   0.22s ease,
               left      0.28s cubic-bezier(.4,0,.2,1);
   will-change: transform, opacity;
 }
-/* When sidebar is collapsed on desktop, bar stretches full width */
 .main.off ~ #sticky-profile-bar,
-body.sb-off #sticky-profile-bar {
-  left: 0;
-}
-#sticky-profile-bar::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: linear-gradient(to bottom, var(--accent), #7c3aed);
-  border-radius: 0 2px 2px 0;
-}
+body.sb-off #sticky-profile-bar { left: 0; }
+
 #sticky-profile-bar.spb-visible {
   transform: translateY(0);
   opacity: 1;
   pointer-events: auto;
 }
-#sticky-profile-bar.spb-visible::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(167,139,250,0.07) 50%, transparent 100%);
-  animation: spbShimmer 0.6s ease 0.05s both;
-  pointer-events: none;
-}
-@keyframes spbShimmer {
-  from { transform: translateX(-100%); opacity: 1; }
-  to   { transform: translateX(200%); opacity: 0; }
-}
+
+/* ── Avatar ── */
 #spb-avatar {
-  width: 30px; height: 30px;
-  border-radius: 9px;
-  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), #6d28d9);
   display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 700; color: #fff;
+  font-size: 11px; font-weight: 700; color: #fff;
   flex-shrink: 0;
-  border: 1.5px solid rgba(167,139,250,0.35);
-  box-shadow: 0 0 12px rgba(139,92,246,0.4);
+  border: 1px solid rgba(167,139,250,0.25);
   overflow: hidden;
 }
-#spb-info { flex: 1; min-width: 0; }
+
+/* ── Name + tagline ── */
+#spb-info { flex: 1; min-width: 0; line-height: 1; }
 #spb-name {
   font-size: 12px; font-weight: 700; color: var(--text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  letter-spacing: -.2px; line-height: 1.2;
+  letter-spacing: -.25px;
 }
 #spb-tagline {
-  font-size: 10px; color: var(--accent2);
-  font-family: var(--mono); opacity: 0.7;
+  font-size: 9.5px; color: var(--text3);
+  font-family: var(--mono);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-top: 2px;
+  letter-spacing: .1px;
 }
-#spb-stats { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+/* ── Stat pills ── */
+#spb-stats { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
 .spb-pill {
   display: flex; flex-direction: column; align-items: center;
-  padding: 3px 10px;
-  background: rgba(255,255,255,0.04);
+  padding: 4px 12px;
+  background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 8px; min-width: 52px;
-  transition: background 0.2s, border-color 0.2s;
+  border-radius: 8px;
+  min-width: 50px;
+  transition: background 0.18s, border-color 0.18s;
   cursor: default;
+  line-height: 1;
 }
-.spb-pill:hover { background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.25); }
+.spb-pill:hover { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.20); }
 .spb-pill-val {
-  font-size: 12px; font-weight: 700;
-  font-family: var(--mono); color: var(--text); line-height: 1;
+  font-size: 11.5px; font-weight: 700;
+  font-family: var(--mono); color: var(--text);
 }
 .spb-pill-val.pos { color: var(--green); }
 .spb-pill-val.neg { color: var(--red); }
 .spb-pill-val.neu { color: var(--text2); }
 .spb-pill-lbl {
-  font-size: 9px; color: var(--text3); text-transform: uppercase;
-  letter-spacing: .5px; margin-top: 2px; font-weight: 600;
+  font-size: 8.5px; color: var(--text3); text-transform: uppercase;
+  letter-spacing: .6px; margin-top: 3px; font-weight: 600;
+  font-family: var(--font);
 }
+
+/* ── Log Trade btn ── */
 #spb-log-btn {
   flex-shrink: 0;
-  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  background: var(--accent);
   color: #fff; border: none; border-radius: 8px;
-  padding: 6px 14px; font-size: 11px; font-weight: 700;
-  cursor: pointer; font-family: var(--font); letter-spacing: .3px;
-  box-shadow: 0 2px 10px rgba(139,92,246,0.35);
-  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+  padding: 7px 14px; font-size: 11px; font-weight: 700;
+  cursor: pointer; font-family: var(--font); letter-spacing: .2px;
+  transition: background 0.15s, transform 0.15s;
 }
-#spb-log-btn:hover { opacity:.88; transform:translateY(-1px); box-shadow:0 4px 16px rgba(139,92,246,.5); }
-#spb-log-btn:active { transform:translateY(0); }
+#spb-log-btn:hover { background: #7c3aed; transform: translateY(-1px); }
+#spb-log-btn:active { transform: translateY(0); }
 @media (max-width: 768px) {
+  /* ══════════════════════════════════════════════════════
+     Mobile: iOS-style centered notification popup
+     Melayang di tengah, tidak nempel topbar = no gap
+     Log Trade btn disembunyikan (ada di FAB bottom nav)
+     ══════════════════════════════════════════════════════ */
   #sticky-profile-bar {
-    left: 0;
-    top: 54px;
-    padding: 0 14px;
-    height: 46px;
-    transform: translateY(0) !important;
+    left: 50% !important;
+    right: auto !important;
+    top: 66px !important;
+    width: calc(100vw - 32px) !important;
+    max-width: 380px !important;
+    height: auto !important;
+    padding: 12px 14px !important;
+    border-radius: 20px !important;
+    gap: 11px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+
+    /* ── Liquid glass — truly translucent, background bleeds through ── */
+    background: linear-gradient(
+      148deg,
+      rgba(28,20,42,0.35) 0%,
+      rgba(10,8,14,0.50) 58%,
+      rgba(22,14,34,0.38) 100%
+    ) !important;
+    backdrop-filter: blur(40px) saturate(1.9) brightness(0.80) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(1.9) brightness(0.80) !important;
+
+    border: 1px solid rgba(255,255,255,0.13) !important;
+    border-bottom: 1px solid rgba(139,92,246,0.24) !important;
+
+    box-shadow:
+      0 28px 72px rgba(0,0,0,0.55),
+      0 8px 28px rgba(0,0,0,0.32),
+      inset 0 1px 0 rgba(255,255,255,0.14),
+      inset 0 -1px 0 rgba(120,80,220,0.14) !important;
+
+    /* Hidden: slide up + fade + slight scale */
     opacity: 0;
-    visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.15s ease !important;
+    transform: translateX(-50%) translateY(-14px) scale(0.96) !important;
+    transition:
+      transform 0.34s cubic-bezier(0.22,1,0.36,1),
+      opacity   0.24s ease !important;
+    will-change: transform, opacity;
   }
-  body.spb-dash #sticky-profile-bar {
+
+  /* Visible: drop in */
+  #sticky-profile-bar.spb-visible {
+    transform: translateX(-50%) translateY(0) scale(1) !important;
     opacity: 1 !important;
-    visibility: visible !important;
     pointer-events: auto !important;
   }
-  body.spb-dash #page-dashboard {
-    padding-top: 46px;
+
+  /* Liquid sheen diagonal */
+  #sticky-profile-bar::before {
+    display: block !important;
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      132deg,
+      rgba(255,255,255,0.10) 0%,
+      rgba(255,255,255,0.00) 42%,
+      rgba(139,92,246,0.08) 100%
+    );
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 0;
   }
-  .spb-pill { min-width: 44px; padding: 2px 7px; }
-  .spb-pill-val { font-size: 11px; }
-  .spb-hide-xs { display: none !important; }
+  #sticky-profile-bar::after { display: none !important; }
+  #sticky-profile-bar > * { position: relative; z-index: 1; }
+
+  /* ── Sembunyikan Log Trade (sudah ada di bottom nav FAB) ── */
+  #spb-log-btn { display: none !important; }
+
+  /* Avatar */
+  #spb-avatar {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    font-size: 13px;
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow: none;
+    flex-shrink: 0;
+  }
+
+  /* Info */
+  #spb-name { font-size: 13px; font-weight: 700; letter-spacing: -.3px; }
+  #spb-tagline {
+    font-size: 9.5px;
+    color: var(--text3);
+    margin-top: 2px;
+    opacity: 1;
+    font-family: var(--mono);
+  }
+
+  /* Stats — 4 pills semua tampil karena ada ruang tanpa btn */
+  #spb-stats { gap: 5px; margin-left: auto; flex-shrink: 0; }
+  .spb-hide-xs { display: flex !important; }
+  .spb-pill {
+    min-width: 42px;
+    padding: 4px 9px;
+    border-radius: 9px;
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.08);
+  }
+  .spb-pill-val { font-size: 11.5px; font-weight: 700; }
+  .spb-pill-lbl { font-size: 7.5px; margin-top: 2px; letter-spacing: .5px; }
 }
 
 @media(max-width:768px){
   .topbar{display:flex;}
   .sb-btn{display:none;}
   .sidebar{top:54px;height:calc(100vh - 54px);}
-  .main{margin-left:0!important;padding:14px;padding-top:54px;padding-bottom:84px;}
+  .main{margin-left:0!important;padding:14px;padding-top:16px;padding-bottom:84px;}
   .stats{grid-template-columns:repeat(2,1fr);}
   .g2,.g3{grid-template-columns:1fr;}
   .ftg{grid-template-columns:1fr 1fr;}
@@ -1251,32 +1334,120 @@ body.sb-off #sticky-profile-bar {
 }
 
 /* ── MORE POPUP ── */
-@keyframes morePopIn{
-  from{opacity:0;transform:scale(0.88) translateY(10px);}
-  to{opacity:1;transform:scale(1) translateY(0);}
+/* ══════════════════════════════════════
+   MORE POPUP — liquid glass bottom sheet
+   ══════════════════════════════════════ */
+@keyframes morePopIn {
+  from { opacity:0; transform: translateY(12px) scale(0.95); }
+  to   { opacity:1; transform: translateY(0)    scale(1);    }
 }
-.bmp-item{
-  display:flex;align-items:center;gap:10px;
-  width:100%;border:none;background:none;
-  padding:9px 10px;border-radius:12px;
-  cursor:pointer;text-align:left;
-  transition:background .15s;
-  -webkit-tap-highlight-color:transparent;
+
+/* Wrapper — bottom right, above bottom nav (posisi asli) */
+#bn-more-popup {
+  display: none;
+  position: fixed !important;
+  bottom: 78px !important;
+  right: 10px !important;
+  left: auto !important;
+  transform: none !important;
+  width: 230px !important;
+  max-width: 230px !important;
+  z-index: 600;
 }
-.bmp-item:active,.bmp-item:hover{background:rgba(255,255,255,0.05);}
-.bmp-item.active-page{background:rgba(139,92,246,0.12);}
-.bmp-icon{
-  width:32px;height:32px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:15px;flex-shrink:0;
+
+/* Glass card */
+#bn-more-popup > div:last-child {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px !important;
+  border: 1px solid rgba(255,255,255,0.11) !important;
+  border-bottom: 1px solid rgba(139,92,246,0.18) !important;
+
+  /* liquid glass */
+  background: linear-gradient(
+    150deg,
+    rgba(30,22,44,0.42) 0%,
+    rgba(10,8,14,0.58) 55%,
+    rgba(24,16,36,0.46) 100%
+  ) !important;
+  backdrop-filter: blur(44px) saturate(1.9) brightness(0.78) !important;
+  -webkit-backdrop-filter: blur(44px) saturate(1.9) brightness(0.78) !important;
+
+  box-shadow:
+    0 32px 80px rgba(0,0,0,0.68),
+    0 8px 24px rgba(0,0,0,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.11),
+    inset 0 -1px 0 rgba(120,80,220,0.11) !important;
+
+  animation: morePopIn .26s cubic-bezier(0.22,1,0.36,1) !important;
 }
-.bmp-label{
-  font-size:13px;font-weight:600;color:#e4e4e7;
-  font-family:'Syne',sans-serif;flex:1;
+
+/* Sheen overlay */
+#bn-more-popup > div:last-child::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.08) 0%,
+    rgba(255,255,255,0.00) 45%,
+    rgba(139,92,246,0.07) 100%
+  );
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
 }
-.bmp-arrow{
-  font-size:10px;color:rgba(255,255,255,0.18);
-  flex-shrink:0;
+#bn-more-popup > div:last-child > * { position: relative; z-index: 1; }
+
+/* Sembunyikan panah bawah (tidak relevan saat centered) */
+#bn-more-popup > div:last-child > div:last-child[style*="bottom:-8px"] {
+  display: none !important;
+}
+
+/* Section header */
+.bmp-section-lbl {
+  padding: 11px 16px 6px;
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.28);
+  text-transform: uppercase; letter-spacing: 1.3px;
+  font-family: var(--font);
+}
+
+/* Divider */
+.bmp-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 0 12px;
+}
+
+/* Menu items */
+.bmp-item {
+  display: flex; align-items: center; gap: 11px;
+  width: 100%; border: none; background: none;
+  padding: 9px 12px; border-radius: 12px;
+  cursor: pointer; text-align: left;
+  transition: background .14s;
+  -webkit-tap-highlight-color: transparent;
+  color: inherit;
+}
+.bmp-item:active, .bmp-item:hover {
+  background: rgba(255,255,255,0.07);
+}
+.bmp-item.active-page {
+  background: rgba(139,92,246,0.14);
+}
+.bmp-icon {
+  width: 33px; height: 33px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.bmp-label {
+  font-size: 13px; font-weight: 600; color: #e4e4e7;
+  font-family: var(--font); flex: 1;
+}
+.bmp-arrow {
+  font-size: 10px; color: rgba(255,255,255,0.16);
+  flex-shrink: 0;
 }
 
 /* ── DASHBOARD TWO-COLUMN LAYOUT ── */
@@ -2970,36 +3141,58 @@ span[style*="font-size:9px"][style*="background:rgba(124,106,247"]{
     <div class="dash-main-col">
 
     <!-- Trader Identity Card (shown when logged in) — includes Starting Balance -->
-    <div id="trader-card" style="display:none;background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(124,58,237,.06));border:1px solid rgba(139,92,246,.25);border-radius:16px;padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden">
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(167,139,250,.08),transparent 60%);pointer-events:none"></div>
-      <!-- Row 1: Avatar + Name + Share -->
-      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:relative">
-        <!-- Avatar -->
-        <div id="tc-avatar" style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;border:2px solid rgba(167,139,250,.3);box-shadow:0 0 20px rgba(139,92,246,.3)"></div>
-        <!-- Info -->
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <div id="tc-greeting" style="font-size:12px;color:var(--text2);font-weight:500">Selamat datang,</div>
-            <div id="tc-name" style="font-size:16px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.3px"></div>
+    <!-- ── TRADER CARD (redesigned) ── -->
+    <div id="trader-card" style="display:none;position:relative;border-radius:20px;margin-bottom:16px;overflow:hidden;background:linear-gradient(145deg,#0f0e17,#130f20);border:1px solid rgba(139,92,246,.2);box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 0 1px rgba(139,92,246,.08)">
+
+      <!-- Ambient glow blobs -->
+      <div style="position:absolute;top:-60px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.18),transparent 65%);pointer-events:none"></div>
+      <div style="position:absolute;bottom:-50px;left:10px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.1),transparent 65%);pointer-events:none"></div>
+
+      <!-- Subtle dot-grid texture -->
+      <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(167,139,250,.25) 1px,transparent 1px);background-size:22px 22px;opacity:.04;pointer-events:none"></div>
+
+      <!-- Top accent line -->
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.6) 40%,rgba(139,92,246,.4) 70%,transparent);pointer-events:none"></div>
+
+      <!-- Card content -->
+      <div style="position:relative;padding:18px 20px">
+
+        <!-- Main row: Avatar | Name+tagline | Balance | Share -->
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+
+          <!-- Avatar with ring -->
+          <div style="position:relative;flex-shrink:0">
+            <div style="position:absolute;inset:-3px;border-radius:17px;background:linear-gradient(135deg,rgba(139,92,246,.6),rgba(124,58,237,.3),transparent);z-index:0"></div>
+            <div id="tc-avatar" style="position:relative;z-index:1;width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;color:#fff;overflow:hidden;font-family:var(--font)"></div>
           </div>
-          <div id="tc-tagline" style="font-size:11px;color:var(--accent2);margin-top:4px;font-family:var(--mono);opacity:.8"><i class="bi bi-graph-up-arrow" style="margin-right:3px"></i> Konsisten adalah kunci</div>
+
+          <!-- Name + greeting + tagline -->
+          <div style="flex:1;min-width:120px">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">
+              <span id="tc-greeting" style="font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.2px">Selamat datang,</span>
+            </div>
+            <div id="tc-name" style="font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15;font-family:var(--font)"></div>
+            <div id="tc-tagline" style="margin-top:5px;display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);font-size:10px;font-weight:600;color:var(--accent2);font-family:var(--mono);letter-spacing:.3px"><i class="bi bi-graph-up-arrow" style="font-size:9px"></i> Konsisten adalah kunci</div>
+          </div>
+
+          <!-- Vertical divider (desktop) -->
+          <div style="width:1px;height:48px;background:linear-gradient(180deg,transparent,rgba(139,92,246,.2) 40%,rgba(139,92,246,.2) 60%,transparent);flex-shrink:0;display:none" class="tc-vdiv"></div>
+
+          <!-- Balance block -->
+          <div id="bbal-wrap" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+            <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;font-weight:700">Starting Balance</div>
+            <div class="bval" id="bal-banner-btn" style="font-family:var(--mono);font-size:20px;font-weight:700;color:var(--accent2);background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.22);border-radius:10px;padding:5px 13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px">$<span id="bdisp">—</span><span class="bedit" style="font-size:10px;color:var(--text3);font-weight:500">✎ ubah</span></div>
+          </div>
+
+          <!-- Share button -->
+          <button id="share-btn" style="background:rgba(255,255,255,.04);color:var(--text2);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;white-space:nowrap;flex-shrink:0;letter-spacing:.3px;display:flex;align-items:center;gap:6px;align-self:flex-start" title="Bagikan statistik trading kamu" onmouseover="this.style.background='rgba(139,92,246,.15)';this.style.color='var(--accent2)';this.style.borderColor='rgba(139,92,246,.3)'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='var(--text2)';this.style.borderColor='rgba(255,255,255,.08)'">
+            <i class="bi bi-share-fill" style="font-size:11px"></i> Share
+          </button>
+
         </div>
-        <!-- Share button -->
-        <button id="share-btn" style="background:rgba(139,92,246,.15);color:var(--accent2);border:1px solid rgba(139,92,246,.3);border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .2s;white-space:nowrap;flex-shrink:0;letter-spacing:.2px;display:flex;align-items:center;gap:6px" title="Bagikan statistik trading kamu">
-          <i class="bi bi-share-fill" style="font-size:12px"></i> Share Stats
-        </button>
-      </div>
-      <!-- Divider -->
-      <div style="height:1px;background:linear-gradient(90deg,rgba(139,92,246,.25),rgba(139,92,246,.06),transparent);margin:14px 0 12px;position:relative"></div>
-      <!-- Row 2: Starting Balance (merged) -->
-      <div id="bbal-wrap" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:relative">
-        <div>
-          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:4px;">Starting Balance</div>
-          <div style="font-size:12px;color:var(--text2)">Modal awal akun trading kamu</div>
-        </div>
-        <div class="bval" id="bal-banner-btn">$<span id="bdisp">—</span><span class="bedit">✎ ubah</span></div>
       </div>
     </div>
+    <!-- ── END TRADER CARD ── -->
 
     <!-- Guest banner -->
     <div id="guest-banner" style="background:linear-gradient(135deg,rgba(139,92,246,.1),rgba(124,58,237,.05));border:1px solid rgba(139,92,246,.2);border-radius:16px;padding:16px 20px;margin-bottom:16px;position:relative;overflow:hidden">
@@ -12036,22 +12229,13 @@ riskpertrade.me`;
 <!-- ════════════════════════════════════════════════════════════
      §MODAL-MORE — Mobile bottom nav "more" popup
      ════════════════════════════════════════════════════════════ -->
-<div id="bn-more-popup" style="display:none;position:fixed;bottom:72px;right:10px;z-index:600;width:220px;">
+<div id="bn-more-popup" style="display:none;">
   <!-- backdrop tap-to-close -->
   <div id="bn-more-backdrop" onclick="bnMoreClose()" style="position:fixed;inset:0;z-index:-1;"></div>
-  <div style="
-    background:linear-gradient(160deg,#1e1e24 0%,#141418 100%);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:18px;
-    box-shadow:0 8px 40px rgba(0,0,0,0.6),0 0 0 0.5px rgba(255,255,255,0.06);
-    overflow:hidden;
-    animation:morePopIn .22s cubic-bezier(.34,1.56,.64,1);
-  ">
-
-    <!-- Header label -->
-    <div style="padding:12px 16px 8px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.2px;">Menu</div>
+  <div>
 
     <!-- Menu section -->
+    <div class="bmp-section-lbl">Menu</div>
     <div style="padding:0 8px 6px;display:flex;flex-direction:column;gap:2px;">
 
       <button class="bmp-item" id="bmp-calendar" onclick="bnMoreGo('calendar')">
@@ -12075,10 +12259,10 @@ riskpertrade.me`;
     </div>
 
     <!-- Divider -->
-    <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 8px;"></div>
+    <div class="bmp-divider"></div>
 
     <!-- Tools section -->
-    <div style="padding:6px 8px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.2px;padding-left:16px;padding-top:10px;">Tools</div>
+    <div class="bmp-section-lbl">Tools</div>
     <div style="padding:0 8px 6px;display:flex;flex-direction:column;gap:2px;">
 
       <button class="bmp-item" id="bmp-daily" onclick="bnMoreGo('daily')">
@@ -12116,7 +12300,7 @@ riskpertrade.me`;
     </div>
 
     <!-- Divider -->
-    <div style="height:1px;background:rgba(255,255,255,0.06);margin:0 8px;"></div>
+    <div class="bmp-divider"></div>
 
     <!-- Cara Penggunaan -->
     <div style="padding:6px 8px 10px;">
@@ -12130,8 +12314,6 @@ riskpertrade.me`;
       </button>
     </div>
 
-    <!-- Bottom arrow pointer -->
-    <div style="position:absolute;bottom:-8px;right:28px;width:16px;height:16px;background:linear-gradient(135deg,transparent 50%,#141418 50%);border-right:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1);transform:rotate(45deg);"></div>
   </div>
 </div>
 
@@ -14391,25 +14573,17 @@ var _rtInt = setInterval(function() {
     cp('st-n',   'spb-trades');
   }
 
-  function isMobile() {
-    return window.innerWidth <= 768;
-  }
-
   function show() {
+    if (visible) { sync(); return; }
     sync();
     visible = true;
-    if (isMobile()) {
-      document.body.classList.add('spb-dash');
-    } else {
-      bar.classList.add('spb-visible');
-    }
+    bar.classList.add('spb-visible');
   }
 
   function hide() {
+    if (!visible) return;
     visible = false;
     bar.classList.remove('spb-visible');
-    document.body.classList.remove('spb-active');
-    document.body.classList.remove('spb-dash');
   }
 
   function isDashActive() {
@@ -14420,12 +14594,8 @@ var _rtInt = setInterval(function() {
   /* ── (re)attach IntersectionObserver to the right sentinel ── */
   function attachCardObserver() {
     if (cardObs) { cardObs.disconnect(); cardObs = null; }
-    window.removeEventListener('scroll', scrollFallback);
 
     if (!isDashActive()) { hide(); return; }
-
-    // Mobile: always show, no scroll observer
-    if (isMobile()) { show(); return; }
 
     var card   = document.getElementById('trader-card');
     var banner = document.getElementById('guest-banner');
@@ -14507,17 +14677,19 @@ var _rtInt = setInterval(function() {
   function init() {
     bar = document.getElementById('sticky-profile-bar');
     if (!bar) return;
+
     attachPageObserver();
     attachCardObserver();
     hookUpdateAll();
-    window.addEventListener('resize', attachCardObserver);
+
+    // expose debug helpers
     window._spbShow = show;
     window._spbHide = hide;
     window._spbSync = sync;
   }
 
   window.addEventListener('load', function() {
-    setTimeout(init, 200);
+    setTimeout(init, 400);
   });
 
 })();
