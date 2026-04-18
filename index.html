@@ -1022,7 +1022,7 @@ select.fi option{background:var(--bg3);}
   -webkit-backdrop-filter: blur(24px) saturate(1.5);
   border-bottom: 1px solid rgba(139,92,246,0.22);
   box-shadow: 0 4px 28px rgba(0,0,0,0.45), 0 1px 0 rgba(139,92,246,0.12);
-  transform: translateY(-110%);
+  transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;
   /* match sidebar transition timing */
@@ -1117,7 +1117,19 @@ body.sb-off #sticky-profile-bar {
 #spb-log-btn:hover { opacity:.88; transform:translateY(-1px); box-shadow:0 4px 16px rgba(139,92,246,.5); }
 #spb-log-btn:active { transform:translateY(0); }
 @media (max-width: 768px) {
-  #sticky-profile-bar { left: 0; top: 54px; padding: 0 14px; height: 46px; }
+  #sticky-profile-bar {
+    left: 0;
+    top: 54px;
+    padding: 0 14px;
+    height: 46px;
+    /* Hidden state: slide fully up behind the topbar */
+    transform: translateY(-100%);
+  }
+  /* When bar is visible, nudge page content down so nothing hides under bar */
+  body.spb-active #page-dashboard {
+    padding-top: 46px;
+    transition: padding-top 0.28s ease;
+  }
   .spb-pill { min-width: 44px; padding: 2px 7px; }
   .spb-pill-val { font-size: 11px; }
   .spb-hide-xs { display: none !important; }
@@ -14373,17 +14385,23 @@ var _rtInt = setInterval(function() {
     cp('st-n',   'spb-trades');
   }
 
+  function isMobile() {
+    return window.innerWidth <= 768;
+  }
+
   function show() {
     if (visible) { sync(); return; }
     sync();
     visible = true;
     bar.classList.add('spb-visible');
+    if (isMobile()) document.body.classList.add('spb-active');
   }
 
   function hide() {
     if (!visible) return;
     visible = false;
     bar.classList.remove('spb-visible');
+    document.body.classList.remove('spb-active');
   }
 
   function isDashActive() {
