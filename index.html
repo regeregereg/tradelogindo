@@ -8141,19 +8141,32 @@ span[style*="font-size:9px"][style*="background:rgba(201,241,88"]{
 </script>
 
 
-<!-- ── SAFETY SPLASH DISMISS: runs independently of Firebase module ── -->
+<!-- ── SAFETY SPLASH DISMISS + APP SHOW: runs independently of Firebase module ── -->
 <script>
 (function() {
-  // Dismiss splash after 6s max — fallback if Firebase module fails/slow
+  // Dismiss splash + show app after 6s max — fallback if Firebase module fails/slow
   var _safetySplash = setTimeout(function() {
+    // Dismiss splash
     var s = document.getElementById('rpt-splash');
-    if (s) { s.classList.add('hidden'); }
-  }, 6000);
+    if (s) s.classList.add('hidden');
+    // Show sidebar and main if still hidden (module may have failed)
+    var sb   = document.getElementById('sb');
+    var main = document.getElementById('main');
+    var sbbtn = document.getElementById('sb-btn');
+    if (sb   && sb.classList.contains('off'))   sb.classList.remove('off');
+    if (main && main.classList.contains('off')) main.classList.remove('off');
+    if (sbbtn && sbbtn.classList.contains('off')) sbbtn.classList.remove('off');
+    // On mobile, re-hide sidebar
+    if (window.innerWidth <= 768 && sb) sb.classList.add('off');
+    // Show guest banner only if user is not logged in
+    var gb = document.getElementById('guest-banner');
+    if (gb && !window._rptLoggedIn) gb.style.display = 'flex';
+  }, 3000);
   // Also expose so Firebase module can cancel it
   window._safetySplashDismiss = function() {
     clearTimeout(_safetySplash);
     var s = document.getElementById('rpt-splash');
-    if (s) { s.classList.add('hidden'); }
+    if (s) s.classList.add('hidden');
   };
 })();
 </script>
@@ -9206,7 +9219,8 @@ onAuthStateChanged(auth, async user => {
       currentUser = user;
       closeLoginScreen();
       showLoginPanel();
-      setAuthUI(true);
+      window._rptLoggedIn = true;
+    setAuthUI(true);
       setAnonUI(true);
       await loadUserProfile(user);
       listenTrades(user.uid);
@@ -9226,6 +9240,7 @@ onAuthStateChanged(auth, async user => {
     $('login-loading').style.display = 'none';
     closeLoginScreen();
     showLoginPanel();
+    window._rptLoggedIn = true;
     setAuthUI(true);
     setAnonUI(false);
     await loadUserProfile(user);
