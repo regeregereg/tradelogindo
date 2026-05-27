@@ -8140,6 +8140,24 @@ span[style*="font-size:9px"][style*="background:rgba(201,241,88"]{
 
 </script>
 
+
+<!-- ── SAFETY SPLASH DISMISS: runs independently of Firebase module ── -->
+<script>
+(function() {
+  // Dismiss splash after 6s max — fallback if Firebase module fails/slow
+  var _safetySplash = setTimeout(function() {
+    var s = document.getElementById('rpt-splash');
+    if (s) { s.classList.add('hidden'); }
+  }, 6000);
+  // Also expose so Firebase module can cancel it
+  window._safetySplashDismiss = function() {
+    clearTimeout(_safetySplash);
+    var s = document.getElementById('rpt-splash');
+    if (s) { s.classList.add('hidden'); }
+  };
+})();
+</script>
+
 <!-- ════════════════════════════════════════════════════════════
      §SCRIPT-MAIN — Main Application Module
      Firebase Auth + Firestore + semua app logic
@@ -8354,7 +8372,7 @@ function getPeriodLabel() {
 }
 
 // ── SYNC INDICATOR ────────────────────────────────────
-// Safety timeout: always dismiss splash after 4s no matter what
+// Safety timeout: runs inside module as backup (primary is outside module)
 (function() {
   var _splashTimer = setTimeout(function() {
     var s = document.getElementById('rpt-splash');
@@ -8362,6 +8380,8 @@ function getPeriodLabel() {
   }, 4000);
   window._splashDismiss = function() {
     clearTimeout(_splashTimer);
+    // Also cancel the external safety timeout
+    if (window._safetySplashDismiss) window._safetySplashDismiss();
     var s = document.getElementById('rpt-splash');
     if (s) s.classList.add('hidden');
   };
